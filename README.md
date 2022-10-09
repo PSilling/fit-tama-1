@@ -1,2 +1,3 @@
-# fit-tama-1
+# Tabletop Assistant
+
 Project for FIT BUT KNN – Tabletop Assistant
