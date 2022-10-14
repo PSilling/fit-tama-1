@@ -37,24 +37,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Dashboard online demo',
-      onGenerateInitialRoutes: (r) {
-        return r == "/dashboard"
-            ? [
-          MaterialPageRoute(builder: (c) {
-            return const DashboardWidget();
-          })
-        ]
-            : [
-          MaterialPageRoute(builder: (c) {
-            return const MainPage();
-          })
-        ];
-      },
-      initialRoute: "/",
-      routes: {
-        "/": (c) => const MainPage(),
-        "/dashboard": (c) => const DashboardWidget()
-      },
+      home: const MainPage(),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -70,6 +53,7 @@ class MainPage extends StatefulWidget {
 }
 
 class MenuItem {
+  // menu item data - TODO: add hooks to the dashboards
   final String name;
   final int id;
 
@@ -106,9 +90,7 @@ class _MainPageState extends State<MainPage> {
   void _placeholderFc(){}
 
   var editingMode = false;
-  var menuItems = <MenuItem>[
-    MenuItem(name: 'lol', id: 1)
-  ];
+  var menuItems = <MenuItem>[];
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +133,12 @@ class _MainPageState extends State<MainPage> {
                 return GestureDetector(
                     onTap: () {
                       if(!editingMode){
-                        Navigator.pushNamed(context, "/dashboard");
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DashboardWidget(itemData: myMenuItem)
+                            )
+                        );
                       }
                     },
                     onLongPress: () {
@@ -234,7 +221,9 @@ class _MainPageState extends State<MainPage> {
 
 class DashboardWidget extends StatefulWidget {
   ///
-  const DashboardWidget({Key? key}) : super(key: key);
+  final MenuItem itemData;
+
+  const DashboardWidget({Key? key, required this.itemData}) : super(key: key);
 
   ///
   @override
@@ -242,6 +231,7 @@ class DashboardWidget extends StatefulWidget {
 }
 
 class _DashboardWidgetState extends State<DashboardWidget> {
+
   ///
   final ScrollController scrollController = ScrollController();
 
@@ -269,7 +259,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Test title'),
+        title: Text(widget.itemData.name),
         actions: [
           IconButton(
               onPressed: () {
