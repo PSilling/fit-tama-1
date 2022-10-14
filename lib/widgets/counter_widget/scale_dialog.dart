@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:tabletop_assistant/widgets/counter_widget/counter_widget.dart';
 
 class ScaleDialog extends StatefulWidget {
   final void Function(NumberEntry) setCurrentIndex;
@@ -16,17 +17,25 @@ class ScaleDialog extends StatefulWidget {
   factory ScaleDialog(
       {Key? key,
       required int currentIndex,
+      required int scaleLength,
       required void Function(int) setCurrentIndex,
-      required List<int> scale}) {
-    final entryScale = scale
-        .asMap()
-        .entries
-        .map((entry) => NumberEntry(index: entry.key, number: entry.value))
-        .toList();
+      required Widget Function(int) getNumberWidgetAt,
+      required bool isLeftDeath,
+      required bool isRightDeath}) {
+    final List<NumberEntry> leftDeathEntry = isLeftDeath
+        ? [NumberEntry.from(index: -1, getNumberAt: getNumberWidgetAt)]
+        : [];
+    final List<NumberEntry> rightDeathEntry = isRightDeath
+        ? [NumberEntry.from(index: scaleLength, getNumberAt: getNumberWidgetAt)]
+        : [];
+    final entryScale = List.generate(scaleLength,
+        (index) => NumberEntry(index: index, widget: getNumberWidgetAt(index)));
+    final fullScale = leftDeathEntry + entryScale + rightDeathEntry;
+    final currentEntry = fullScale[currentIndex + (isLeftDeath ? 1 : 0)];
     return ScaleDialog._private(
       key: key,
-      scale: entryScale,
-      currentEntry: entryScale[currentIndex],
+      scale: fullScale,
+      currentEntry: currentEntry,
       setCurrentIndex: (entry) => setCurrentIndex(entry.index),
     );
   }
@@ -96,7 +105,7 @@ class ScaleDialogState extends State<ScaleDialog> {
                 });
               },
               style: getButtonStyle(entry: entry),
-              child: Text("${entry.number}"),
+              child: entry.widget,
             );
           }).toList(),
         ),
@@ -123,7 +132,12 @@ class ScaleDialogState extends State<ScaleDialog> {
 class NumberEntry {
   final key = GlobalKey();
   final int index;
-  final int number;
+  final Widget widget;
 
-  NumberEntry({required this.index, required this.number});
+  NumberEntry({required this.index, required this.widget});
+
+  factory NumberEntry.from(
+      {required int index, required Widget Function(int) getNumberAt}) {
+    return NumberEntry(index: index, widget: getNumberAt(index));
+  }
 }

@@ -7,6 +7,10 @@ class CounterWidget extends StatefulWidget {
   final name = "Threat";
   final scale = const [3, 3, 3, 4, 5, 6, 6, 99, 105, 105, 106];
   final defaultIndex = 3;
+  final isLeftDeath = true;
+  final isRightDeath = false;
+
+  static const death = Icon(Icons.sentiment_very_dissatisfied_rounded);
 
   const CounterWidget({super.key});
 
@@ -32,7 +36,8 @@ class CounterWidgetState extends State<CounterWidget> {
   void increaseIndex() {
     setState(() {
       final newIndex = currentIndex + 1;
-      if (newIndex < widget.scale.length) {
+      final deathModifier = widget.isRightDeath ? 1 : 0;
+      if (newIndex < widget.scale.length + deathModifier) {
         currentIndex = newIndex;
       }
     });
@@ -41,7 +46,8 @@ class CounterWidgetState extends State<CounterWidget> {
   void decreaseIndex() {
     setState(() {
       final newIndex = currentIndex - 1;
-      if (newIndex >= 0) {
+      final deathModifier = widget.isLeftDeath ? 1 : 0;
+      if (newIndex >= 0 - deathModifier) {
         currentIndex = newIndex;
       }
     });
@@ -77,10 +83,31 @@ class CounterWidgetState extends State<CounterWidget> {
         context: context,
         builder: (context) {
           return ScaleDialog(
-              scale: widget.scale,
-              currentIndex: currentIndex,
-              setCurrentIndex: setIndex);
+            scaleLength: widget.scale.length,
+            currentIndex: currentIndex,
+            isLeftDeath: widget.isLeftDeath,
+            isRightDeath: widget.isRightDeath,
+            setCurrentIndex: setIndex,
+            getNumberWidgetAt: getNumberWidgetAt,
+          );
         });
+  }
+
+  Widget getNumberWidgetAt(int index, {TextAlign? textAlign, TextStyle? style}) {
+    final number = widget.scale.elementAtOrNull(index);
+    if (number != null) {
+      return Text("$number", textAlign: textAlign, style: style);
+    } else {
+      final leftDeath = widget.isLeftDeath;
+      final rightDeath = widget.isRightDeath;
+      if (leftDeath && index == -1) {
+        return CounterWidget.death;
+      } else if (rightDeath && index == widget.scale.length) {
+        return CounterWidget.death;
+      } else {
+        return Container();
+      }
+    }
   }
 
   Widget titleWidget(BuildContext context) {
@@ -92,7 +119,7 @@ class CounterWidgetState extends State<CounterWidget> {
   }
 
   Widget numberButton(
-      {required int? number,
+      {required int index,
       void Function()? onPressed,
       void Function()? onLongPressed,
       required TextStyle? textStyle,
@@ -107,10 +134,9 @@ class CounterWidgetState extends State<CounterWidget> {
           heightFactor: 0.5,
           child: Opacity(
             opacity: 0.4,
-            child:  FittedBox(
+            child: FittedBox(
               fit: BoxFit.contain,
-              child: Text("${number ?? ""}",
-                  textAlign: textAlign, style: textStyle),
+              child: getNumberWidgetAt(index, textAlign: textAlign, style: textStyle),
             ),
           ),
         ),
@@ -127,7 +153,7 @@ class CounterWidgetState extends State<CounterWidget> {
       child: Row(
         children: [
           numberButton(
-            number: widget.scale.elementAtOrNull(currentIndex - 1),
+            index: currentIndex - 1,
             flex: 4,
             textAlign: TextAlign.right,
             onPressed: decreaseIndex,
@@ -139,15 +165,15 @@ class CounterWidgetState extends State<CounterWidget> {
               onTap: showScale,
               child: FittedBox(
                 fit: BoxFit.contain,
-                child: Text(
-                  "${widget.scale.elementAtOrNull(currentIndex) ?? ""}",
+                child: getNumberWidgetAt(
+                  currentIndex,
                   style: mainNumberStyle,
                 ),
               ),
             ),
           ),
           numberButton(
-            number: widget.scale.elementAtOrNull(currentIndex + 1),
+            index: currentIndex + 1,
             flex: 4,
             textAlign: TextAlign.left,
             onPressed: increaseIndex,
