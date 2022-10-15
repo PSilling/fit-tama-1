@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:tabletop_assistant/helpers.dart';
 
 class ScaleDialog extends StatefulWidget {
-  final void Function(NumberEntry) setCurrentIndex;
-  final List<NumberEntry> scale;
-  final NumberEntry currentEntry;
+  final void Function(IndexedEntry) setCurrentIndex;
+  final List<IndexedEntry> scale;
+  final IndexedEntry currentEntry;
 
   const ScaleDialog._private(
       {super.key,
@@ -19,14 +20,14 @@ class ScaleDialog extends StatefulWidget {
       required Widget Function(int) getNumberWidgetAt,
       required bool isLeftDeath,
       required bool isRightDeath}) {
-    final List<NumberEntry> leftDeathEntry = isLeftDeath
-        ? [NumberEntry.from(index: -1, getNumberAt: getNumberWidgetAt)]
+    final List<IndexedEntry> leftDeathEntry = isLeftDeath
+        ? [IndexedEntry.from(index: -1, getNumberAt: getNumberWidgetAt)]
         : [];
-    final List<NumberEntry> rightDeathEntry = isRightDeath
-        ? [NumberEntry.from(index: scaleLength, getNumberAt: getNumberWidgetAt)]
+    final List<IndexedEntry> rightDeathEntry = isRightDeath
+        ? [IndexedEntry.from(index: scaleLength, getNumberAt: getNumberWidgetAt)]
         : [];
     final entryScale = List.generate(scaleLength,
-        (index) => NumberEntry(index: index, widget: getNumberWidgetAt(index)));
+        (index) => IndexedEntry(index: index, widget: getNumberWidgetAt(index)));
     final fullScale = leftDeathEntry + entryScale + rightDeathEntry;
     final currentEntry = fullScale[currentIndex + (isLeftDeath ? 1 : 0)];
     return ScaleDialog._private(
@@ -38,13 +39,23 @@ class ScaleDialog extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => ScaleDialogState();
+  State<StatefulWidget> createState() => _ScaleDialogState();
 }
 
-class ScaleDialogState extends State<ScaleDialog> {
-  NumberEntry? selectedEntry;
+class _ScaleDialogState extends State<ScaleDialog> {
+  IndexedEntry? _selectedEntry;
 
-  ButtonStyle? getButtonStyle({required NumberEntry entry}) {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => Scrollable.ensureVisible(
+              widget.currentEntry.key.currentContext!,
+              alignment: 0.5,
+            ));
+  }
+  
+  ButtonStyle? _getButtonStyle({required IndexedEntry entry}) {
     const minSize = Size(50, 0);
     final textStyle = Theme.of(context).textTheme.headlineSmall;
     final normal = TextButton.styleFrom(
@@ -64,21 +75,11 @@ class ScaleDialogState extends State<ScaleDialog> {
         textStyle: textStyle);
     if (entry == widget.currentEntry) {
       return current;
-    } else if (entry == selectedEntry) {
+    } else if (entry == _selectedEntry) {
       return selected;
     } else {
       return normal;
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => Scrollable.ensureVisible(
-              widget.currentEntry.key.currentContext!,
-              alignment: 0.5,
-            ));
   }
 
   @override
@@ -94,14 +95,14 @@ class ScaleDialogState extends State<ScaleDialog> {
               key: entry.key,
               onPressed: () {
                 setState(() {
-                  if (selectedEntry == entry || widget.currentEntry == entry) {
-                    selectedEntry = null;
+                  if (_selectedEntry == entry || widget.currentEntry == entry) {
+                    _selectedEntry = null;
                   } else {
-                    selectedEntry = entry;
+                    _selectedEntry = entry;
                   }
                 });
               },
-              style: getButtonStyle(entry: entry),
+              style: _getButtonStyle(entry: entry),
               child: entry.widget,
             );
           }).toList(),
@@ -109,12 +110,10 @@ class ScaleDialogState extends State<ScaleDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: selectedEntry != null
-              ? () {
-                  widget.setCurrentIndex(selectedEntry!);
-                  Navigator.of(context).pop();
-                }
-              : null,
+          onPressed: _selectedEntry.flatMap((entry) => () {
+            widget.setCurrentIndex(entry);
+            Navigator.of(context).pop();
+          }),
           child: const Text("Confirm"),
         ),
         TextButton(
@@ -126,15 +125,15 @@ class ScaleDialogState extends State<ScaleDialog> {
   }
 }
 
-class NumberEntry {
+class IndexedEntry {
   final key = GlobalKey();
   final int index;
   final Widget widget;
 
-  NumberEntry({required this.index, required this.widget});
+  IndexedEntry({required this.index, required this.widget});
 
-  factory NumberEntry.from(
+  factory IndexedEntry.from(
       {required int index, required Widget Function(int) getNumberAt}) {
-    return NumberEntry(index: index, widget: getNumberAt(index));
+    return IndexedEntry(index: index, widget: getNumberAt(index));
   }
 }

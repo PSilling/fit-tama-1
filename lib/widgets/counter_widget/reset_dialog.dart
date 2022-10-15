@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tabletop_assistant/helpers.dart';
 
 class ResetDialog extends StatelessWidget {
   final void Function() resetIndex;
@@ -9,12 +10,8 @@ class ResetDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String titleEnding;
-    if (originalValue != null) {
-      titleEnding = " of $originalValue?";
-    } else {
-      titleEnding = "?";
-    }
+    final titleEnding =
+        "${originalValue.flatMap((value) => " of $value") ?? ""}?";
     return AlertDialog(
       title: Text("Reset counter to original value$titleEnding"),
       actions: [

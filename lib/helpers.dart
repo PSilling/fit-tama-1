@@ -9,7 +9,7 @@ extension ListNullSafety<T> on List<T> {
 }
 
 extension NullableListSafety<T> on List<T?> {
-  /// Maps elements of list to nullable, null elements after mapping are filtered
+  /// Maps elements of list to nullable, null elements after mapping are filtered out
   List<R> compactMap<R>(R? Function(T? element) mapper) {
     var result = <R>[];
     for (final element in this) {

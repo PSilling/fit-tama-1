@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:tabletop_assistant/helpers.dart';
+import 'package:tabletop_assistant/widgets/counter_widget/counter_widget_data.dart';
 import 'package:tabletop_assistant/widgets/counter_widget/edit_dialog.dart';
 import 'package:tabletop_assistant/widgets/counter_widget/reset_dialog.dart';
 import 'package:tabletop_assistant/widgets/counter_widget/scale_dialog.dart';
 import 'package:tabletop_assistant/widgets/editable.dart';
 
 class CounterWidget extends StatefulWidget {
-  static const death = Icon(Icons.sentiment_very_dissatisfied_rounded);
+  static const _death = Icons.sentiment_very_dissatisfied_rounded;
 
   final CounterWidgetData initData;
   const CounterWidget({super.key, required this.initData});
@@ -23,143 +24,146 @@ class CounterWidgetState extends State<CounterWidget>
     boxShadow: [BoxShadow()],
   );
 
-  late CounterWidgetData data;
-  late int currentIndex;
-  var isEditing = false;
+  late CounterWidgetData _data;
+  late int _currentIndex;
+  var _isEditing = false;
 
   @override
-  bool getEditing() => isEditing;
+  bool get isEditing => _isEditing;
 
   @override
-  void setEditing(bool editing) {
+  set isEditing(bool editing) {
     setState(() {
-      isEditing = editing;
+      _isEditing = editing;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    data = widget.initData;
-    currentIndex = data.defaultIndex;
+    _data = widget.initData;
+    _currentIndex = _data.defaultIndex;
   }
 
   void increaseIndex() {
     setState(() {
-      final newIndex = currentIndex + 1;
-      final deathModifier = data.isRightDeath ? 1 : 0;
-      if (newIndex < data.scale.length + deathModifier) {
-        currentIndex = newIndex;
+      final newIndex = _currentIndex + 1;
+      final deathModifier = _data.isRightDeath ? 1 : 0;
+      if (newIndex < _data.scale.length + deathModifier) {
+        _currentIndex = newIndex;
       }
     });
   }
 
   void decreaseIndex() {
     setState(() {
-      final newIndex = currentIndex - 1;
-      final deathModifier = data.isLeftDeath ? 1 : 0;
+      final newIndex = _currentIndex - 1;
+      final deathModifier = _data.isLeftDeath ? 1 : 0;
       if (newIndex >= 0 - deathModifier) {
-        currentIndex = newIndex;
+        _currentIndex = newIndex;
       }
     });
   }
 
   void setIndex(int index) {
     setState(() {
-      currentIndex = index;
+      _currentIndex = index;
     });
   }
 
   void resetIndex() {
     setState(() {
-      currentIndex = data.defaultIndex;
+      _currentIndex = _data.defaultIndex;
     });
   }
 
-  void onLeftTapped() {
-    if (isEditing) {
-      showEditingDialog();
+  void _onLeftTapped() {
+    if (_isEditing) {
+      _showEditingDialog();
     } else {
       decreaseIndex();
     }
   }
 
-  void onRightTapped() {
-    if (isEditing) {
-      showEditingDialog();
+  void _onRightTapped() {
+    if (_isEditing) {
+      _showEditingDialog();
     } else {
       increaseIndex();
     }
   }
 
-  void showResetIndexConfirmation() {
+  void _showResetIndexConfirmation() {
     showDialog(
       context: context,
       builder: (context) => ResetDialog(
-        originalValue: data.scale.elementAtOrNull(data.defaultIndex),
+        originalValue: _data.scale.elementAtOrNull(_data.defaultIndex),
         resetIndex: resetIndex,
       ),
     );
   }
 
-  void showScale() {
+  void _showScale() {
     showDialog(
       context: context,
       builder: (context) => ScaleDialog(
-        scaleLength: data.scale.length,
-        currentIndex: currentIndex,
-        isLeftDeath: data.isLeftDeath,
-        isRightDeath: data.isRightDeath,
+        scaleLength: _data.scale.length,
+        currentIndex: _currentIndex,
+        isLeftDeath: _data.isLeftDeath,
+        isRightDeath: _data.isRightDeath,
         setCurrentIndex: setIndex,
-        getNumberWidgetAt: getNumberWidgetAt,
+        getNumberWidgetAt: _getNumberWidgetAt,
       ),
     );
   }
 
-  void showEditingDialog() {
+  void _showEditingDialog() {
     showDialog(
       context: context,
       builder: (context) => EditDialog(
-        data: data,
+        data: _data,
         setData: (data) {
           setState(() {
-            this.data = data;
-            currentIndex = data.defaultIndex;
+            _data = data;
+            _currentIndex = data.defaultIndex;
           });
         },
       ),
     );
   }
 
-  Widget getNumberWidgetAt(int index,
+  Widget _getNumberWidgetAt(int index,
       {TextAlign? textAlign, TextStyle? style}) {
-    final number = data.scale.elementAtOrNull(index);
+    final number = _data.scale.elementAtOrNull(index);
     if (number != null) {
       return Text("$number", textAlign: textAlign, style: style);
     } else {
-      final leftDeath = data.isLeftDeath;
-      final rightDeath = data.isRightDeath;
+      final leftDeath = _data.isLeftDeath;
+      final rightDeath = _data.isRightDeath;
+      final deathIcon = _themedIcon(CounterWidget._death,
+          context: context, semanticLabel: "Death");
       if (leftDeath && index == -1) {
-        return CounterWidget.death;
-      } else if (rightDeath && index == data.scale.length) {
-        return CounterWidget.death;
+        return deathIcon;
+      } else if (rightDeath && index == _data.scale.length) {
+        return deathIcon;
       } else {
         return Container();
       }
     }
   }
 
-  Widget titleWidget(BuildContext context) {
+  Widget _titleWidget(BuildContext context) {
     final theme = Theme.of(context).textTheme;
     return IgnorePointer(
-        ignoring: isEditing,
-        child: Text(
-          data.name,
-          style: theme.headlineLarge,
-        ));
+      ignoring: _isEditing,
+      child: Text(
+        _data.name,
+        style: theme.headlineLarge,
+      ),
+    );
   }
 
-  Widget numberButton(
+  Widget _numberButton(
       {required int index,
       required TextStyle? textStyle,
       required int flex,
@@ -173,7 +177,7 @@ class CounterWidgetState extends State<CounterWidget>
             opacity: 0.4,
             child: FittedBox(
               fit: BoxFit.contain,
-              child: getNumberWidgetAt(index,
+              child: _getNumberWidgetAt(index,
                   textAlign: textAlign, style: textStyle),
             ),
           ),
@@ -182,7 +186,7 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget numbersSection(BuildContext context) {
+  Widget _numbersSection(BuildContext context) {
     final theme = Theme.of(context);
     final mainNumberStyle =
         theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
@@ -190,8 +194,8 @@ class CounterWidgetState extends State<CounterWidget>
     return Expanded(
       child: Row(
         children: [
-          numberButton(
-            index: currentIndex - 1,
+          _numberButton(
+            index: _currentIndex - 1,
             flex: 4,
             textAlign: TextAlign.right,
             textStyle: secondaryNumberStyle,
@@ -199,16 +203,16 @@ class CounterWidgetState extends State<CounterWidget>
           Expanded(
             flex: 5,
             child: IgnorePointer(
-              ignoring: isEditing,
+              ignoring: _isEditing,
               child: GestureDetector(
-                onTap: showScale,
+                onTap: _showScale,
                 child: FittedBox(
                   fit: BoxFit.contain,
                   child: ConstrainedBox(
                     constraints:
                         const BoxConstraints(minWidth: 1, minHeight: 1),
-                    child: getNumberWidgetAt(
-                      currentIndex,
+                    child: _getNumberWidgetAt(
+                      _currentIndex,
                       style: mainNumberStyle,
                     ),
                   ),
@@ -216,8 +220,8 @@ class CounterWidgetState extends State<CounterWidget>
               ),
             ),
           ),
-          numberButton(
-            index: currentIndex + 1,
+          _numberButton(
+            index: _currentIndex + 1,
             flex: 4,
             textAlign: TextAlign.left,
             textStyle: secondaryNumberStyle,
@@ -227,25 +231,26 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget themedIcon(IconData? icon,
+  Widget _themedIcon(IconData? icon,
       {required BuildContext context, required String semanticLabel}) {
     final iconTheme = Theme.of(context).iconTheme;
+    final textTheme = Theme.of(context).textTheme;
     return Icon(
       icon,
-      color: iconTheme.color,
+      color: textTheme.displayLarge?.color,
       shadows: iconTheme.shadows,
       size: iconTheme.size,
       semanticLabel: semanticLabel,
     );
   }
 
-  Widget buttonsSection(BuildContext context) {
+  Widget _buttonsSection(BuildContext context) {
     return Center(
       child: IgnorePointer(
-        ignoring: isEditing,
+        ignoring: _isEditing,
         child: IconButton(
-          onPressed: showResetIndexConfirmation,
-          icon: themedIcon(Icons.replay,
+          onPressed: _showResetIndexConfirmation,
+          icon: _themedIcon(Icons.replay,
               context: context, semanticLabel: "Reset the counter"),
         ),
       ),
@@ -266,13 +271,13 @@ class CounterWidgetState extends State<CounterWidget>
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onTap: onLeftTapped,
+                  onTap: _onLeftTapped,
                 ),
               ),
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onTap: onRightTapped,
+                  onTap: _onRightTapped,
                 ),
               ),
             ],
@@ -282,30 +287,13 @@ class CounterWidgetState extends State<CounterWidget>
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              titleWidget(context),
-              numbersSection(context),
-              buttonsSection(context),
+              _titleWidget(context),
+              _numbersSection(context),
+              _buttonsSection(context),
             ],
           ),
         ],
       ),
     );
   }
-}
-
-class CounterWidgetData {
-  String name;
-  bool isUneven;
-  List<int> scale;
-  int defaultIndex;
-  bool isLeftDeath;
-  bool isRightDeath;
-
-  CounterWidgetData(
-      {required this.name,
-      required this.isUneven,
-      required this.scale,
-      required this.defaultIndex,
-      required this.isLeftDeath,
-      required this.isRightDeath});
 }
