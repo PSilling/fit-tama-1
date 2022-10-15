@@ -16,8 +16,7 @@ class CounterWidget extends StatefulWidget {
   State<CounterWidget> createState() => CounterWidgetState();
 }
 
-class CounterWidgetState extends State<CounterWidget>
-    implements Editable<CounterWidget> {
+class CounterWidgetState extends State<CounterWidget> implements Editable<CounterWidget> {
   static const decoration = BoxDecoration(
     color: Colors.white,
     borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -132,16 +131,14 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _getNumberWidgetAt(int index,
-      {TextAlign? textAlign, TextStyle? style}) {
+  Widget _getNumberWidgetAt(int index, {TextAlign? textAlign, TextStyle? style}) {
     final number = _data.scale.elementAtOrNull(index);
     if (number != null) {
       return Text("$number", textAlign: textAlign, style: style);
     } else {
       final leftDeath = _data.isLeftDeath;
       final rightDeath = _data.isRightDeath;
-      final deathIcon = _themedIcon(CounterWidget._death,
-          context: context, semanticLabel: "Death");
+      final deathIcon = _themedIcon(CounterWidget._death, context: context, semanticLabel: "Death");
       if (leftDeath && index == -1) {
         return deathIcon;
       } else if (rightDeath && index == _data.scale.length) {
@@ -163,11 +160,7 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _numberButton(
-      {required int index,
-      required TextStyle? textStyle,
-      required int flex,
-      TextAlign? textAlign}) {
+  Widget _numberButton({required int index, required TextStyle? textStyle, required int flex, TextAlign? textAlign}) {
     return Expanded(
       flex: flex,
       child: IgnorePointer(
@@ -177,8 +170,7 @@ class CounterWidgetState extends State<CounterWidget>
             opacity: 0.4,
             child: FittedBox(
               fit: BoxFit.contain,
-              child: _getNumberWidgetAt(index,
-                  textAlign: textAlign, style: textStyle),
+              child: _getNumberWidgetAt(index, textAlign: textAlign, style: textStyle),
             ),
           ),
         ),
@@ -188,8 +180,7 @@ class CounterWidgetState extends State<CounterWidget>
 
   Widget _numbersSection(BuildContext context) {
     final theme = Theme.of(context);
-    final mainNumberStyle =
-        theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
+    final mainNumberStyle = theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
     final secondaryNumberStyle = theme.textTheme.displaySmall;
     return Expanded(
       child: Row(
@@ -209,8 +200,7 @@ class CounterWidgetState extends State<CounterWidget>
                 child: FittedBox(
                   fit: BoxFit.contain,
                   child: ConstrainedBox(
-                    constraints:
-                        const BoxConstraints(minWidth: 1, minHeight: 1),
+                    constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
                     child: _getNumberWidgetAt(
                       _currentIndex,
                       style: mainNumberStyle,
@@ -231,8 +221,7 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _themedIcon(IconData? icon,
-      {required BuildContext context, required String semanticLabel}) {
+  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel}) {
     final iconTheme = Theme.of(context).iconTheme;
     final textTheme = Theme.of(context).textTheme;
     return Icon(
@@ -250,8 +239,7 @@ class CounterWidgetState extends State<CounterWidget>
         ignoring: _isEditing,
         child: IconButton(
           onPressed: _showResetIndexConfirmation,
-          icon: _themedIcon(Icons.replay,
-              context: context, semanticLabel: "Reset the counter"),
+          icon: _themedIcon(Icons.replay, context: context, semanticLabel: "Reset the counter"),
         ),
       ),
     );

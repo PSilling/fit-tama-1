@@ -14,8 +14,7 @@ class DiceWidget extends StatefulWidget {
   State<StatefulWidget> createState() => DiceWidgetState();
 }
 
-class DiceWidgetState extends State<DiceWidget>
-    implements Editable<DiceWidget> {
+class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> {
   static const decoration = BoxDecoration(
     color: Colors.white,
     borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -49,24 +48,21 @@ class DiceWidgetState extends State<DiceWidget>
 
   void rollDice() {
     setState(() {
-      _currentRoll = List.generate(
-          _data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
+      _currentRoll = List.generate(_data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
     });
   }
 
   void _showEditingDialog() {
     showDialog(
-      context: context,
-      builder: (context) => DiceEditDialog(
-        data: _data,
-        setData: (data) {
-          setState(() {
-            _data = data;
-            rollDice();
-          });
-        }
-      )
-    );
+        context: context,
+        builder: (context) => DiceEditDialog(
+            data: _data,
+            setData: (data) {
+              setState(() {
+                _data = data;
+                rollDice();
+              });
+            }));
   }
 
   void _onTap() {
@@ -86,9 +82,7 @@ class DiceWidgetState extends State<DiceWidget>
   Widget _diceText(BuildContext context) {
     final theme = Theme.of(context);
     final textStyle = theme.textTheme.displaySmall;
-    final rollText = _currentRoll
-        .map((element) => "$element")
-        .reduce((value, element) => "$value+$element");
+    final rollText = _currentRoll.map((element) => "$element").reduce((value, element) => "$value+$element");
     return FittedBox(
       fit: BoxFit.contain,
       child: Text(
@@ -100,8 +94,7 @@ class DiceWidgetState extends State<DiceWidget>
 
   Widget _resultText(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle =
-        theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
+    final textStyle = theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
     final result = _currentRoll.reduce((value, element) => value + element);
     return FittedBox(
       fit: BoxFit.contain,
@@ -143,8 +136,7 @@ class DiceWidgetState extends State<DiceWidget>
 
   Widget _configurationWidget(BuildContext context) {
     final theme = Theme.of(context).textTheme;
-    final style =
-        theme.headlineSmall?.copyWith(color: theme.headlineMedium?.color);
+    final style = theme.headlineSmall?.copyWith(color: theme.headlineMedium?.color);
     final text = "${_data.numberOfSides}-sided";
     return Text(text, style: style);
   }

@@ -24,16 +24,13 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
 
   late final _rangeInitialValue = IntRange.from(scale: widget.data.scale);
   final _rangeDefaultSliderKey = GlobalKey<FormBuilderFieldState>();
-  static const _defaultEntryOption =
-      FormBuilderChipOption<String>(value: "Default");
+  static const _defaultEntryOption = FormBuilderChipOption<String>(value: "Default");
 
   @override
   void initState() {
     _isUneven = widget.data.isUneven;
     if (widget.data.isUneven) {
-      final defaultScale = widget.data.scale
-          .map((element) => KeyedEntry(value: element))
-          .toList();
+      final defaultScale = widget.data.scale.map((element) => KeyedEntry(value: element)).toList();
       _keyedScale = defaultScale + [KeyedEntry(value: null)];
       _defaultIndexKey = defaultScale[widget.data.defaultIndex].checkKey;
     } else {
@@ -82,10 +79,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
   }
 
   void _cleanTempScale() {
-    final newState = _keyedScale.compactMap((element) =>
-        (element == _keyedScale.last || element.value != null)
-            ? element
-            : null);
+    final newState =
+        _keyedScale.compactMap((element) => (element == _keyedScale.last || element.value != null) ? element : null);
     setState(() {
       final focused = FocusScope.of(context).focusedChild;
       if (!newState.map((e) => e.focusNode).contains(focused)) {
@@ -97,9 +92,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
 
   void _updateTempScale(String? value, KeyedEntry entry, FormFieldState field) {
     final newValue = value.flatMap((value) => int.tryParse(value));
-    _keyedScale
-        .firstWhere((element) => element.textKey == entry.textKey)
-        .value = newValue;
+    _keyedScale.firstWhere((element) => element.textKey == entry.textKey).value = newValue;
     if (_keyedScale.last.textKey == entry.textKey && newValue != null) {
       _keyedScale.add(KeyedEntry(value: null));
     }
@@ -168,16 +161,14 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
             children: [
               FormBuilderTextField(
                 name: "range_start",
-                initialValue:
-                    widget.data.isUneven ? null : "${_rangeInitialValue.start}",
+                initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.start}",
                 keyboardType: TextInputType.number,
                 onChanged: (value) => _rangeStartChanged(value, field),
                 validator: _numberValidator,
               ),
               FormBuilderTextField(
                 name: "range_end",
-                initialValue:
-                    widget.data.isUneven ? null : "${_rangeInitialValue.end}",
+                initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.end}",
                 keyboardType: TextInputType.number,
                 onChanged: (value) => _rangeEndChanged(value, field),
                 validator: _numberValidator,
@@ -186,14 +177,12 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 FormBuilderSlider(
                   key: _rangeDefaultSliderKey,
                   name: "range_default",
-                  initialValue: widget.data.isUneven
-                      ? field.value!.start!.toDouble()
-                      : widget.data.defaultIndex.toDouble(),
+                  initialValue:
+                      widget.data.isUneven ? field.value!.start!.toDouble() : widget.data.defaultIndex.toDouble(),
                   min: min(field.value!.start!, field.value!.end!).toDouble(),
                   max: max(field.value!.start!, field.value!.end!).toDouble(),
                   divisions: (field.value!.start! - field.value!.end!).abs(),
-                  valueTransformer: (value) =>
-                      value.flatMap((value) => value.toInt()),
+                  valueTransformer: (value) => value.flatMap((value) => value.toInt()),
                   onSaved: (value) => widget.data.defaultIndex = value!.toInt(),
                 )
             ],
@@ -209,21 +198,17 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         builder: (FormFieldState field) => InputDecorator(
           decoration: InputDecoration(errorText: field.errorText),
           child: Column(children: [
-            for (var entry in _keyedScale)
-              _scaleTextField(entry: entry, superField: field),
+            for (var entry in _keyedScale) _scaleTextField(entry: entry, superField: field),
           ]),
         ),
         validator: (value) => _scaleValidator(value, scale: _keyedScale),
         onSaved: (key) {
           widget.data.scale = _keyedScale.compactMap((e) => e.value).toList();
-          widget.data.defaultIndex =
-              _keyedScale.indexWhere((element) => element.checkKey == key);
+          widget.data.defaultIndex = _keyedScale.indexWhere((element) => element.checkKey == key);
         },
       );
 
-  Widget _scaleTextField(
-          {required KeyedEntry entry, required FormFieldState superField}) =>
-      FormBuilderField(
+  Widget _scaleTextField({required KeyedEntry entry, required FormFieldState superField}) => FormBuilderField(
         key: entry.mainKey,
         name: "scale_field_${entry.mainKey}",
         builder: (FormFieldState field) => InputDecorator(
@@ -237,10 +222,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                   name: "scale_textfield_${entry.textKey}",
                   initialValue: entry.value.flatMap((value) => "$value"),
                   keyboardType: TextInputType.number,
-                  validator: (value) =>
-                      _numberValidator(value, isRequired: false),
-                  onChanged: (value) =>
-                      _updateTempScale(value, entry, superField),
+                  validator: (value) => _numberValidator(value, isRequired: false),
+                  onChanged: (value) => _updateTempScale(value, entry, superField),
                   onTap: _cleanTempScale,
                 ),
               ),
@@ -250,9 +233,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                     key: entry.checkKey,
                     name: "scale_checkbox_${entry.checkKey}",
                     options: const [_defaultEntryOption],
-                    initialValue: _defaultIndexKey == entry.checkKey
-                        ? _defaultEntryOption.value
-                        : null,
+                    initialValue: _defaultIndexKey == entry.checkKey ? _defaultEntryOption.value : null,
                     onChanged: (value) {
                       if (value != null) {
                         superField.value?.currentState?.didChange(null);
@@ -282,31 +263,25 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               FormBuilderCheckboxGroup<String>(
                 name: "death",
-                initialValue: _DeathOptions.initialValue(
-                    left: widget.data.isLeftDeath,
-                    right: widget.data.isLeftDeath),
+                initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isLeftDeath),
                 options: [
                   _DeathOptions.left.option,
                   _DeathOptions.right.option,
                 ],
                 onSaved: (value) {
-                  widget.data.isLeftDeath =
-                      value!.contains(_DeathOptions.left.label);
-                  widget.data.isRightDeath =
-                      value.contains(_DeathOptions.right.label);
+                  widget.data.isLeftDeath = value!.contains(_DeathOptions.left.label);
+                  widget.data.isRightDeath = value.contains(_DeathOptions.right.label);
                 },
               ),
               FormBuilderRadioGroup<String>(
                   name: "type",
-                  initialValue:
-                      _EvennessOptions.fromData(isUneven: _isUneven).label,
+                  initialValue: _EvennessOptions.fromData(isUneven: _isUneven).label,
                   onChanged: (value) {
                     setState(() {
                       _isUneven = _EvennessOptions.isUneven(value: value);
                     });
                   },
-                  onSaved: (value) => widget.data.isUneven =
-                      _EvennessOptions.isUneven(value: value),
+                  onSaved: (value) => widget.data.isUneven = _EvennessOptions.isUneven(value: value),
                   options: [
                     _EvennessOptions.range.option,
                     _EvennessOptions.scale.option,
@@ -336,8 +311,7 @@ class IntRange {
 
   IntRange(this.start, this.end);
 
-  factory IntRange.from({required List<int> scale}) =>
-      IntRange(scale.first, scale.last);
+  factory IntRange.from({required List<int> scale}) => IntRange(scale.first, scale.last);
 
   bool validate() {
     final start = this.start;
@@ -394,9 +368,7 @@ enum _DeathOptions {
   static List<String> initialValue({required bool left, required bool right}) {
     final leftOption = left ? _DeathOptions.left : null;
     final rightOption = right ? _DeathOptions.right : null;
-    return [leftOption, rightOption]
-        .compactMap((element) => element?.label)
-        .toList();
+    return [leftOption, rightOption].compactMap((element) => element?.label).toList();
   }
 
   String get label {
