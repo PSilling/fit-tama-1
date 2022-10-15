@@ -21,6 +21,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
   late bool _isUneven;
   late List<KeyedEntry> _keyedScale;
   late final GlobalKey? _defaultIndexKey;
+  GlobalKey? _hiddenCurrentIndexKey;
 
   late final _rangeInitialValue = IntRange.from(scale: widget.data.scale);
   final _rangeDefaultSliderKey = GlobalKey<FormBuilderFieldState>();
@@ -97,8 +98,12 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
       _keyedScale.add(KeyedEntry(value: null));
     }
     if (newValue == null && field.value == entry.checkKey) {
-      field.value?.currentState?.didChange(null);
+      print("removed the field");
       field.didChange(null);
+      _hiddenCurrentIndexKey = entry.checkKey;
+    } else if (newValue != null && _hiddenCurrentIndexKey == entry.checkKey) {
+      field.didChange(_hiddenCurrentIndexKey);
+      _hiddenCurrentIndexKey = null;
     }
   }
 
@@ -233,12 +238,17 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                     key: entry.checkKey,
                     name: "scale_checkbox_${entry.checkKey}",
                     options: const [_defaultEntryOption],
-                    initialValue: _defaultIndexKey == entry.checkKey ? _defaultEntryOption.value : null,
+                    initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
                     onChanged: (value) {
+                      if (entry.checkKey == _defaultIndexKey) {
+                        print("value: $value");
+                      }
                       if (value != null) {
                         superField.value?.currentState?.didChange(null);
+                        superField.didChange(entry.checkKey);
+                      } else {
+                        superField.didChange(null);
                       }
-                      superField.didChange(entry.checkKey);
                     },
                   ),
                 ),
@@ -263,7 +273,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               FormBuilderCheckboxGroup<String>(
                 name: "death",
-                initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isLeftDeath),
+                initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isRightDeath),
                 options: [
                   _DeathOptions.left.option,
                   _DeathOptions.right.option,
