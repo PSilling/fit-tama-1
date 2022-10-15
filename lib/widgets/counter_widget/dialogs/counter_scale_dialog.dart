@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:tabletop_assistant/helpers.dart';
 
-class ScaleDialog extends StatefulWidget {
+class CounterScaleDialog extends StatefulWidget {
   final void Function(IndexedEntry) setCurrentIndex;
   final List<IndexedEntry> scale;
   final IndexedEntry currentEntry;
 
-  const ScaleDialog._private(
+  const CounterScaleDialog._private(
       {super.key,
       required this.scale,
       required this.currentEntry,
       required this.setCurrentIndex});
 
-  factory ScaleDialog(
+  factory CounterScaleDialog(
       {Key? key,
       required int currentIndex,
       required int scaleLength,
@@ -24,13 +24,18 @@ class ScaleDialog extends StatefulWidget {
         ? [IndexedEntry.from(index: -1, getNumberAt: getNumberWidgetAt)]
         : [];
     final List<IndexedEntry> rightDeathEntry = isRightDeath
-        ? [IndexedEntry.from(index: scaleLength, getNumberAt: getNumberWidgetAt)]
+        ? [
+            IndexedEntry.from(
+                index: scaleLength, getNumberAt: getNumberWidgetAt)
+          ]
         : [];
-    final entryScale = List.generate(scaleLength,
-        (index) => IndexedEntry(index: index, widget: getNumberWidgetAt(index)));
+    final entryScale = List.generate(
+        scaleLength,
+        (index) =>
+            IndexedEntry(index: index, widget: getNumberWidgetAt(index)));
     final fullScale = leftDeathEntry + entryScale + rightDeathEntry;
     final currentEntry = fullScale[currentIndex + (isLeftDeath ? 1 : 0)];
-    return ScaleDialog._private(
+    return CounterScaleDialog._private(
       key: key,
       scale: fullScale,
       currentEntry: currentEntry,
@@ -39,10 +44,10 @@ class ScaleDialog extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => _ScaleDialogState();
+  State<StatefulWidget> createState() => _CounterScaleDialogState();
 }
 
-class _ScaleDialogState extends State<ScaleDialog> {
+class _CounterScaleDialogState extends State<CounterScaleDialog> {
   IndexedEntry? _selectedEntry;
 
   @override
@@ -54,7 +59,7 @@ class _ScaleDialogState extends State<ScaleDialog> {
               alignment: 0.5,
             ));
   }
-  
+
   ButtonStyle? _getButtonStyle({required IndexedEntry entry}) {
     const minSize = Size(50, 0);
     final textStyle = Theme.of(context).textTheme.headlineSmall;
@@ -111,9 +116,9 @@ class _ScaleDialogState extends State<ScaleDialog> {
       actions: [
         TextButton(
           onPressed: _selectedEntry.flatMap((entry) => () {
-            widget.setCurrentIndex(entry);
-            Navigator.of(context).pop();
-          }),
+                widget.setCurrentIndex(entry);
+                Navigator.of(context).pop();
+              }),
           child: const Text("Confirm"),
         ),
         TextButton(

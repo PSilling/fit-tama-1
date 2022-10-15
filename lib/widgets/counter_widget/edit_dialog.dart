@@ -5,17 +5,18 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:tabletop_assistant/helpers.dart';
 import 'package:tabletop_assistant/widgets/counter_widget/counter_widget_data.dart';
 
-class EditDialog extends StatefulWidget {
+class CounterEditDialog extends StatefulWidget {
   final CounterWidgetData data;
   final void Function(CounterWidgetData) setData;
 
-  const EditDialog({super.key, required this.data, required this.setData});
+  const CounterEditDialog(
+      {super.key, required this.data, required this.setData});
 
   @override
-  State<StatefulWidget> createState() => _EditDialogState();
+  State<StatefulWidget> createState() => _CounterEditDialogState();
 }
 
-class _EditDialogState extends State<EditDialog> {
+class _CounterEditDialogState extends State<CounterEditDialog> {
   final _formKey = GlobalKey<FormBuilderState>();
 
   late bool _isUneven;

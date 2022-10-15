@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tabletop_assistant/helpers.dart';
 
-class ResetDialog extends StatelessWidget {
+class CounterResetDialog extends StatelessWidget {
   final void Function() resetIndex;
   final int? originalValue;
 
-  const ResetDialog(
+  const CounterResetDialog(
       {super.key, required this.originalValue, required this.resetIndex});
 
   @override

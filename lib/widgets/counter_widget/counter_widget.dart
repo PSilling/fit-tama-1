@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tabletop_assistant/helpers.dart';
 import 'package:tabletop_assistant/widgets/counter_widget/counter_widget_data.dart';
-import 'package:tabletop_assistant/widgets/counter_widget/edit_dialog.dart';
-import 'package:tabletop_assistant/widgets/counter_widget/reset_dialog.dart';
-import 'package:tabletop_assistant/widgets/counter_widget/scale_dialog.dart';
+import 'package:tabletop_assistant/widgets/counter_widget/dialogs/counter_edit_dialog.dart';
+import 'package:tabletop_assistant/widgets/counter_widget/dialogs/counter_reset_dialog.dart';
+import 'package:tabletop_assistant/widgets/counter_widget/dialogs/counter_scale_dialog.dart';
 import 'package:tabletop_assistant/widgets/editable.dart';
 
 class CounterWidget extends StatefulWidget {
@@ -96,7 +96,7 @@ class CounterWidgetState extends State<CounterWidget>
   void _showResetIndexConfirmation() {
     showDialog(
       context: context,
-      builder: (context) => ResetDialog(
+      builder: (context) => CounterResetDialog(
         originalValue: _data.scale.elementAtOrNull(_data.defaultIndex),
         resetIndex: resetIndex,
       ),
@@ -106,7 +106,7 @@ class CounterWidgetState extends State<CounterWidget>
   void _showScale() {
     showDialog(
       context: context,
-      builder: (context) => ScaleDialog(
+      builder: (context) => CounterScaleDialog(
         scaleLength: _data.scale.length,
         currentIndex: _currentIndex,
         isLeftDeath: _data.isLeftDeath,
@@ -120,7 +120,7 @@ class CounterWidgetState extends State<CounterWidget>
   void _showEditingDialog() {
     showDialog(
       context: context,
-      builder: (context) => EditDialog(
+      builder: (context) => CounterEditDialog(
         data: _data,
         setData: (data) {
           setState(() {
