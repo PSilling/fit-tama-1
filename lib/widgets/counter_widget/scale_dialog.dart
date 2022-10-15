@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:tabletop_assistant/widgets/counter_widget/counter_widget.dart';
 
 class ScaleDialog extends StatefulWidget {
   final void Function(NumberEntry) setCurrentIndex;
