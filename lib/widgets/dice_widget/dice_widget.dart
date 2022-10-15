@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:tabletop_assistant/widgets/dice_widget/dice_edit_dialog.dart';
 import 'package:tabletop_assistant/widgets/dice_widget/dice_widget_data.dart';
 import 'package:tabletop_assistant/widgets/editable.dart';
 
@@ -53,10 +54,24 @@ class DiceWidgetState extends State<DiceWidget>
     });
   }
 
+  void _showEditingDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => DiceEditDialog(
+        data: _data,
+        setData: (data) {
+          setState(() {
+            _data = data;
+            rollDice();
+          });
+        }
+      )
+    );
+  }
+
   void _onTap() {
     if (_isEditing) {
-      print("Edit");
-      //showEditingDialog()
+      _showEditingDialog();
     } else if (!_data.longPressToReroll) {
       rollDice();
     }
@@ -109,16 +124,17 @@ class DiceWidgetState extends State<DiceWidget>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              flex: 2,
-              child: FractionallySizedBox(
-                heightFactor: 0.5,
-                child: Opacity(
-                  opacity: 0.4,
-                  child: _diceText(context),
+            if (_data.numberOfDice > 1)
+              Expanded(
+                flex: 2,
+                child: FractionallySizedBox(
+                  heightFactor: 0.5,
+                  child: Opacity(
+                    opacity: 0.4,
+                    child: _diceText(context),
+                  ),
                 ),
               ),
-            ),
             Expanded(
               flex: 1,
               child: _resultText(context),
