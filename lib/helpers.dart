@@ -8,9 +8,9 @@ extension ListNullSafety<T> on List<T> {
   }
 }
 
-extension NullableListSafety<T> on List<T?> {
+extension NullableListSafety<T> on Iterable<T> {
   /// Maps elements of list to nullable, null elements after mapping are filtered out
-  List<R> compactMap<R>(R? Function(T? element) mapper) {
+  Iterable<R> compactMap<R>(R? Function(T element) mapper) {
     var result = <R>[];
     for (final element in this) {
       final mapped = mapper(element);

@@ -68,7 +68,7 @@ class _EditDialogState extends State<EditDialog> {
 
   void _cleanTempScale() {
     final newState = _keyedScale.compactMap((element) =>
-        (element == _keyedScale.last || element?.value != null)
+        (element == _keyedScale.last || element.value != null)
             ? element
             : null);
     setState(() {
@@ -209,7 +209,7 @@ class _EditDialogState extends State<EditDialog> {
           }
         },
         onSaved: (key) {
-          widget.data.scale = _keyedScale.compactMap((e) => e?.value).toList();
+          widget.data.scale = _keyedScale.compactMap((e) => e.value).toList();
           widget.data.defaultIndex =
               _keyedScale.indexWhere((element) => element.checkKey == key);
         },
@@ -386,7 +386,7 @@ enum _DeathOptions {
   static List<String> initialValue({required bool left, required bool right}) {
     final leftOption = left ? _DeathOptions.left : null;
     final rightOption = right ? _DeathOptions.right : null;
-    return [leftOption, rightOption].compactMap((element) => element?.label);
+    return [leftOption, rightOption].compactMap((element) => element?.label).toList();
   }
 
   String get label {
