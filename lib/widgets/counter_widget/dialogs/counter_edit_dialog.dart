@@ -98,7 +98,6 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
       _keyedScale.add(KeyedEntry(value: null));
     }
     if (newValue == null && field.value == entry.checkKey) {
-      print("removed the field");
       field.didChange(null);
       _hiddenCurrentIndexKey = entry.checkKey;
     } else if (newValue != null && _hiddenCurrentIndexKey == entry.checkKey) {
@@ -182,14 +181,16 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 FormBuilderSlider(
                   key: _rangeDefaultSliderKey,
                   name: "range_default",
-                  initialValue:
-                      widget.data.isUneven ? field.value!.start!.toDouble() : widget.data.defaultIndex.toDouble(),
+                  initialValue: field.value!.toScale()[widget.data.defaultIndex].toDouble(),
                   min: min(field.value!.start!, field.value!.end!).toDouble(),
                   max: max(field.value!.start!, field.value!.end!).toDouble(),
                   divisions: (field.value!.start! - field.value!.end!).abs(),
                   valueTransformer: (value) => value.flatMap((value) => value.toInt()),
-                  onSaved: (value) => widget.data.defaultIndex = value!.toInt(),
-                )
+                  onSaved: (value) {
+                    final scale = field.value!.toScale();
+                    widget.data.defaultIndex = scale.indexWhere((element) => element == value);
+                  },
+                ),
             ],
           ),
         ),
@@ -240,9 +241,6 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                     options: const [_defaultEntryOption],
                     initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
                     onChanged: (value) {
-                      if (entry.checkKey == _defaultIndexKey) {
-                        print("value: $value");
-                      }
                       if (value != null) {
                         superField.value?.currentState?.didChange(null);
                         superField.didChange(entry.checkKey);
