@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tabletop_assistant/widgets/dice_widget/dice_edit_dialog.dart';
 import 'package:tabletop_assistant/widgets/dice_widget/dice_widget_data.dart';
 import 'package:tabletop_assistant/widgets/editable.dart';
+import 'package:tabletop_assistant/helpers.dart';
 
 class DiceWidget extends StatefulWidget {
   final DiceWidgetData initData;
@@ -24,7 +25,7 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
   final _random = Random();
 
   late DiceWidgetData _data;
-  late List<int> _currentRoll;
+  List<int>? _currentRoll;
   bool _isEditing = false;
 
   @override
@@ -46,7 +47,11 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
 
   int _randIntFrom1({required int to}) => _random.nextInt(to) + 1;
 
-  void rollDice() {
+  void rollDice() async {
+    setState(() {
+      _currentRoll = null;
+    });
+    await Future.delayed(const Duration(milliseconds: 100));
     setState(() {
       _currentRoll = List.generate(_data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
     });
@@ -82,12 +87,18 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
   Widget _diceText(BuildContext context) {
     final theme = Theme.of(context);
     final textStyle = theme.textTheme.displaySmall;
-    final rollText = _currentRoll.map((element) => "$element").reduce((value, element) => "$value+$element");
+    final rollText = _currentRoll
+      ?.map((element) => "$element")
+      .reduce((value, element) => "$value+$element")
+      .flatMap((value) => "$value=") ?? "";
     return FittedBox(
       fit: BoxFit.contain,
-      child: Text(
-        "$rollText=",
-        style: textStyle,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
+        child: Text(
+          rollText,
+          style: textStyle,
+        ),
       ),
     );
   }
@@ -95,12 +106,15 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
   Widget _resultText(BuildContext context) {
     final theme = Theme.of(context);
     final textStyle = theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
-    final result = _currentRoll.reduce((value, element) => value + element);
+    final result = _currentRoll?.reduce((value, element) => value + element);
     return FittedBox(
       fit: BoxFit.contain,
-      child: Text(
-        "$result",
-        style: textStyle,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
+        child: Text(
+          "${result ?? ""}",
+          style: textStyle,
+        ),
       ),
     );
   }
@@ -162,7 +176,7 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
                 child: _titleWidget(context),
               ),
               Expanded(
-                flex: 3 ,
+                flex: 3,
                 child: _rollWidget(context),
               ),
               Flexible(
