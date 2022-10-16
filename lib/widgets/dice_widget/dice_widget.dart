@@ -156,11 +156,20 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _titleWidget(context),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: _titleWidget(context),
+              ),
               Expanded(
+                flex: 3 ,
                 child: _rollWidget(context),
               ),
-              _configurationWidget(context),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: _configurationWidget(context),
+              )
             ],
           ),
         ),

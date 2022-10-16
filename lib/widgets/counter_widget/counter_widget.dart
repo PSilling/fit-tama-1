@@ -182,42 +182,40 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     final theme = Theme.of(context);
     final mainNumberStyle = theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
     final secondaryNumberStyle = theme.textTheme.displaySmall;
-    return Expanded(
-      child: Row(
-        children: [
-          _numberButton(
-            index: _currentIndex - 1,
-            flex: 4,
-            textAlign: TextAlign.right,
-            textStyle: secondaryNumberStyle,
-          ),
-          Expanded(
-            flex: 5,
-            child: IgnorePointer(
-              ignoring: _isEditing,
-              child: GestureDetector(
-                onTap: _showScale,
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
-                    child: _getNumberWidgetAt(
-                      _currentIndex,
-                      style: mainNumberStyle,
-                    ),
+    return Row(
+      children: [
+        _numberButton(
+          index: _currentIndex - 1,
+          flex: 4,
+          textAlign: TextAlign.right,
+          textStyle: secondaryNumberStyle,
+        ),
+        Expanded(
+          flex: 5,
+          child: IgnorePointer(
+            ignoring: _isEditing,
+            child: GestureDetector(
+              onTap: _showScale,
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
+                  child: _getNumberWidgetAt(
+                    _currentIndex,
+                    style: mainNumberStyle,
                   ),
                 ),
               ),
             ),
           ),
-          _numberButton(
-            index: _currentIndex + 1,
-            flex: 4,
-            textAlign: TextAlign.left,
-            textStyle: secondaryNumberStyle,
-          ),
-        ],
-      ),
+        ),
+        _numberButton(
+          index: _currentIndex + 1,
+          flex: 4,
+          textAlign: TextAlign.left,
+          textStyle: secondaryNumberStyle,
+        ),
+      ],
     );
   }
 
@@ -275,9 +273,20 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _titleWidget(context),
-              _numbersSection(context),
-              _buttonsSection(context),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: _titleWidget(context),
+              ),
+              Expanded(
+                flex: 3,
+                child: _numbersSection(context),
+              ),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: _buttonsSection(context),
+              ),
             ],
           ),
         ],
