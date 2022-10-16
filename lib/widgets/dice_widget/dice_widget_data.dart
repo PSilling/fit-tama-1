@@ -4,9 +4,10 @@ class DiceWidgetData {
   int numberOfSides;
   bool longPressToReroll;
 
-  DiceWidgetData(
-      {this.name = "",
-      required this.numberOfDice,
-      required this.numberOfSides,
-      this.longPressToReroll = true});
+  DiceWidgetData({
+    this.name = "",
+    required this.numberOfDice, 
+    required this.numberOfSides, 
+    this.longPressToReroll = true
+  });
 }

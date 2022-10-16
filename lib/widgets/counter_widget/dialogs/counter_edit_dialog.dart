@@ -5,22 +5,23 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:tabletop_assistant/helpers.dart';
 import 'package:tabletop_assistant/widgets/counter_widget/counter_widget_data.dart';
 
-class EditDialog extends StatefulWidget {
+class CounterEditDialog extends StatefulWidget {
   final CounterWidgetData data;
   final void Function(CounterWidgetData) setData;
 
-  const EditDialog({super.key, required this.data, required this.setData});
+  const CounterEditDialog({super.key, required this.data, required this.setData});
 
   @override
-  State<StatefulWidget> createState() => _EditDialogState();
+  State<StatefulWidget> createState() => _CounterEditDialogState();
 }
 
-class _EditDialogState extends State<EditDialog> {
+class _CounterEditDialogState extends State<CounterEditDialog> {
   final _formKey = GlobalKey<FormBuilderState>();
 
   late bool _isUneven;
   late List<KeyedEntry> _keyedScale;
   late final GlobalKey? _defaultIndexKey;
+  GlobalKey? _hiddenCurrentIndexKey;
 
   late final _rangeInitialValue = IntRange.from(scale: widget.data.scale);
   final _rangeDefaultSliderKey = GlobalKey<FormBuilderFieldState>();
@@ -30,9 +31,7 @@ class _EditDialogState extends State<EditDialog> {
   void initState() {
     _isUneven = widget.data.isUneven;
     if (widget.data.isUneven) {
-      final defaultScale = widget.data.scale
-          .map((element) => KeyedEntry(value: element))
-          .toList();
+      final defaultScale = widget.data.scale.map((element) => KeyedEntry(value: element)).toList();
       _keyedScale = defaultScale + [KeyedEntry(value: null)];
       _defaultIndexKey = defaultScale[widget.data.defaultIndex].checkKey;
     } else {
@@ -42,19 +41,33 @@ class _EditDialogState extends State<EditDialog> {
     super.initState();
   }
 
-  String? _textValidator(String? value) {
-    if ((value ?? "").isEmpty) {
-      return "Text field cannot be emtpy";
-    } else {
-      return null;
+  String? _numberValidator(String? value, {bool isRequired = true}) {
+    if (value == null) {
+      return isRequired ? "This field cannot be empty" : null;
     }
+    final number = int.tryParse(value);
+    if (number == null) {
+      return "Input must be an integer";
+    }
+    return null;
   }
 
   String? _rangeValidator(IntRange? range) {
     return (range != null) ? null : "Range must be set";
   }
 
-  void _validateSaveAndDismiss() {
+  String? _scaleValidator(Key? key, {required List<KeyedEntry> scale}) {
+    final isScaleEmpty = scale.every((element) => element.value == null);
+    if (isScaleEmpty) {
+      return "Scale cannnot be empty";
+    } else if (key == null) {
+      return "You have to choose a default value";
+    } else {
+      return null;
+    }
+  }
+
+  void _validateSaveAndDismiss(BuildContext context) {
     final formState = _formKey.currentState;
     if (formState == null) {
       return;
@@ -67,10 +80,8 @@ class _EditDialogState extends State<EditDialog> {
   }
 
   void _cleanTempScale() {
-    final newState = _keyedScale.compactMap((element) =>
-        (element == _keyedScale.last || element.value != null)
-            ? element
-            : null);
+    final newState =
+        _keyedScale.compactMap((element) => (element == _keyedScale.last || element.value != null) ? element : null);
     setState(() {
       final focused = FocusScope.of(context).focusedChild;
       if (!newState.map((e) => e.focusNode).contains(focused)) {
@@ -82,14 +93,16 @@ class _EditDialogState extends State<EditDialog> {
 
   void _updateTempScale(String? value, KeyedEntry entry, FormFieldState field) {
     final newValue = value.flatMap((value) => int.tryParse(value));
-    _keyedScale
-        .firstWhere((element) => element.textKey == entry.textKey)
-        .value = newValue;
+    _keyedScale.firstWhere((element) => element.textKey == entry.textKey).value = newValue;
     if (_keyedScale.last.textKey == entry.textKey && newValue != null) {
       _keyedScale.add(KeyedEntry(value: null));
     }
     if (newValue == null && field.value == entry.checkKey) {
       field.didChange(null);
+      _hiddenCurrentIndexKey = entry.checkKey;
+    } else if (newValue != null && _hiddenCurrentIndexKey == entry.checkKey) {
+      field.didChange(_hiddenCurrentIndexKey);
+      _hiddenCurrentIndexKey = null;
     }
   }
 
@@ -152,34 +165,32 @@ class _EditDialogState extends State<EditDialog> {
             children: [
               FormBuilderTextField(
                 name: "range_start",
-                initialValue:
-                    widget.data.isUneven ? null : "${_rangeInitialValue.start}",
+                initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.start}",
                 keyboardType: TextInputType.number,
                 onChanged: (value) => _rangeStartChanged(value, field),
-                validator: _textValidator,
+                validator: _numberValidator,
               ),
               FormBuilderTextField(
                 name: "range_end",
-                initialValue:
-                    widget.data.isUneven ? null : "${_rangeInitialValue.end}",
+                initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.end}",
                 keyboardType: TextInputType.number,
                 onChanged: (value) => _rangeEndChanged(value, field),
-                validator: _textValidator,
+                validator: _numberValidator,
               ),
               if (field.value.flatMap((value) => value.validate()) ?? false)
                 FormBuilderSlider(
                   key: _rangeDefaultSliderKey,
                   name: "range_default",
-                  initialValue: widget.data.isUneven
-                      ? field.value!.start!.toDouble()
-                      : widget.data.defaultIndex.toDouble(),
+                  initialValue: field.value!.toScale()[widget.data.defaultIndex].toDouble(),
                   min: min(field.value!.start!, field.value!.end!).toDouble(),
                   max: max(field.value!.start!, field.value!.end!).toDouble(),
                   divisions: (field.value!.start! - field.value!.end!).abs(),
-                  valueTransformer: (value) =>
-                      value.flatMap((value) => value.toInt()),
-                  onSaved: (value) => widget.data.defaultIndex = value!.toInt(),
-                )
+                  valueTransformer: (value) => value.flatMap((value) => value.toInt()),
+                  onSaved: (value) {
+                    final scale = field.value!.toScale();
+                    widget.data.defaultIndex = scale.indexWhere((element) => element == value);
+                  },
+                ),
             ],
           ),
         ),
@@ -193,31 +204,17 @@ class _EditDialogState extends State<EditDialog> {
         builder: (FormFieldState field) => InputDecorator(
           decoration: InputDecoration(errorText: field.errorText),
           child: Column(children: [
-            for (var entry in _keyedScale)
-              _scaleTextField(entry: entry, superField: field),
+            for (var entry in _keyedScale) _scaleTextField(entry: entry, superField: field),
           ]),
         ),
-        validator: (key) {
-          final isScaleEmpty =
-              _keyedScale.every((element) => element.value == null);
-          if (isScaleEmpty) {
-            return "Scale cannnot be empty";
-          } else if (key == null) {
-            return "You have to choose a default value";
-          } else {
-            return null;
-          }
-        },
+        validator: (value) => _scaleValidator(value, scale: _keyedScale),
         onSaved: (key) {
           widget.data.scale = _keyedScale.compactMap((e) => e.value).toList();
-          widget.data.defaultIndex =
-              _keyedScale.indexWhere((element) => element.checkKey == key);
+          widget.data.defaultIndex = _keyedScale.indexWhere((element) => element.checkKey == key);
         },
       );
 
-  Widget _scaleTextField(
-          {required KeyedEntry entry, required FormFieldState superField}) =>
-      FormBuilderField(
+  Widget _scaleTextField({required KeyedEntry entry, required FormFieldState superField}) => FormBuilderField(
         key: entry.mainKey,
         name: "scale_field_${entry.mainKey}",
         builder: (FormFieldState field) => InputDecorator(
@@ -231,8 +228,8 @@ class _EditDialogState extends State<EditDialog> {
                   name: "scale_textfield_${entry.textKey}",
                   initialValue: entry.value.flatMap((value) => "$value"),
                   keyboardType: TextInputType.number,
-                  onChanged: (value) =>
-                      _updateTempScale(value, entry, superField),
+                  validator: (value) => _numberValidator(value, isRequired: false),
+                  onChanged: (value) => _updateTempScale(value, entry, superField),
                   onTap: _cleanTempScale,
                 ),
               ),
@@ -242,13 +239,14 @@ class _EditDialogState extends State<EditDialog> {
                     key: entry.checkKey,
                     name: "scale_checkbox_${entry.checkKey}",
                     options: const [_defaultEntryOption],
-                    initialValue:
-                        _defaultIndexKey == entry.checkKey ? _defaultEntryOption.value : null,
+                    initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
                     onChanged: (value) {
                       if (value != null) {
                         superField.value?.currentState?.didChange(null);
+                        superField.didChange(entry.checkKey);
+                      } else {
+                        superField.didChange(null);
                       }
-                      superField.didChange(entry.checkKey);
                     },
                   ),
                 ),
@@ -269,36 +267,29 @@ class _EditDialogState extends State<EditDialog> {
               FormBuilderTextField(
                 name: "title",
                 initialValue: widget.data.name,
-                validator: _textValidator,
-                onSaved: (value) => widget.data.name = value!,
+                onSaved: (value) => widget.data.name = value ?? "",
               ),
               FormBuilderCheckboxGroup<String>(
                 name: "death",
-                initialValue: _DeathOptions.initialValue(
-                    left: widget.data.isLeftDeath,
-                    right: widget.data.isLeftDeath),
+                initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isRightDeath),
                 options: [
                   _DeathOptions.left.option,
                   _DeathOptions.right.option,
                 ],
                 onSaved: (value) {
-                  widget.data.isLeftDeath =
-                      value!.contains(_DeathOptions.left.label);
-                  widget.data.isRightDeath =
-                      value.contains(_DeathOptions.right.label);
+                  widget.data.isLeftDeath = value!.contains(_DeathOptions.left.label);
+                  widget.data.isRightDeath = value.contains(_DeathOptions.right.label);
                 },
               ),
               FormBuilderRadioGroup<String>(
                   name: "type",
-                  initialValue:
-                      _EvennessOptions.fromData(isUneven: _isUneven).label,
+                  initialValue: _EvennessOptions.fromData(isUneven: _isUneven).label,
                   onChanged: (value) {
                     setState(() {
                       _isUneven = _EvennessOptions.isUneven(value: value);
                     });
                   },
-                  onSaved: (value) =>
-                      widget.data.isUneven = _EvennessOptions.isUneven(value: value),
+                  onSaved: (value) => widget.data.isUneven = _EvennessOptions.isUneven(value: value),
                   options: [
                     _EvennessOptions.range.option,
                     _EvennessOptions.scale.option,
@@ -310,7 +301,7 @@ class _EditDialogState extends State<EditDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _validateSaveAndDismiss,
+          onPressed: () => _validateSaveAndDismiss(context),
           child: const Text("Save"),
         ),
         TextButton(
@@ -328,8 +319,7 @@ class IntRange {
 
   IntRange(this.start, this.end);
 
-  factory IntRange.from({required List<int> scale}) =>
-      IntRange(scale.first, scale.last);
+  factory IntRange.from({required List<int> scale}) => IntRange(scale.first, scale.last);
 
   bool validate() {
     final start = this.start;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tabletop_assistant/widgets/dice_widget/dice_edit_dialog.dart';
 import 'package:tabletop_assistant/widgets/dice_widget/dice_widget_data.dart';
 import 'package:tabletop_assistant/widgets/editable.dart';
+import 'package:tabletop_assistant/helpers.dart';
 
 class DiceWidget extends StatefulWidget {
   final DiceWidgetData initData;
@@ -14,8 +15,7 @@ class DiceWidget extends StatefulWidget {
   State<StatefulWidget> createState() => DiceWidgetState();
 }
 
-class DiceWidgetState extends State<DiceWidget>
-    implements Editable<DiceWidget> {
+class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> {
   static const decoration = BoxDecoration(
     color: Colors.white,
     borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -25,7 +25,7 @@ class DiceWidgetState extends State<DiceWidget>
   final _random = Random();
 
   late DiceWidgetData _data;
-  late List<int> _currentRoll;
+  List<int>? _currentRoll;
   bool _isEditing = false;
 
   @override
@@ -47,26 +47,27 @@ class DiceWidgetState extends State<DiceWidget>
 
   int _randIntFrom1({required int to}) => _random.nextInt(to) + 1;
 
-  void rollDice() {
+  void rollDice() async {
     setState(() {
-      _currentRoll = List.generate(
-          _data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
+      _currentRoll = null;
+    });
+    await Future.delayed(const Duration(milliseconds: 100));
+    setState(() {
+      _currentRoll = List.generate(_data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
     });
   }
 
   void _showEditingDialog() {
     showDialog(
-      context: context,
-      builder: (context) => DiceEditDialog(
-        data: _data,
-        setData: (data) {
-          setState(() {
-            _data = data;
-            rollDice();
-          });
-        }
-      )
-    );
+        context: context,
+        builder: (context) => DiceEditDialog(
+            data: _data,
+            setData: (data) {
+              setState(() {
+                _data = data;
+                rollDice();
+              });
+            }));
   }
 
   void _onTap() {
@@ -87,27 +88,33 @@ class DiceWidgetState extends State<DiceWidget>
     final theme = Theme.of(context);
     final textStyle = theme.textTheme.displaySmall;
     final rollText = _currentRoll
-        .map((element) => "$element")
-        .reduce((value, element) => "$value+$element");
+      ?.map((element) => "$element")
+      .reduce((value, element) => "$value+$element")
+      .flatMap((value) => "$value=") ?? "";
     return FittedBox(
       fit: BoxFit.contain,
-      child: Text(
-        "$rollText=",
-        style: textStyle,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
+        child: Text(
+          rollText,
+          style: textStyle,
+        ),
       ),
     );
   }
 
   Widget _resultText(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle =
-        theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
-    final result = _currentRoll.reduce((value, element) => value + element);
+    final textStyle = theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
+    final result = _currentRoll?.reduce((value, element) => value + element);
     return FittedBox(
       fit: BoxFit.contain,
-      child: Text(
-        "$result",
-        style: textStyle,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
+        child: Text(
+          "${result ?? ""}",
+          style: textStyle,
+        ),
       ),
     );
   }
@@ -143,8 +150,7 @@ class DiceWidgetState extends State<DiceWidget>
 
   Widget _configurationWidget(BuildContext context) {
     final theme = Theme.of(context).textTheme;
-    final style =
-        theme.headlineSmall?.copyWith(color: theme.headlineMedium?.color);
+    final style = theme.headlineSmall?.copyWith(color: theme.headlineMedium?.color);
     final text = "${_data.numberOfSides}-sided";
     return Text(text, style: style);
   }
@@ -164,11 +170,20 @@ class DiceWidgetState extends State<DiceWidget>
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _titleWidget(context),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: _titleWidget(context),
+              ),
               Expanded(
+                flex: 3,
                 child: _rollWidget(context),
               ),
-              _configurationWidget(context),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: _configurationWidget(context),
+              )
             ],
           ),
         ),
