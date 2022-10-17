@@ -30,6 +30,7 @@ class TimerWidgetState extends State<TimerWidget>
   TimerWidgetTimerState _currentState = TimerWidgetTimerState.init;
   bool _isEditing = false;
   late TimerWidgetData _data;
+  late Timer _countdownTimer;
 
   @override
   bool get isEditing => _isEditing;
@@ -45,12 +46,13 @@ class TimerWidgetState extends State<TimerWidget>
     setState(() {
       _currentState = TimerWidgetTimerState.running;
     });
-    update();
+    _countdownTimer = Timer(const Duration(seconds: 1), update);
   }
 
   void pause() {
     setState(() {
       _currentState = TimerWidgetTimerState.paused;
+      _countdownTimer.cancel();
     });
   }
 
@@ -65,8 +67,7 @@ class TimerWidgetState extends State<TimerWidget>
     setState(() {
       if (_currentState == TimerWidgetTimerState.running) {
         _currentTime--;
-        // TOFIX: On play/pause spam, decrements faster (fix: cancel the timer on pause).
-        Timer(const Duration(seconds: 1), update);
+        _countdownTimer = Timer(const Duration(seconds: 1), update);
       }
     });
   }
