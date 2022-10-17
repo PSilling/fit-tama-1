@@ -178,8 +178,6 @@ class TimerWidgetState extends State<TimerWidget>
     );
   }
 
-  // TODO: Editing dialog.
-
   @override
   void initState() {
     _data = widget.initData;
