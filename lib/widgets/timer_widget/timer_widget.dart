@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:tabletop_assistant/widgets/editable.dart';
+import 'package:tabletop_assistant/widgets/timer_widget/timer_widget_data.dart';
 
-import 'timer_widget_data.dart';
 
 class TimerWidget extends StatefulWidget {
   final TimerWidgetData initData;
@@ -44,9 +44,9 @@ class TimerWidgetState extends State<TimerWidget>
 
   void run() {
     setState(() {
+      _countdownTimer = Timer(const Duration(seconds: 1), update);
       _currentState = TimerWidgetTimerState.running;
     });
-    _countdownTimer = Timer(const Duration(seconds: 1), update);
   }
 
   void pause() {
@@ -66,13 +66,29 @@ class TimerWidgetState extends State<TimerWidget>
   void update() {
     setState(() {
       if (_currentState == TimerWidgetTimerState.running) {
-        _currentTime--;
         _countdownTimer = Timer(const Duration(seconds: 1), update);
+        _currentTime--;
       }
     });
   }
 
-  void _onTap() { // TODO: Re-add.
+  String formatTime(int time) {
+
+    var sign = time < 0 ? "-" : "";
+    var seconds = time.abs() % 60;
+    var minutes = time.abs() % 3600 ~/ 60;
+    var hours = time.abs() ~/ 3600;
+
+    if (minutes == 0) {
+      return "${sign}${seconds}s";
+    } else if (hours == 0) {
+      return "${sign}${minutes}m ${seconds}s";
+    } else {
+      return "${sign}${hours}h ${minutes}m ${seconds}s";
+    }
+  }
+
+  void _onTap() {
     switch (_currentState) {
       case TimerWidgetTimerState.init:
         run();
@@ -106,7 +122,7 @@ class TimerWidgetState extends State<TimerWidget>
                   child: Text(
                     style: _currentTime <= 0 ?
                       const TextStyle(color: Colors.red) : const TextStyle(),
-                    "${_currentTime}s",
+                    formatTime(_currentTime),
                   ),
                 ),
               )
