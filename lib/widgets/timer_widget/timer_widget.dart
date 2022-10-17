@@ -41,7 +41,7 @@ class TimerWidgetState extends State<TimerWidget>
     });
   }
 
-  void start() {
+  void run() {
     setState(() {
       _currentState = TimerWidgetTimerState.running;
     });
@@ -65,21 +65,23 @@ class TimerWidgetState extends State<TimerWidget>
     setState(() {
       if (_currentState == TimerWidgetTimerState.running) {
         _currentTime--;
+        // TOFIX: On play/pause spam, decrements faster (fix: cancel the timer on pause).
         Timer(const Duration(seconds: 1), update);
       }
     });
   }
 
-  void _onTap() {
+  void _onTap() { // TODO: Re-add.
     switch (_currentState) {
       case TimerWidgetTimerState.init:
-        start();
+        run();
         break;
       case TimerWidgetTimerState.running:
         pause();
         break;
       case TimerWidgetTimerState.paused:
-        throw StateError("_onTap called when widget is paused.");
+        run();
+        break;
     }
   }
 
@@ -110,6 +112,69 @@ class TimerWidgetState extends State<TimerWidget>
     );
   }
 
+  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel}) {
+    final iconTheme = Theme.of(context).iconTheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Icon(
+      icon,
+      color: textTheme.displayLarge?.color,
+      shadows: iconTheme.shadows,
+      size: iconTheme.size,
+      semanticLabel: semanticLabel,
+    );
+  }
+
+  Widget _buttonWidget(BuildContext context) {
+    return Center(
+      child: IgnorePointer(
+        ignoring: _isEditing,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (_currentState == TimerWidgetTimerState.init)
+              IconButton(
+                onPressed: run,
+                icon: _themedIcon(
+                    Icons.play_arrow,
+                    context: context,
+                    semanticLabel: "Start the timer"
+                ),
+              ),
+            if (_currentState == TimerWidgetTimerState.running)
+              IconButton(
+                onPressed: pause,
+                icon: _themedIcon(
+                    Icons.pause,
+                    context: context,
+                    semanticLabel: "Pause the timer"
+                ),
+              ),
+            if (_currentState == TimerWidgetTimerState.paused)
+              IconButton(
+                onPressed: run,
+                icon: _themedIcon(
+                    Icons.play_arrow,
+                    context: context,
+                    semanticLabel: "Resume the timer"
+                ),
+              ),
+            if (_currentState == TimerWidgetTimerState.paused)
+              IconButton(
+                onPressed: reset,
+                icon: _themedIcon(
+                    Icons.replay,
+                    context: context,
+                    semanticLabel: "Reset the timer"
+                ),
+              ),
+          ],
+        )
+      ),
+    );
+  }
+
   // TODO: Editing dialog.
 
   @override
@@ -125,20 +190,17 @@ class TimerWidgetState extends State<TimerWidget>
       height: 240,
       width: 240,
       padding: const EdgeInsets.all(10),
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: _onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [ // TODO: Add buttons (based on state) and remove _onTap.
-            _titleWidget(context),
-            Expanded(
-              child: _timeWidget(context),
-            )
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _titleWidget(context),
+          Expanded(
+            child: _timeWidget(context),
+          ),
+          _buttonWidget(context)
+        ],
       ),
     );
   }
