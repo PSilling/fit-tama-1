@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:tabletop_assistant/widgets/editable.dart';
+import 'package:tabletop_assistant/widgets/timer_widget/timer_edit_dialog.dart';
 import 'package:tabletop_assistant/widgets/timer_widget/timer_widget_data.dart';
 
 
@@ -79,7 +80,7 @@ class TimerWidgetState extends State<TimerWidget>
     var minutes = time.abs() % 3600 ~/ 60;
     var hours = time.abs() ~/ 3600;
 
-    if (minutes == 0) {
+    if (hours == 0 && minutes == 0) {
       return "${sign}${seconds}s";
     } else if (hours == 0) {
       return "${sign}${minutes}m ${seconds}s";
@@ -89,6 +90,12 @@ class TimerWidgetState extends State<TimerWidget>
   }
 
   void _onTap() {
+
+    if (_isEditing) {
+      _showEditingDialog();
+      return;
+    }
+
     switch (_currentState) {
       case TimerWidgetTimerState.init:
         run();
@@ -100,6 +107,21 @@ class TimerWidgetState extends State<TimerWidget>
         run();
         break;
     }
+  }
+
+  void _showEditingDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => TimerEditDialog(
+        data: _data,
+        setData: (data) {
+          setState(() {
+            _data = data;
+            _currentTime = data.initialTime;
+          });
+        },
+      ),
+    );
   }
 
   Widget _titleWidget(BuildContext context) {
