@@ -102,7 +102,9 @@ class TimerWidgetState extends State<TimerWidget>
                 flex: 1,
                 child: FittedBox(
                   fit: BoxFit.contain,
-                  child: Text( // TODO: Effect on value <= 0.
+                  child: Text(
+                    style: _currentTime <= 0 ?
+                      const TextStyle(color: Colors.red) : const TextStyle(),
                     "${_currentTime}s",
                   ),
                 ),
@@ -190,18 +192,22 @@ class TimerWidgetState extends State<TimerWidget>
       height: 240,
       width: 240,
       padding: const EdgeInsets.all(10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _titleWidget(context),
-          Expanded(
-            child: _timeWidget(context),
-          ),
-          _buttonWidget(context)
-        ],
-      ),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _titleWidget(context),
+            Expanded(
+              child: _timeWidget(context),
+            ),
+            _buttonWidget(context)
+          ],
+        ),
+      )
     );
   }
 
