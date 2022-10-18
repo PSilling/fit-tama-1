@@ -1,13 +1,14 @@
-import 'dart:async';
 import 'dart:math';
-
-import 'package:dashboard/dashboard.dart';
-import 'package:tabletop_assistant/storage.dart';
-
 import 'package:flutter/material.dart';
+import 'package:tabletop_assistant/table-board.dart';
 
-import 'add_dialog.dart';
-import 'data_widget.dart';
+import 'package:flutter_reorderable_grid_view/entities/order_update_entity.dart';
+import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
+import 'package:flutter_reorderable_grid_view/widgets/widgets.dart';
+
+import './menu-item.dart';
+import './add-dashboard-dialog.dart';
+
 
 ///
 void main() {
@@ -26,11 +27,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ///
-  Color getRandomColor() {
-    var r = Random();
-    return Color.fromRGBO(r.nextInt(256), r.nextInt(256), r.nextInt(256), 1);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,33 +48,33 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class MenuItem {
-  // menu item data - TODO: add hooks to the dashboards
-  final String name;
-  final int id;
-
-  MenuItem({
-    required this.name,
-    required this.id
-  });
-}
-
 class _MainPageState extends State<MainPage> {
+  // main page description
 
-  void _addDashboard(){
-    // some code to add new dashboard, show add
-    setState(() {
-      var newId = Random().nextInt(100000) + 4;
-      menuItems.add(
-        MenuItem(
-            name: 'Bar ' + newId.toString(),
-            id: newId
-        )
-      );
-    });
+  Future<void> _addDashboard(BuildContext context) async {
+    // opens dialog and adds a Dashboard to the menu
+    var res = await showDialog(
+        context: context,
+        builder: (c) {
+          return const AddDashboardDialog();
+        }
+    );
+
+    if (res != null && res != '') {
+      setState(() {
+        var newId = Random().nextInt(100000) + 4;
+        menuItems.add(
+            MenuItemData(
+                name: res,
+                id: newId
+            )
+        );
+      });
+    }
   }
 
   void _removeDashboard(id){
+    // removes given dashboard from page
     if (menuItems.length <= 1){
       editingMode = false;
     }
@@ -87,307 +83,156 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  void _placeholderFc(){}
+  void _placeholderFc(){
+    // does nothing - placeholder
+  }
 
-  var editingMode = false;
-  var menuItems = <MenuItem>[];
+  var editingMode = false;                      // sets the menu to editing mode
+  var menuItems = <MenuItemData>[];             // array of menu items
+  final _gridViewKey = GlobalKey();             // key for reorderable grid
+  final _scrollController = ScrollController(); // scroll controller for reorderable grid
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Main menu'),
-        backgroundColor: Colors.black,
-        actions: [
-          IconButton(
-              onPressed: _placeholderFc,
-              icon: const Icon(Icons.search)
-          ),
-          IconButton(
-              onPressed: _placeholderFc,
-              icon: const Icon(Icons.sort)
-          ),
-          IconButton(
-              onPressed: _placeholderFc,
-              icon: const Icon(Icons.more_vert)
-          )
-        ],
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.black54
-        ),
-        child: Padding(
-            padding: const EdgeInsets.all(0),
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 200,
-                  childAspectRatio: 3/4,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8
-              ),
-              itemCount: menuItems.length,
-              itemBuilder: (BuildContext context, index) {
-                var myMenuItem = menuItems[index];
-                return GestureDetector(
-                    onTap: () {
-                      if(!editingMode){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => DashboardWidget(itemData: myMenuItem)
-                            )
-                        );
-                      }
-                    },
-                    onLongPress: () {
-                      editingMode = !editingMode;
-                      setState(() {});
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black87.withOpacity(0.5),
-                                spreadRadius: 3,
-                                blurRadius: 7,
-                                offset: const Offset(0, 5)
-                            )
-                          ]
-                      ),
-                      child: Stack(
-                        children: [
-                          Column(
-                            children: <Widget>[
-                              const ClipRRect(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(15),
-                                      topRight: Radius.circular(15)
-                                  ),
-                                  child: Image(
-                                    image: AssetImage('assets/placeholder.png'),
-                                    width: 200,
-                                    height: 200,
-                                    fit: BoxFit.fitHeight,
-                                  )
+
+    var generatedMenuList = List.generate(
+      // generating the menu content - list of dashboard panels
+      menuItems.length, (index) =>
+        Container(
+          key: Key(menuItems.elementAt(index).id.toString()),
+          child: GestureDetector(
+              onTap: () {
+                if(!editingMode){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DashboardWidget(itemData: menuItems.elementAt(index))
+                      )
+                  );
+                }
+              },
+              onLongPress: () {
+                editingMode = !editingMode;
+                setState(() {});
+              },
+              child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black87.withOpacity(0.5),
+                            spreadRadius: 3,
+                            blurRadius: 7,
+                            offset: const Offset(0, 5)
+                        )
+                      ]
+                  ),
+                  child: Stack(
+                    children: [
+                      Column(
+                        children: <Widget>[
+                          const ClipRRect(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  topRight: Radius.circular(15)
                               ),
-                              ListTile(
-                                title: Text(myMenuItem.name),
-                                textColor: Colors.white,
-                              ),
-                            ],
+                              child: Image(
+                                image: AssetImage('assets/placeholder.png'),
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.fitHeight,
+                              )
                           ),
-                          if (editingMode)
-                            Positioned(
-                              right: 5,
-                              top: 5,
-                              child: InkResponse(
+                          ListTile(
+                            title: Text(menuItems.elementAt(index).name),
+                            textColor: Colors.white,
+                          ),
+                        ],
+                      ),
+                      if (editingMode)
+                        Positioned(
+                            right: 5,
+                            top: 5,
+                            child: InkResponse(
                                 radius: 20,
                                 onTap: () {
-                                  _removeDashboard(myMenuItem.id);
+                                  _removeDashboard(menuItems.elementAt(index).id);
                                 },
                                 child: const Icon(
                                   Icons.clear,
                                   color: Colors.black,
                                   size: 20,
                                 )
-                              )
                             )
-                        ],
-                      )
-                    )
-                );
-              },
-            )
+                        ),
+                    ],
+                  )
+              )
+          ),
+        )
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Main menu'),
+        backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+              onPressed: _placeholderFc, // TODO - replace
+              icon: const Icon(Icons.search)
+          ),
+          IconButton(
+              onPressed: _placeholderFc, // TODO - replace
+              icon: const Icon(Icons.sort)
+          ),
+          IconButton(
+              onPressed: _placeholderFc, // TODO - replace
+              icon: const Icon(Icons.more_vert)
+          )
+        ],
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+            color: Colors.black54
         ),
+        child: ReorderableBuilder(
+          children: generatedMenuList,
+          enableLongPress: false,
+          enableDraggable: editingMode,
+          onReorder: (List<OrderUpdateEntity> orderUpdateEntities) {
+            for (final orderUpdateEntity in orderUpdateEntities) {
+              final menuItem = menuItems.removeAt(orderUpdateEntity.oldIndex);
+                menuItems.insert(orderUpdateEntity.newIndex, menuItem);
+            }
+          },
+          builder: (children) {
+            return GridView(
+              padding: const EdgeInsets.all(8),
+              key: _gridViewKey,
+              controller: _scrollController,
+              children: children,
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                childAspectRatio: 3/4,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8
+              ),
+            );
+          }
+        )
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addDashboard,
+        onPressed: () {_addDashboard(context);},
         tooltip: 'Increment',
         child: const Icon(Icons.add),
         backgroundColor: Colors.black,
         foregroundColor: Colors.deepPurple,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15)
+            borderRadius: BorderRadius.circular(15)
         ),
       ),
     );
-  }
-}
-
-class DashboardWidget extends StatefulWidget {
-  ///
-  final MenuItem itemData;
-
-  const DashboardWidget({Key? key, required this.itemData}) : super(key: key);
-
-  ///
-  @override
-  State<DashboardWidget> createState() => _DashboardWidgetState();
-}
-
-class _DashboardWidgetState extends State<DashboardWidget> {
-
-  ///
-  final ScrollController scrollController = ScrollController();
-
-  ///
-  late var itemController =
-      DashboardItemController<ColoredDashboardItem>.withDelegate(
-          itemStorageDelegate: storage);
-
-  bool refreshing = false;
-
-  var storage = MyItemStorage();
-
-  int? slot;
-
-  setSlot() {
-    setState(() {
-      slot = 2;
-    });
-  }
-
-  ///
-  @override
-  Widget build(BuildContext context) {
-    slot = 2;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(widget.itemData.name),
-        actions: [
-          IconButton(
-              onPressed: () {
-                itemController.clear();
-              },
-              icon: const Icon(Icons.delete)),
-          IconButton(
-              onPressed: () {
-                add(context);
-              },
-              icon: const Icon(Icons.add)),
-          IconButton(
-              onPressed: () {
-                itemController.isEditing = !itemController.isEditing;
-                setState(() {});
-              },
-              icon: const Icon(Icons.edit)),
-        ],
-      ),
-      body: SafeArea(
-        child:
-          Dashboard<ColoredDashboardItem>(
-            shrinkToPlace: false,
-            slideToTop: true,
-            absorbPointer: false,
-            padding: const EdgeInsets.all(8),
-            horizontalSpace: 8,
-            verticalSpace: 8,
-            slotAspectRatio: 1,
-            animateEverytime: true,
-            scrollController: ScrollController(),
-            dashboardItemController: itemController,
-            slotCount: slot!,
-            errorPlaceholder: (e, s) {
-               return Text("$e , $s");
-            },
-            itemStyle: ItemStyle(
-              color: Colors.transparent,
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15))),
-            editModeSettings: EditModeSettings(
-              paintBackgroundLines: false,
-              fillEditingBackground: false,
-              resizeCursorSide: 0, // when set to 0 user cannot change the shape of the widgets
-              curve: Curves.easeIn,
-              duration: const Duration(milliseconds: 300),
-            ),
-            itemBuilder: (ColoredDashboardItem item) {
-              var layout = item.layoutData;
-
-              if (item.data != null) {
-                return DataWidget(
-                  item: item,
-                );
-              }
-
-              return Stack(
-                children: [
-                  Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: item.color,
-                      borderRadius: BorderRadius.circular(10)),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Text(
-                        "Subject to change \n ID: ${item.identifier}\n${[
-                          "x: ${layout.startX}",
-                          "y: ${layout.startY}",
-                          "w: ${layout.width}",
-                          "h: ${layout.height}",
-                          if (layout.minWidth != 1)
-                            "minW: ${layout.minWidth}",
-                          if (layout.minHeight != 1)
-                            "minH: ${layout.minHeight}",
-                          if (layout.maxWidth != null)
-                            "maxW: ${layout.maxWidth}",
-                          if (layout.maxHeight != null)
-                            "maxH : ${layout.maxHeight}"
-                        ].join("\n")}",
-                        style: const TextStyle(color: Colors.white),
-                      )),
-                  ),
-                  if (itemController.isEditing)
-                    Positioned(
-                      right: 5,
-                      top: 5,
-                      child: InkResponse(
-                        radius: 20,
-                        onTap: () {
-                          itemController.delete(item.identifier);
-                        },
-                        child: const Icon(
-                        Icons.clear,
-                        color: Colors.white,
-                        size: 20,
-                        )
-                      )
-                    )
-                    ],
-                  );
-                },
-          ),
-      ),
-    );
-  }
-
-  Future<void> add(BuildContext context) async {
-    var res = await showDialog(
-        context: context,
-        builder: (c) {
-          return const AddDialog();
-        });
-
-    if (res != null) {
-      itemController.add(ColoredDashboardItem(
-          color: res[6],
-          width: res[0],
-          height: res[1],
-          identifier: (Random().nextInt(100000) + 4).toString(),
-          minWidth: res[2],
-          minHeight: res[3],
-          maxWidth: res[4] == 0 ? null : res[4],
-          maxHeight: res[5] == 0 ? null : res[5]));
-    }
   }
 }
