@@ -10,12 +10,9 @@ import 'data_widget.dart';
 import 'models/preset_model.dart';
 
 class DashboardWidget extends StatefulWidget {
-  ///
-  final PresetModel itemData;
+  final PresetModel preset;
 
-  const DashboardWidget({Key? key, required this.itemData}) : super(key: key);
-
-  ///
+  const DashboardWidget({super.key, required this.preset});
   @override
   State<DashboardWidget> createState() => _DashboardWidgetState();
 }
@@ -46,7 +43,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(widget.itemData.name),
+        title: Text(widget.preset.name),
         actions: [
           IconButton(
               onPressed: () {
