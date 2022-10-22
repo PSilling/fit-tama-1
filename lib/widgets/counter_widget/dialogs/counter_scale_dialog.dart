@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tabletop_assistant/helpers.dart';
+
+import '../../../helpers.dart';
 
 class CounterScaleDialog extends StatefulWidget {
   final void Function(IndexedEntry) setCurrentIndex;
@@ -7,7 +8,10 @@ class CounterScaleDialog extends StatefulWidget {
   final IndexedEntry currentEntry;
 
   const CounterScaleDialog._private(
-      {super.key, required this.scale, required this.currentEntry, required this.setCurrentIndex});
+      {super.key,
+      required this.scale,
+      required this.currentEntry,
+      required this.setCurrentIndex});
 
   factory CounterScaleDialog(
       {Key? key,
@@ -17,12 +21,19 @@ class CounterScaleDialog extends StatefulWidget {
       required Widget Function(int) getNumberWidgetAt,
       required bool isLeftDeath,
       required bool isRightDeath}) {
-    final List<IndexedEntry> leftDeathEntry =
-        isLeftDeath ? [IndexedEntry.from(index: -1, getNumberAt: getNumberWidgetAt)] : [];
-    final List<IndexedEntry> rightDeathEntry =
-        isRightDeath ? [IndexedEntry.from(index: scaleLength, getNumberAt: getNumberWidgetAt)] : [];
-    final entryScale =
-        List.generate(scaleLength, (index) => IndexedEntry(index: index, widget: getNumberWidgetAt(index)));
+    final List<IndexedEntry> leftDeathEntry = isLeftDeath
+        ? [IndexedEntry.from(index: -1, getNumberAt: getNumberWidgetAt)]
+        : [];
+    final List<IndexedEntry> rightDeathEntry = isRightDeath
+        ? [
+            IndexedEntry.from(
+                index: scaleLength, getNumberAt: getNumberWidgetAt)
+          ]
+        : [];
+    final entryScale = List.generate(
+        scaleLength,
+        (index) =>
+            IndexedEntry(index: index, widget: getNumberWidgetAt(index)));
     final fullScale = leftDeathEntry + entryScale + rightDeathEntry;
     final currentEntry = fullScale[currentIndex + (isLeftDeath ? 1 : 0)];
     return CounterScaleDialog._private(
@@ -43,17 +54,20 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => Scrollable.ensureVisible(
-          widget.currentEntry.key.currentContext!,
-          alignment: 0.5,
-        ));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => Scrollable.ensureVisible(
+              widget.currentEntry.key.currentContext!,
+              alignment: 0.5,
+            ));
   }
 
   ButtonStyle? _getButtonStyle({required IndexedEntry entry}) {
     const minSize = Size(50, 0);
     final textStyle = Theme.of(context).textTheme.headlineSmall;
     final normal = TextButton.styleFrom(
-        minimumSize: minSize, tapTargetSize: MaterialTapTargetSize.shrinkWrap, textStyle: textStyle);
+        minimumSize: minSize,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        textStyle: textStyle);
     final selected = TextButton.styleFrom(
         minimumSize: minSize,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -124,7 +138,8 @@ class IndexedEntry {
 
   IndexedEntry({required this.index, required this.widget});
 
-  factory IndexedEntry.from({required int index, required Widget Function(int) getNumberAt}) {
+  factory IndexedEntry.from(
+      {required int index, required Widget Function(int) getNumberAt}) {
     return IndexedEntry(index: index, widget: getNumberAt(index));
   }
 }

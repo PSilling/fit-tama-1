@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:tabletop_assistant/widgets/dice_widget/dice_edit_dialog.dart';
-import 'package:tabletop_assistant/widgets/dice_widget/dice_widget_data.dart';
-import 'package:tabletop_assistant/widgets/editable.dart';
-import 'package:tabletop_assistant/helpers.dart';
+
+import '../../helpers.dart';
+import '../editable.dart';
+import 'dice_edit_dialog.dart';
+import 'dice_widget_data.dart';
 
 class DiceWidget extends StatefulWidget {
   final DiceWidgetData initData;
@@ -15,7 +16,8 @@ class DiceWidget extends StatefulWidget {
   State<StatefulWidget> createState() => DiceWidgetState();
 }
 
-class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> {
+class DiceWidgetState extends State<DiceWidget>
+    implements Editable<DiceWidget> {
   static const decoration = BoxDecoration(
     color: Colors.white,
     borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -53,7 +55,8 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
     });
     await Future.delayed(const Duration(milliseconds: 100));
     setState(() {
-      _currentRoll = List.generate(_data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
+      _currentRoll = List.generate(
+          _data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
     });
   }
 
@@ -88,9 +91,10 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
     final theme = Theme.of(context);
     final textStyle = theme.textTheme.displaySmall;
     final rollText = _currentRoll
-      ?.map((element) => "$element")
-      .reduce((value, element) => "$value+$element")
-      .flatMap((value) => "$value=") ?? "";
+            ?.map((element) => "$element")
+            .reduce((value, element) => "$value+$element")
+            .flatMap((value) => "$value=") ??
+        "";
     return FittedBox(
       fit: BoxFit.contain,
       child: ConstrainedBox(
@@ -105,7 +109,8 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
 
   Widget _resultText(BuildContext context) {
     final theme = Theme.of(context);
-    final textStyle = theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
+    final textStyle =
+        theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
     final result = _currentRoll?.reduce((value, element) => value + element);
     return FittedBox(
       fit: BoxFit.contain,
@@ -150,7 +155,8 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
 
   Widget _configurationWidget(BuildContext context) {
     final theme = Theme.of(context).textTheme;
-    final style = theme.headlineSmall?.copyWith(color: theme.headlineMedium?.color);
+    final style =
+        theme.headlineSmall?.copyWith(color: theme.headlineMedium?.color);
     final text = "${_data.numberOfSides}-sided";
     return Text(text, style: style);
   }

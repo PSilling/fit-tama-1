@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:tabletop_assistant/widgets/dice_widget/dice_widget_data.dart';
-import 'package:tabletop_assistant/helpers.dart';
+
+import '../../helpers.dart';
+import 'dice_widget_data.dart';
 
 class DiceEditDialog extends StatelessWidget {
   final DiceWidgetData data;

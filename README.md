@@ -1,3 +1,3 @@
-# Tabletop Assistant
+# Board Aid
 
-Project for FIT BUT KNN – Tabletop Assistant
+Project for FIT BUT TAMa – Board Aid

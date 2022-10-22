@@ -1,18 +1,17 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dashboard/dashboard.dart';
-import 'package:tabletop_assistant/storage.dart';
-import 'dart:async';
-import 'add-widget-dialog.dart';
-import 'data_widget.dart';
 import 'package:flutter/material.dart';
 
-import './menu-item.dart';
-
+import './storage.dart';
+import 'add_widget_dialog.dart';
+import 'data_widget.dart';
+import 'models/preset_model.dart';
 
 class DashboardWidget extends StatefulWidget {
   ///
-  final MenuItemData itemData;
+  final PresetModel itemData;
 
   const DashboardWidget({Key? key, required this.itemData}) : super(key: key);
 
@@ -22,14 +21,13 @@ class DashboardWidget extends StatefulWidget {
 }
 
 class _DashboardWidgetState extends State<DashboardWidget> {
-
   ///
   final ScrollController scrollController = ScrollController();
 
   ///
   late var itemController =
-  DashboardItemController<ColoredDashboardItem>.withDelegate(
-      itemStorageDelegate: storage);
+      DashboardItemController<ColoredDashboardItem>.withDelegate(
+          itemStorageDelegate: storage);
 
   var storage = MyItemStorage();
 
@@ -69,8 +67,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         ],
       ),
       body: SafeArea(
-        child:
-        Dashboard<ColoredDashboardItem>(
+        child: Dashboard<ColoredDashboardItem>(
           shrinkToPlace: false,
           slideToTop: true,
           absorbPointer: false,
@@ -94,7 +91,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
           editModeSettings: EditModeSettings(
             paintBackgroundLines: false,
             fillEditingBackground: false,
-            resizeCursorSide: 0, // when set to 0 user cannot change the shape of the widgets
+            resizeCursorSide:
+                0, // when set to 0 user cannot change the shape of the widgets
             curve: Curves.easeIn,
             duration: const Duration(milliseconds: 300),
           ),
@@ -124,8 +122,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           "y: ${layout.startY}",
                           "w: ${layout.width}",
                           "h: ${layout.height}",
-                          if (layout.minWidth != 1)
-                            "minW: ${layout.minWidth}",
+                          if (layout.minWidth != 1) "minW: ${layout.minWidth}",
                           if (layout.minHeight != 1)
                             "minH: ${layout.minHeight}",
                           if (layout.maxWidth != null)
@@ -149,9 +146,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                             Icons.clear,
                             color: Colors.white,
                             size: 20,
-                          )
-                      )
-                  )
+                          )))
               ],
             );
           },

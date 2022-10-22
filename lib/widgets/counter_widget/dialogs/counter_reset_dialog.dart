@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:tabletop_assistant/helpers.dart';
+
+import '../../../helpers.dart';
 
 class CounterResetDialog extends StatelessWidget {
   final void Function() resetIndex;
   final int? originalValue;
 
-  const CounterResetDialog({super.key, required this.originalValue, required this.resetIndex});
+  const CounterResetDialog(
+      {super.key, required this.originalValue, required this.resetIndex});
 
   @override
   Widget build(BuildContext context) {
-    final titleEnding = "${originalValue.flatMap((value) => " of $value") ?? ""}?";
+    final titleEnding =
+        "${originalValue.flatMap((value) => " of $value") ?? ""}?";
     return AlertDialog(
       title: Text("Reset counter to original value$titleEnding"),
       actions: [
