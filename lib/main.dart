@@ -1,3 +1,4 @@
+import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
 
 import 'views/presets_view/presets_view.dart';
@@ -8,7 +9,6 @@ void main() {
 }
 
 /// Root application widget of Board Aid.
-// TODO: maybe setup a global theme?
 class BoardAidApp extends StatelessWidget {
   const BoardAidApp({super.key});
 
@@ -16,8 +16,10 @@ class BoardAidApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Board Aid',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
       home: const PresetsView(),
-      theme: Theme.of(context),
       debugShowCheckedModeBanner: false,
     );
   }
