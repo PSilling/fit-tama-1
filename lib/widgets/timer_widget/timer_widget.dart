@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
 
 import '../editable.dart';
@@ -121,8 +122,10 @@ class TimerWidgetState extends State<TimerWidget>
   }
 
   Widget _titleWidget(BuildContext context) {
-    final theme = Theme.of(context).textTheme;
-    return Text(_data.name, style: theme.headlineLarge);
+    return Text(
+      _data.name,
+      style: ThemeHelper.widgetTitle(context),
+    );
   }
 
   Widget _timeWidget(BuildContext context) {
