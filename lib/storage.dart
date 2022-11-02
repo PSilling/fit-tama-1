@@ -5,6 +5,10 @@ import 'package:dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import './widgets/counter_widget/counter_widget_data.dart';
+import './widgets/dice_widget/dice_widget_data.dart';
+import './widgets/timer_widget/timer_widget_data.dart';
+
 class ColoredDashboardItem extends DashboardItem {
   ColoredDashboardItem(
       {this.color,
@@ -35,7 +39,6 @@ class ColoredDashboardItem extends DashboardItem {
         super.withLayout(map["item_id"], ItemLayout.fromMap(map["layout"]));
 
   Color? color;
-
   String? data;
 
   @override
@@ -51,17 +54,41 @@ class ColoredDashboardItem extends DashboardItem {
   }
 }
 
-class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
-  late SharedPreferences _preferences;
+class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
 
+  late SharedPreferences _preferences;
   final List<int> _slotCounts = [2, 3];
+  Map<int, Map<String, ColoredDashboardItem>>? _localItems;
 
   final Map<int, List<ColoredDashboardItem>> _default = {
-    2: <ColoredDashboardItem>[],
+    2: <ColoredDashboardItem>[
+      ColoredDashboardItem(
+        width: 1,
+        height: 1,
+        identifier: 'counter',
+        startX: 0,
+        startY: 0,
+        data: 'counter',
+      ),
+      ColoredDashboardItem(
+        width: 1,
+        height: 1,
+        identifier: 'dice',
+        startX: 1,
+        startY: 0,
+        data: 'dice',
+      ),
+      ColoredDashboardItem(
+        width: 1,
+        height: 1,
+        identifier: 'timer',
+        startX: 0,
+        startY: 1,
+        data: 'timer',
+      )
+    ],
     3: <ColoredDashboardItem>[],
   };
-
-  Map<int, Map<String, ColoredDashboardItem>>? _localItems;
 
   @override
   FutureOr<List<ColoredDashboardItem>> getAllItems(int slotCount) {
@@ -75,7 +102,7 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
 
         var init = _preferences.getBool("init") ?? false;
 
-        if (!init) {
+        if (!init || _localItems == null) {
           _localItems = {
             for (var s in _slotCounts)
               s: _default[s]!
@@ -108,6 +135,7 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
   @override
   FutureOr<void> onItemsUpdated(
       List<ColoredDashboardItem> items, int slotCount) async {
+
     for (var item in items) {
       _localItems?[slotCount]?[item.identifier] = item;
     }

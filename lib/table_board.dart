@@ -21,12 +21,12 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   ///
   final ScrollController scrollController = ScrollController();
 
+  var storage = MyItemStorage();
+
   ///
   late var itemController =
       DashboardItemController<ColoredDashboardItem>.withDelegate(
           itemStorageDelegate: storage);
-
-  var storage = MyItemStorage();
 
   int? slot;
 
@@ -97,8 +97,28 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             var layout = item.layoutData;
 
             if (item.data != null) {
-              return DataWidget(
-                item: item,
+              return Stack(
+                children: [
+                  DataWidget(
+                    item: item,
+                  ),
+                  if (itemController.isEditing)
+                    Positioned(
+                        right: 5,
+                        top: 5,
+                        child: InkResponse(
+                            radius: 20,
+                            onTap: () {
+                              itemController.delete(item.identifier);
+                            },
+                            child: const Icon(
+                              Icons.clear,
+                              color: Colors.black,
+                              size: 20,
+                            )
+                        )
+                    )
+                ]
               );
             }
 
@@ -143,7 +163,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                             Icons.clear,
                             color: Colors.white,
                             size: 20,
-                          )))
+                          )
+                      )
+                  )
               ],
             );
           },
