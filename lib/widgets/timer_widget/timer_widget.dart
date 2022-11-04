@@ -20,11 +20,6 @@ enum TimerWidgetTimerState { init, running, paused }
 
 class TimerWidgetState extends State<TimerWidget>
     implements Editable<TimerWidget> {
-  static const decoration = BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.all(Radius.circular(12)),
-    boxShadow: [BoxShadow()],
-  );
 
   late int _currentTime = _data.initialTime;
   TimerWidgetTimerState _currentState = TimerWidgetTimerState.init;
@@ -142,8 +137,8 @@ class TimerWidgetState extends State<TimerWidget>
                   fit: BoxFit.contain,
                   child: Text(
                     style: _currentTime <= 0
-                        ? const TextStyle(color: Colors.red)
-                        : const TextStyle(),
+                        ? ThemeHelper.widgetContentMain(context).copyWith(color: Colors.yellow)
+                        : ThemeHelper.widgetContentMain(context),
                     formatTime(_currentTime),
                   ),
                 ),
@@ -154,12 +149,9 @@ class TimerWidgetState extends State<TimerWidget>
   Widget _themedIcon(IconData? icon,
       {required BuildContext context, required String semanticLabel}) {
     final iconTheme = Theme.of(context).iconTheme;
-    final textTheme = Theme.of(context).textTheme;
     return Icon(
       icon,
-      color: textTheme.displayLarge?.color,
-      shadows: iconTheme.shadows,
-      size: iconTheme.size,
+      color: iconTheme.color,
       semanticLabel: semanticLabel,
     );
   }
@@ -211,7 +203,11 @@ class TimerWidgetState extends State<TimerWidget>
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: decoration,
+        decoration: BoxDecoration(
+          color: ThemeHelper.widgetBackgroundColor(context),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          boxShadow: const [BoxShadow()],
+        ),
         height: 240,
         width: 240,
         padding: const EdgeInsets.all(10),
