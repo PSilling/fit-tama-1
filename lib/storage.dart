@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './widgets/counter_widget/counter_widget_data.dart';
 import './widgets/dice_widget/dice_widget_data.dart';
 import './widgets/timer_widget/timer_widget_data.dart';
+import './data_widget.dart';
 
 class ColoredDashboardItem extends DashboardItem {
   ColoredDashboardItem(
@@ -15,7 +16,8 @@ class ColoredDashboardItem extends DashboardItem {
       required int width,
       required int height,
       required String identifier,
-      this.data,
+      this.type,  //TODO - set required
+      this.data,  //TODO - set required
       int minWidth = 1,
       int minHeight = 1,
       int? maxHeight = 1,
@@ -35,10 +37,12 @@ class ColoredDashboardItem extends DashboardItem {
 
   ColoredDashboardItem.fromMap(Map<String, dynamic> map)
       : color = map["color"] != null ? Color(map["color"]) : null,
-        data = map["data"],
+        type = map['type'],
+        data = map['data'],
         super.withLayout(map["item_id"], ItemLayout.fromMap(map["layout"]));
 
   Color? color;
+  String? type;
   String? data;
 
   @override
@@ -46,6 +50,9 @@ class ColoredDashboardItem extends DashboardItem {
     var sup = super.toMap();
     if (color != null) {
       sup["color"] = color?.value;
+    }
+    if (type != null){
+      sup['type'] = type;
     }
     if (data != null) {
       sup["data"] = data;
@@ -56,19 +63,32 @@ class ColoredDashboardItem extends DashboardItem {
 
 class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
 
+  MyItemStorage(this.presetLink);
+
+  String presetLink;
   late SharedPreferences _preferences;
   final List<int> _slotCounts = [2, 3];
   Map<int, Map<String, ColoredDashboardItem>>? _localItems;
+  Map<String, DataWidget>? widgets;
 
   final Map<int, List<ColoredDashboardItem>> _default = {
     2: <ColoredDashboardItem>[
       ColoredDashboardItem(
+        color: Colors.blue,
         width: 1,
         height: 1,
         identifier: 'counter',
-        startX: 0,
-        startY: 0,
-        data: 'counter',
+        startX: 3,
+        startY: 1,
+        type: 'counter',
+        data: jsonEncode(CounterWidgetData(
+            name: "Round",
+            isUneven: false,
+            scale: List<int>.generate(10, (i) => i + 1),
+            defaultIndex: 2,
+            isLeftDeath: false,
+            isRightDeath: false
+        ))
       ),
       ColoredDashboardItem(
         width: 1,
@@ -76,7 +96,12 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
         identifier: 'dice',
         startX: 1,
         startY: 0,
-        data: 'dice',
+        type: 'dice',
+        data: jsonEncode(DiceWidgetData(
+            name: 'Dice',
+            numberOfDice: 2,
+            numberOfSides: 2
+        ))
       ),
       ColoredDashboardItem(
         width: 1,
@@ -84,7 +109,11 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
         identifier: 'timer',
         startX: 0,
         startY: 1,
-        data: 'timer',
+        type: 'timer',
+        data: jsonEncode(TimerWidgetData(
+            name: 'Timer',
+            initialTime: 90
+        ))
       )
     ],
     3: <ColoredDashboardItem>[],
@@ -100,9 +129,10 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
       return Future.microtask(() async {
         _preferences = await SharedPreferences.getInstance();
 
-        var init = _preferences.getBool("init") ?? false;
+        var init = _preferences.getBool("init_$presetLink") ?? false;
+        //var init = false;
 
-        if (!init || _localItems == null) {
+        if (!init) {
           _localItems = {
             for (var s in _slotCounts)
               s: _default[s]!
@@ -112,15 +142,28 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
 
           for (var s in _slotCounts) {
             await _preferences.setString(
-                "layout_data_$s",
+                "preset_data_${presetLink}_$s",
                 json.encode(_default[s]!.asMap().map((key, value) =>
                     MapEntry(value.identifier, value.toMap()))));
           }
 
-          await _preferences.setBool("init", true);
+          await _preferences.setBool("init_$presetLink", true);
         }
 
-        var js = json.decode(_preferences.getString("layout_data_$slotCount")!);
+        var js = json.decode(_preferences.getString(
+            "preset_data_${presetLink}_$slotCount")!);
+
+        _localItems = {
+          slotCount: {
+            for (var e in js!.values.map((value) =>
+                ColoredDashboardItem.fromMap(value)).toList()) e.identifier : e
+          }
+        };
+
+        widgets = {
+            for (var e in _localItems![slotCount]!.keys)
+              e : DataWidget(key: GlobalKey(), item: _localItems![slotCount]![e]!)
+        };
 
         return js!.values
             .map<ColoredDashboardItem>(
@@ -143,7 +186,7 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
     var js = json.encode(_localItems![slotCount]!
         .map((key, value) => MapEntry(key, value.toMap())));
 
-    await _preferences.setString("layout_data_$slotCount", js);
+    await _preferences.setString("preset_data_${presetLink}_$slotCount", js);
   }
 
   @override
@@ -152,10 +195,11 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
     for (var s in _slotCounts) {
       for (var i in items) {
         _localItems![s]?[i.identifier] = i;
+        widgets![i.identifier] = DataWidget(key: GlobalKey(), item: i);
       }
 
       await _preferences.setString(
-          "layout_data_$s",
+          "preset_data_${presetLink}_$s",
           json.encode(_localItems![s]!
               .map((key, value) => MapEntry(key, value.toMap()))));
     }
@@ -167,10 +211,11 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
     for (var s in _slotCounts) {
       for (var i in items) {
         _localItems![s]?.remove(i.identifier);
+        widgets?.remove(i.identifier);
       }
 
       await _preferences.setString(
-          "layout_data_$s",
+          "preset_data_${presetLink}_$s",
           json.encode(_localItems![s]!
               .map((key, value) => MapEntry(key, value.toMap()))));
     }
@@ -179,10 +224,11 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
   Future<void> clear() async {
     for (var s in _slotCounts) {
       _localItems?[s]?.clear();
-      await _preferences.remove("layout_data_$s");
+      await _preferences.remove("preset_data_${presetLink}_$s");
     }
     _localItems = null;
-    await _preferences.setBool("init", false);
+    widgets = null;
+    await _preferences.setBool("init_$presetLink", false);
   }
 
   @override

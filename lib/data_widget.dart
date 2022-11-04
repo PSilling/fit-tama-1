@@ -1,8 +1,9 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dashboard/dashboard.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 import './storage.dart';
 
@@ -25,32 +26,49 @@ class DataWidget extends StatelessWidget {
 
   final Map<String, Widget Function(ColoredDashboardItem i)> _map = {
     "counter": (l) => CounterWidget(
-      initData: CounterWidgetData(
-        name: "Round",
-        isUneven: false,
-        scale: [1, 2, 3],
-        defaultIndex: 2,
-        isLeftDeath: false,
-        isRightDeath: false
-      )
+      initData: CounterWidgetData.fromJson(jsonDecode(l.data!))
     ),
     "dice": (l) => DiceWidget(
-      initData: DiceWidgetData(
-        name: 'Dice',
-        numberOfDice: 2,
-        numberOfSides: 2
-      )
+      initData: DiceWidgetData.fromJson(jsonDecode(l.data!))
     ),
     "timer": (l) => TimerWidget(
-      initData: TimerWidgetData(
-        name: 'Timer',
-        initialTime: 90
-      )
+      initData: TimerWidgetData.fromJson(jsonDecode(l.data!))
     ),
   };
 
   @override
   Widget build(BuildContext context) {
-    return _map[item.data]!(item);
+    if (item.data != null){
+      return _map[item.type]!(item);
+    }
+    //TODO - remove placeholder widget
+    var layout = item.layoutData;
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          color: item.color,
+          borderRadius: BorderRadius.circular(10)),
+      child: SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: Text(
+            "Subject to change \n ID: ${item.identifier}\n${[
+              "x: ${layout.startX}",
+              "y: ${layout.startY}",
+              "w: ${layout.width}",
+              "h: ${layout.height}",
+              if (layout.minWidth != 1) "minW: ${layout.minWidth}",
+              if (layout.minHeight != 1)
+                "minH: ${layout.minHeight}",
+              if (layout.maxWidth != null)
+                "maxW: ${layout.maxWidth}",
+              if (layout.maxHeight != null)
+                "maxH : ${layout.maxHeight}"
+            ].join("\n")}",
+            style: const TextStyle(color: Colors.white),
+          )),
+    );
+
   }
 }

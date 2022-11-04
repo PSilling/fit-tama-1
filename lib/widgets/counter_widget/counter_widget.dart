@@ -15,6 +15,7 @@ class CounterWidget extends StatefulWidget {
 
   @override
   State<CounterWidget> createState() => CounterWidgetState();
+
 }
 
 class CounterWidgetState extends State<CounterWidget>
@@ -42,6 +43,7 @@ class CounterWidgetState extends State<CounterWidget>
   @override
   void initState() {
     super.initState();
+    print('hello');
     _data = widget.initData;
     _currentIndex = _data.defaultIndex;
   }

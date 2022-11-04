@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import './storage.dart';
 import 'add_widget_dialog.dart';
@@ -21,19 +23,24 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   ///
   final ScrollController scrollController = ScrollController();
 
-  var storage = MyItemStorage();
+  late MyItemStorage storage;
 
   ///
-  late var itemController =
-      DashboardItemController<ColoredDashboardItem>.withDelegate(
-          itemStorageDelegate: storage);
+  late DashboardItemController<ColoredDashboardItem> itemController;
 
   int? slot;
 
+  @override
+  void initState(){
+    super.initState();
+    storage =  MyItemStorage(widget.preset.id);
+    itemController = DashboardItemController<ColoredDashboardItem>.withDelegate(
+        itemStorageDelegate: storage);
+  }
+
   setSlot() {
-    setState(() {
-      slot = 2;
-    });
+    slot = 2;
+    setState(() {});
   }
 
   ///
@@ -58,7 +65,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
           IconButton(
               onPressed: () {
                 itemController.isEditing = !itemController.isEditing;
-                setState(() {});
+                //setState(() {});
               },
               icon: const Icon(Icons.edit)),
         ],
@@ -66,7 +73,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       body: SafeArea(
         child: Dashboard<ColoredDashboardItem>(
           shrinkToPlace: false,
-          slideToTop: true,
+          slideToTop: false,
           absorbPointer: false,
           padding: const EdgeInsets.all(8),
           horizontalSpace: 8,
@@ -84,7 +91,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               clipBehavior: Clip.antiAliasWithSaveLayer,
               elevation: 5,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15))),
+                  borderRadius: BorderRadius.circular(15)
+              )
+          ),
           editModeSettings: EditModeSettings(
             paintBackgroundLines: false,
             fillEditingBackground: false,
@@ -94,81 +103,29 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             duration: const Duration(milliseconds: 300),
           ),
           itemBuilder: (ColoredDashboardItem item) {
-            var layout = item.layoutData;
-
-            if (item.data != null) {
-              return Stack(
-                children: [
-                  DataWidget(
-                    item: item,
-                  ),
-                  if (itemController.isEditing)
-                    Positioned(
-                        right: 5,
-                        top: 5,
-                        child: InkResponse(
-                            radius: 20,
-                            onTap: () {
-                              itemController.delete(item.identifier);
-                            },
-                            child: const Icon(
-                              Icons.clear,
-                              color: Colors.black,
-                              size: 20,
-                            )
-                        )
-                    )
-                ]
-              );
-            }
-
+            //print(storage.localItems![slot]![item.identifier]);
             return Stack(
               children: [
-                Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: item.color,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Text(
-                        "Subject to change \n ID: ${item.identifier}\n${[
-                          "x: ${layout.startX}",
-                          "y: ${layout.startY}",
-                          "w: ${layout.width}",
-                          "h: ${layout.height}",
-                          if (layout.minWidth != 1) "minW: ${layout.minWidth}",
-                          if (layout.minHeight != 1)
-                            "minH: ${layout.minHeight}",
-                          if (layout.maxWidth != null)
-                            "maxW: ${layout.maxWidth}",
-                          if (layout.maxHeight != null)
-                            "maxH : ${layout.maxHeight}"
-                        ].join("\n")}",
-                        style: const TextStyle(color: Colors.white),
-                      )),
-                ),
+                storage.widgets![item.identifier]!,
                 if (itemController.isEditing)
                   Positioned(
-                      right: 5,
-                      top: 5,
-                      child: InkResponse(
-                          radius: 20,
-                          onTap: () {
-                            itemController.delete(item.identifier);
-                          },
-                          child: const Icon(
-                            Icons.clear,
-                            color: Colors.white,
-                            size: 20,
-                          )
+                    right: 5,
+                    top: 5,
+                    child: InkResponse(
+                      radius: 20,
+                      onTap: () {
+                        itemController.delete(item.identifier);
+                      },
+                      child: const Icon(
+                        Icons.clear,
+                        color: Colors.black,
+                        size: 20,
                       )
+                    )
                   )
-              ],
+                ]
             );
-          },
+          }
         ),
       ),
     );
