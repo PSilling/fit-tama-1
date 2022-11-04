@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import './storage.dart';
 import 'add_widget_dialog.dart';
-import 'data_widget.dart';
 import 'models/preset_model.dart';
 
 class DashboardWidget extends StatefulWidget {
@@ -46,28 +43,31 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   ///
   @override
   Widget build(BuildContext context) {
-    slot = 2;
+    slot=2;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(widget.preset.name),
         actions: [
           IconButton(
-              onPressed: () {
-                itemController.clear();
-              },
-              icon: const Icon(Icons.delete)),
+            onPressed: () {
+              itemController.clear();
+            },
+            icon: const Icon(Icons.delete)),
           IconButton(
-              onPressed: () {
-                add(context);
-              },
-              icon: const Icon(Icons.add)),
+            onPressed: () {
+              add(context);
+            },
+            icon: const Icon(Icons.add)),
           IconButton(
-              onPressed: () {
-                itemController.isEditing = !itemController.isEditing;
-                //setState(() {});
-              },
-              icon: const Icon(Icons.edit)),
+            onPressed: () {
+              itemController.isEditing = !itemController.isEditing;
+              storage.setWidgetsEditing(itemController.isEditing);
+              if(itemController.isEditing == false){
+                storage.onItemsUpdated([], slot!);
+              }
+            },
+            icon: const Icon(Icons.edit)),
         ],
       ),
       body: SafeArea(
@@ -140,14 +140,17 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
     if (res != null) {
       itemController.add(ColoredDashboardItem(
-          color: res[6],
-          width: res[0],
-          height: res[1],
-          identifier: (Random().nextInt(100000) + 4).toString(),
-          minWidth: res[2],
-          minHeight: res[3],
-          maxWidth: res[4] == 0 ? null : res[4],
-          maxHeight: res[5] == 0 ? null : res[5]));
+        color: Colors.blue,
+        width: 1,
+        height: 1,
+        identifier: Random().nextInt(1000).toString() +
+          DateTime.now().microsecondsSinceEpoch.toString(),
+        minWidth: 1,
+        minHeight: 1,
+        maxWidth: 2,
+        maxHeight: 1,
+        type:res,
+        data:storage.defaultData[res]!));
     }
   }
 }

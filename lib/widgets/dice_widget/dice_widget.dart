@@ -47,6 +47,8 @@ class DiceWidgetState extends State<DiceWidget>
     super.initState();
   }
 
+  DiceWidgetData get data => _data;
+
   int _randIntFrom1({required int to}) => _random.nextInt(to) + 1;
 
   void rollDice() async {

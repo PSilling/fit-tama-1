@@ -8,7 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './widgets/counter_widget/counter_widget_data.dart';
 import './widgets/dice_widget/dice_widget_data.dart';
 import './widgets/timer_widget/timer_widget_data.dart';
-import './data_widget.dart';
+import './widgets/counter_widget/counter_widget.dart';
+import './widgets/dice_widget/dice_widget.dart';
+import './widgets/timer_widget/timer_widget.dart';
 
 class ColoredDashboardItem extends DashboardItem {
   ColoredDashboardItem(
@@ -16,12 +18,12 @@ class ColoredDashboardItem extends DashboardItem {
       required int width,
       required int height,
       required String identifier,
-      this.type,  //TODO - set required
-      this.data,  //TODO - set required
+      required this.type,
+      required this.data,
       int minWidth = 1,
       int minHeight = 1,
       int? maxHeight = 1,
-      int? maxWidth = 1,
+      int? maxWidth = 2,
       int? startX,
       int? startY})
       : super(
@@ -42,8 +44,8 @@ class ColoredDashboardItem extends DashboardItem {
         super.withLayout(map["item_id"], ItemLayout.fromMap(map["layout"]));
 
   Color? color;
-  String? type;
-  String? data;
+  String type;
+  String data;
 
   @override
   Map<String, dynamic> toMap() {
@@ -51,12 +53,9 @@ class ColoredDashboardItem extends DashboardItem {
     if (color != null) {
       sup["color"] = color?.value;
     }
-    if (type != null){
-      sup['type'] = type;
-    }
-    if (data != null) {
-      sup["data"] = data;
-    }
+    sup['type'] = type;
+    sup['data'] = data;
+
     return sup;
   }
 }
@@ -67,41 +66,66 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
 
   String presetLink;
   late SharedPreferences _preferences;
-  final List<int> _slotCounts = [2, 3];
+  final List<int> _slotCounts = [2];
   Map<int, Map<String, ColoredDashboardItem>>? _localItems;
-  Map<String, DataWidget>? widgets;
+  Map<String, dynamic>? widgets;
+  bool _editing = false;
 
-  final Map<int, List<ColoredDashboardItem>> _default = {
+  final Map<String, Widget Function(String i)> _widgetMap = {
+    "counter": (l) => CounterWidget(
+        key: GlobalKey(),
+        initData: CounterWidgetData.fromJson(jsonDecode(l))
+    ),
+    "dice": (l) => DiceWidget(
+        key: GlobalKey(),
+        initData: DiceWidgetData.fromJson(jsonDecode(l))
+    ),
+    "timer": (l) => TimerWidget(
+        key: GlobalKey(),
+        initData: TimerWidgetData.fromJson(jsonDecode(l))
+    ),
+  };
+
+  final Map<String, String> defaultData = {
+    'counter': jsonEncode(CounterWidgetData(
+        name: "Round",
+        isUneven: false,
+        scale: List<int>.generate(10, (i) => i + 1),
+        defaultIndex: 2,
+        isLeftDeath: false,
+        isRightDeath: false
+    )),
+    'dice': jsonEncode(DiceWidgetData(
+        name: 'Dice',
+        numberOfDice: 2,
+        numberOfSides: 2
+    )),
+    'timer': jsonEncode(TimerWidgetData(
+        name: 'Timer',
+        initialTime: 90
+    ))
+  };
+
+  late final Map<int, List<ColoredDashboardItem>> _default = {
     2: <ColoredDashboardItem>[
       ColoredDashboardItem(
         color: Colors.blue,
         width: 1,
         height: 1,
         identifier: 'counter',
-        startX: 3,
-        startY: 1,
+        startX: 0,
+        startY: 0,
         type: 'counter',
-        data: jsonEncode(CounterWidgetData(
-            name: "Round",
-            isUneven: false,
-            scale: List<int>.generate(10, (i) => i + 1),
-            defaultIndex: 2,
-            isLeftDeath: false,
-            isRightDeath: false
-        ))
+        data: defaultData['counter']!,
       ),
       ColoredDashboardItem(
         width: 1,
         height: 1,
         identifier: 'dice',
         startX: 1,
-        startY: 0,
+        startY: 1,
         type: 'dice',
-        data: jsonEncode(DiceWidgetData(
-            name: 'Dice',
-            numberOfDice: 2,
-            numberOfSides: 2
-        ))
+        data: defaultData['dice']!,
       ),
       ColoredDashboardItem(
         width: 1,
@@ -110,14 +134,14 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
         startX: 0,
         startY: 1,
         type: 'timer',
-        data: jsonEncode(TimerWidgetData(
-            name: 'Timer',
-            initialTime: 90
-        ))
+        data: defaultData['timer']!
       )
     ],
-    3: <ColoredDashboardItem>[],
   };
+
+  dynamic buildWidget(item){
+    return _widgetMap[item.type]!(item.data);
+  }
 
   @override
   FutureOr<List<ColoredDashboardItem>> getAllItems(int slotCount) {
@@ -161,8 +185,8 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
         };
 
         widgets = {
-            for (var e in _localItems![slotCount]!.keys)
-              e : DataWidget(key: GlobalKey(), item: _localItems![slotCount]![e]!)
+          for (var e in _localItems![slotCount]!.keys)
+            e : buildWidget(_localItems![slotCount]![e]!)
         };
 
         return js!.values
@@ -183,6 +207,11 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
       _localItems?[slotCount]?[item.identifier] = item;
     }
 
+    for (var id in widgets!.keys){
+      _localItems?[slotCount]?[id]?.data =
+          jsonEncode(widgets![id].key.currentState.data);
+    }
+
     var js = json.encode(_localItems![slotCount]!
         .map((key, value) => MapEntry(key, value.toMap())));
 
@@ -192,10 +221,11 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
   @override
   FutureOr<void> onItemsAdded(
       List<ColoredDashboardItem> items, int slotCount) async {
+
     for (var s in _slotCounts) {
       for (var i in items) {
         _localItems![s]?[i.identifier] = i;
-        widgets![i.identifier] = DataWidget(key: GlobalKey(), item: i);
+        widgets![i.identifier] = buildWidget(i);
       }
 
       await _preferences.setString(
@@ -203,6 +233,13 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
           json.encode(_localItems![s]!
               .map((key, value) => MapEntry(key, value.toMap()))));
     }
+
+    if(_editing){
+      for (var i in items){
+        widgets![i.identifier].key.currentState.isEditing = _editing;
+      }
+    }
+
   }
 
   @override
@@ -229,6 +266,15 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem>{
     _localItems = null;
     widgets = null;
     await _preferences.setBool("init_$presetLink", false);
+  }
+
+  void setWidgetsEditing(value){
+    _editing = value;
+    for (var item in widgets!.values){
+      if(item != null){
+        item.key.currentState.isEditing = _editing;
+      }
+    }
   }
 
   @override
