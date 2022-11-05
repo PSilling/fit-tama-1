@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../helpers.dart';
+import '../../themes.dart';
 import 'timer_widget_data.dart';
 
 class TimerEditDialog extends StatelessWidget {
@@ -37,6 +38,7 @@ class TimerEditDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.background,
         content: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: FormBuilder(
@@ -65,13 +67,15 @@ class TimerEditDialog extends StatelessWidget {
               ]),
             )),
         actions: [
-          TextButton(
+          ThemeHelper.buttonPrimary(
+            context: context,
             onPressed: () => _validateSaveAndDismiss(context),
-            child: const Text("Save"),
+            label: "Save",
           ),
-          TextButton(
+          ThemeHelper.buttonSecondary(
+            context: context,
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Cancel"),
+            label: "Cancel",
           ),
         ],
       );

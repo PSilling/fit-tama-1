@@ -19,7 +19,6 @@ class PresetsSearchInput extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Icon(Icons.search),
         ),
-        // TODO: not sure if these colour are setup properly
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -27,30 +26,21 @@ class PresetsSearchInput extends StatelessWidget {
               autofocus: true,
               decoration: InputDecoration(
                 hintText: 'Search presets…',
-                hintStyle: TextStyle(
-                  color: Theme.of(context).secondaryHeaderColor,
-                ),
+                hintStyle: Theme.of(context).textTheme.titleMedium,
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context)
-                        .secondaryHeaderColor
-                        .withOpacity(0.75),
+                    color: Theme.of(context).colorScheme.onBackground
                   ),
                 ),
                 // TODO: maybe disable underline when focused?
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context)
-                        .secondaryHeaderColor
-                        .withOpacity(0.75),
+                    color: Theme.of(context).colorScheme.onBackground,
                   ),
                 ),
               ),
-              style: TextStyle(
-                color: Theme.of(context).secondaryHeaderColor,
-              ),
-              cursorColor:
-                  Theme.of(context).secondaryHeaderColor.withOpacity(0.5),
+              style: Theme.of(context).textTheme.titleMedium,
+              cursorColor: Theme.of(context).colorScheme.onBackground,
               onChanged: onSearchChanged,
             ),
           ),

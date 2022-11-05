@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:board_aid/themes.dart';
 import 'package:dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
 
@@ -45,8 +46,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   Widget build(BuildContext context) {
     slot=2;
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.black,
         title: Text(widget.preset.name),
         actions: [
           IconButton(
@@ -75,9 +76,10 @@ class _DashboardWidgetState extends State<DashboardWidget> {
           shrinkToPlace: false,
           slideToTop: false,
           absorbPointer: false,
-          padding: const EdgeInsets.all(8),
-          horizontalSpace: 8,
-          verticalSpace: 8,
+          // HACK: Values must be 50% larger compared to those in presets_view to match for some reason.
+          padding: EdgeInsets.all(ThemeHelper.cardSpacing()) * 1.5,
+          horizontalSpace: ThemeHelper.cardSpacing() * 1.5,
+          verticalSpace: ThemeHelper.cardSpacing() * 1.5,
           slotAspectRatio: 1,
           animateEverytime: true,
           scrollController: ScrollController(),
@@ -87,11 +89,10 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             return Text("$e , $s");
           },
           itemStyle: ItemStyle(
-              color: Colors.transparent,
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              elevation: 5,
+              elevation: ThemeHelper.cardElevation(),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)
+                  borderRadius: BorderRadius.circular(ThemeHelper.borderRadius())
               )
           ),
           editModeSettings: EditModeSettings(
@@ -118,8 +119,6 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       },
                       child: const Icon(
                         Icons.clear,
-                        color: Colors.black,
-                        size: 20,
                       )
                     )
                   )

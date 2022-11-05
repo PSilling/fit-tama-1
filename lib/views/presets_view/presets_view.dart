@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:board_aid/themes.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_more_button.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_sort_button.dart';
 import 'package:flutter/material.dart';
@@ -168,6 +169,7 @@ class _PresetsViewState extends State<PresetsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: PresetsAppbar(
         onSearchChanged: _handleSearchChanged,
         onSortSelected: _handleSortSelected,
@@ -175,118 +177,107 @@ class _PresetsViewState extends State<PresetsView> {
         sortOption: sortOption,
         sortAscending: sortAscending,
       ),
-      body: Container(
-        decoration: BoxDecoration(color: Theme.of(context).backgroundColor),
-        child: GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1.5,
-            crossAxisSpacing: 6,
-            mainAxisSpacing: 6,
-          ),
-          itemCount: renderedPresets.length,
-          itemBuilder: (BuildContext context, index) {
-            var preset = renderedPresets[index];
-            return Card(
-              elevation: 6,
-              color: preset.backgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              DashboardWidget(preset: preset)));
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Stack(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image(
-                              image: preset.image,
-                              width: 30,
-                              height: 30,
+      body: GridView.builder(
+        padding: EdgeInsets.all(ThemeHelper.cardSpacing()),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.5,
+          crossAxisSpacing: ThemeHelper.cardSpacing() / 2,
+          mainAxisSpacing: ThemeHelper.cardSpacing() / 2,
+        ),
+        itemCount: renderedPresets.length,
+        itemBuilder: (BuildContext context, index) {
+          var preset = renderedPresets[index];
+          return Card(
+            elevation: ThemeHelper.cardElevation(),
+            color: preset.backgroundColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeHelper.borderRadius()),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            DashboardWidget(preset: preset)));
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image(
+                            image: preset.image,
+                            width: 30,
+                            height: 30,
+                          ),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Text(
+                              preset.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Text(
-                                preset.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            preset.game,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: InkResponse(
+                              radius: 20,
+                              onTap: () => _toggleFavourite(preset.id),
+                              child: Icon(
+                                preset.isFavourite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                size: 20,
                               ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              preset.game,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                            padding: const EdgeInsets.only(left: 6),
+                            child: InkResponse(
+                              radius: 20,
+                              // TODO: add real dropdown menu, not just delete
+                              onTap: () => _removePreset(preset.id),
+                              child: const Icon(
+                                Icons.more_vert,
+                                size: 20,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8),
-                              child: InkResponse(
-                                radius: 20,
-                                onTap: () => _toggleFavourite(preset.id),
-                                child: Icon(
-                                  preset.isFavourite
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 6),
-                              child: InkResponse(
-                                radius: 20,
-                                // TODO: add real dropdown menu, not just delete
-                                onTap: () => _removePreset(preset.id),
-                                child: const Icon(
-                                  Icons.more_vert,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createPreset,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../helpers.dart';
+import '../../themes.dart';
 import 'dice_widget_data.dart';
 
 class DiceEditDialog extends StatelessWidget {
@@ -37,6 +38,7 @@ class DiceEditDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.background,
         content: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: FormBuilder(
@@ -44,11 +46,13 @@ class DiceEditDialog extends StatelessWidget {
               child: Column(children: [
                 FormBuilderTextField(
                   name: "name",
+                  decoration: ThemeHelper.textInputDecoration(context, "Title"),
                   initialValue: data.name,
                   onSaved: (value) => data.name = value ?? "",
                 ),
                 FormBuilderTextField(
                   name: "number_of_dice",
+                  decoration: ThemeHelper.textInputDecoration(context, "Dice count"),
                   keyboardType: TextInputType.number,
                   initialValue: "${data.numberOfDice}",
                   validator: _numberValidator,
@@ -56,12 +60,15 @@ class DiceEditDialog extends StatelessWidget {
                 ),
                 FormBuilderTextField(
                   name: "number_of_sides",
+                  decoration: ThemeHelper.textInputDecoration(context, "Side count"),
                   keyboardType: TextInputType.number,
                   initialValue: "${data.numberOfSides}",
                   validator: _numberValidator,
                   onSaved: (value) => data.numberOfSides = int.parse(value!),
                 ),
                 FormBuilderCheckbox(
+                  activeColor: Theme.of(context).colorScheme.onBackground,
+                  checkColor: Theme.of(context).colorScheme.primary,
                   name: "long_press_required",
                   title: const Text("Long press to reroll"),
                   initialValue: data.longPressToReroll,
@@ -70,13 +77,15 @@ class DiceEditDialog extends StatelessWidget {
               ]),
             )),
         actions: [
-          TextButton(
+          ThemeHelper.buttonPrimary(
+            context: context,
             onPressed: () => _validateSaveAndDismiss(context),
-            child: const Text("Save"),
+            label: "Save",
           ),
-          TextButton(
+          ThemeHelper.buttonSecondary(
+            context: context,
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Cancel"),
+            label: "Cancel",
           ),
         ],
       );

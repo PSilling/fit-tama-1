@@ -127,7 +127,7 @@ class TimerWidgetState extends State<TimerWidget>
 
   Widget _timeWidget(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: ThemeHelper.cardPadding(),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -150,10 +150,8 @@ class TimerWidgetState extends State<TimerWidget>
 
   Widget _themedIcon(IconData? icon,
       {required BuildContext context, required String semanticLabel}) {
-    final iconTheme = Theme.of(context).iconTheme;
     return Icon(
       icon,
-      color: iconTheme.color,
       semanticLabel: semanticLabel,
     );
   }
@@ -161,38 +159,38 @@ class TimerWidgetState extends State<TimerWidget>
   Widget _buttonWidget(BuildContext context) {
     return Center(
       child: IgnorePointer(
-          ignoring: _isEditing,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (_currentState == TimerWidgetTimerState.init)
-                IconButton(
-                  onPressed: run,
-                  icon: _themedIcon(Icons.play_arrow,
-                      context: context, semanticLabel: "Start the timer"),
-                ),
-              if (_currentState == TimerWidgetTimerState.running)
-                IconButton(
-                  onPressed: pause,
-                  icon: _themedIcon(Icons.pause,
-                      context: context, semanticLabel: "Pause the timer"),
-                ),
-              if (_currentState == TimerWidgetTimerState.paused)
-                IconButton(
-                  onPressed: run,
-                  icon: _themedIcon(Icons.play_arrow,
-                      context: context, semanticLabel: "Resume the timer"),
-                ),
-              if (_currentState == TimerWidgetTimerState.paused)
-                IconButton(
-                  onPressed: reset,
-                  icon: _themedIcon(Icons.replay,
-                      context: context, semanticLabel: "Reset the timer"),
-                ),
-            ],
-          )),
+        ignoring: _isEditing,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_currentState == TimerWidgetTimerState.init)
+              IconButton(
+                onPressed: run,
+                icon: _themedIcon(Icons.play_arrow,
+                    context: context, semanticLabel: "Start the timer"),
+              ),
+            if (_currentState == TimerWidgetTimerState.running)
+              IconButton(
+                onPressed: pause,
+                icon: _themedIcon(Icons.pause,
+                    context: context, semanticLabel: "Pause the timer"),
+              ),
+            if (_currentState == TimerWidgetTimerState.paused)
+              IconButton(
+                onPressed: run,
+                icon: _themedIcon(Icons.play_arrow,
+                    context: context, semanticLabel: "Resume the timer"),
+              ),
+            if (_currentState == TimerWidgetTimerState.paused)
+              IconButton(
+                onPressed: reset,
+                icon: _themedIcon(Icons.replay,
+                    context: context, semanticLabel: "Reset the timer"),
+              ),
+          ],
+        )),
     );
   }
 
@@ -207,12 +205,12 @@ class TimerWidgetState extends State<TimerWidget>
     return Container(
         decoration: BoxDecoration(
           color: ThemeHelper.widgetBackgroundColor(context),
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
           boxShadow: const [BoxShadow()],
         ),
         height: 240,
         width: 240,
-        padding: const EdgeInsets.all(10),
+        padding: ThemeHelper.cardPadding(),
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: _onTap,
@@ -221,11 +219,20 @@ class TimerWidgetState extends State<TimerWidget>
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _titleWidget(context),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: _titleWidget(context),
+              ),
               Expanded(
+                flex: 3,
                 child: _timeWidget(context),
               ),
-              _buttonWidget(context)
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: _buttonWidget(context),
+              ),
             ],
           ),
         ));

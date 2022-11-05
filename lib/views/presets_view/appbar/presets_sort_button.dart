@@ -33,11 +33,8 @@ class PresetsSortButton extends StatelessWidget {
 
     // Add sort direction icon for the selected sort option.
     if (option == sortOption) {
-      // TODO: color and size based on context theme
       children.add(Icon(
         sortAscending ? Icons.south : Icons.north,
-        color: Colors.black,
-        size: 20,
       ));
     }
 

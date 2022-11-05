@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -174,6 +175,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
             children: [
               FormBuilderTextField(
                 name: "range_start",
+                decoration: ThemeHelper.textInputDecoration(context, "Minimum value"),
                 initialValue:
                     widget.data.isUneven ? null : "${_rangeInitialValue.start}",
                 keyboardType: TextInputType.number,
@@ -182,6 +184,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               FormBuilderTextField(
                 name: "range_end",
+                decoration: ThemeHelper.textInputDecoration(context, "Maximum value"),
                 initialValue:
                     widget.data.isUneven ? null : "${_rangeInitialValue.end}",
                 keyboardType: TextInputType.number,
@@ -190,6 +193,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               if (field.value.flatMap((value) => value.validate()) ?? false)
                 FormBuilderSlider(
+                  activeColor: Theme.of(context).colorScheme.onBackground,
+                  inactiveColor: Theme.of(context).colorScheme.onBackground.withOpacity(0.25),
                   key: _rangeDefaultSliderKey,
                   name: "range_default",
                   initialValue: field.value!
@@ -281,6 +286,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Theme.of(context).colorScheme.background,
       content: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: FormBuilder(
@@ -289,10 +295,13 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
             children: [
               FormBuilderTextField(
                 name: "title",
+                decoration: ThemeHelper.textInputDecoration(context, "Title"),
                 initialValue: widget.data.name,
                 onSaved: (value) => widget.data.name = value ?? "",
               ),
               FormBuilderCheckboxGroup<String>(
+                activeColor: Theme.of(context).colorScheme.onBackground,
+                checkColor: Theme.of(context).colorScheme.primary,
                 name: "death",
                 initialValue: _DeathOptions.initialValue(
                     left: widget.data.isLeftDeath,
@@ -309,6 +318,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 },
               ),
               FormBuilderRadioGroup<String>(
+                  activeColor: Theme.of(context).colorScheme.onBackground,
                   name: "type",
                   initialValue:
                       _EvennessOptions.fromData(isUneven: _isUneven).label,
@@ -329,13 +339,15 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        ThemeHelper.buttonPrimary(
+          context: context,
           onPressed: () => _validateSaveAndDismiss(context),
-          child: const Text("Save"),
+          label: "Save",
         ),
-        TextButton(
+        ThemeHelper.buttonSecondary(
+          context: context,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text("Cancel"),
+          label: "Cancel",
         ),
       ],
     );

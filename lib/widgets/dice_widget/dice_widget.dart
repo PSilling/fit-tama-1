@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
 
 import '../../helpers.dart';
@@ -18,11 +19,6 @@ class DiceWidget extends StatefulWidget {
 
 class DiceWidgetState extends State<DiceWidget>
     implements Editable<DiceWidget> {
-  static const decoration = BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.all(Radius.circular(12)),
-    boxShadow: [BoxShadow()],
-  );
 
   final _random = Random();
 
@@ -90,8 +86,6 @@ class DiceWidgetState extends State<DiceWidget>
   }
 
   Widget _diceText(BuildContext context) {
-    final theme = Theme.of(context);
-    final textStyle = theme.textTheme.displaySmall;
     final rollText = _currentRoll
             ?.map((element) => "$element")
             .reduce((value, element) => "$value+$element")
@@ -103,16 +97,13 @@ class DiceWidgetState extends State<DiceWidget>
         constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
         child: Text(
           rollText,
-          style: textStyle,
+          style: ThemeHelper.widgetContentSecondary(context),
         ),
       ),
     );
   }
 
   Widget _resultText(BuildContext context) {
-    final theme = Theme.of(context);
-    final textStyle =
-        theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
     final result = _currentRoll?.reduce((value, element) => value + element);
     return FittedBox(
       fit: BoxFit.contain,
@@ -120,15 +111,14 @@ class DiceWidgetState extends State<DiceWidget>
         constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
         child: Text(
           "${result ?? ""}",
-          style: textStyle,
+          style: ThemeHelper.widgetContentMain(context),
         ),
       ),
     );
   }
 
   Widget _titleWidget(BuildContext context) {
-    final theme = Theme.of(context).textTheme;
-    return Text(_data.name, style: theme.headlineLarge);
+    return Text(_data.name, style: ThemeHelper.widgetTitle(context));
   }
 
   Widget _rollWidget(BuildContext context) => Padding(
@@ -156,19 +146,22 @@ class DiceWidgetState extends State<DiceWidget>
           ]));
 
   Widget _configurationWidget(BuildContext context) {
-    final theme = Theme.of(context).textTheme;
-    final style =
-        theme.headlineSmall?.copyWith(color: theme.headlineMedium?.color);
-    final text = "${_data.numberOfSides}-sided";
-    return Text(text, style: style);
+    return Text(
+      "${_data.numberOfSides}-sided",
+      style: ThemeHelper.widgetTitleBottom(context)
+    );
   }
 
   @override
   Widget build(BuildContext context) => Container(
-        decoration: decoration,
+        decoration: BoxDecoration(
+          color: ThemeHelper.widgetBackgroundColor(context),
+          borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
+          boxShadow: const [BoxShadow()],
+        ),
         height: 240,
         width: 240,
-        padding: const EdgeInsets.all(10),
+        padding: ThemeHelper.cardPadding(),
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: _onTap,
@@ -188,7 +181,7 @@ class DiceWidgetState extends State<DiceWidget>
                 child: _rollWidget(context),
               ),
               Flexible(
-                flex: 1,
+                flex: 0,
                 fit: FlexFit.tight,
                 child: _configurationWidget(context),
               )

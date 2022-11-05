@@ -1,3 +1,4 @@
+import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
 
 import './counter_widget_data.dart';
@@ -19,11 +20,6 @@ class CounterWidget extends StatefulWidget {
 
 class CounterWidgetState extends State<CounterWidget>
     implements Editable<CounterWidget> {
-  static const decoration = BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.all(Radius.circular(12)),
-    boxShadow: [BoxShadow()],
-  );
 
   late CounterWidgetData _data;
   late int _currentIndex;
@@ -156,12 +152,11 @@ class CounterWidgetState extends State<CounterWidget>
   }
 
   Widget _titleWidget(BuildContext context) {
-    final theme = Theme.of(context).textTheme;
     return IgnorePointer(
       ignoring: _isEditing,
       child: Text(
         _data.name,
-        style: theme.headlineLarge,
+        style: ThemeHelper.widgetTitle(context),
       ),
     );
   }
@@ -190,17 +185,13 @@ class CounterWidgetState extends State<CounterWidget>
   }
 
   Widget _numbersSection(BuildContext context) {
-    final theme = Theme.of(context);
-    final mainNumberStyle =
-        theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.normal);
-    final secondaryNumberStyle = theme.textTheme.displaySmall;
     return Row(
       children: [
         _numberButton(
           index: _currentIndex - 1,
           flex: 4,
           textAlign: TextAlign.right,
-          textStyle: secondaryNumberStyle,
+          textStyle: ThemeHelper.widgetContentSecondary(context),
         ),
         Expanded(
           flex: 5,
@@ -214,7 +205,7 @@ class CounterWidgetState extends State<CounterWidget>
                   constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
                   child: _getNumberWidgetAt(
                     _currentIndex,
-                    style: mainNumberStyle,
+                    style: ThemeHelper.widgetContentMain(context),
                   ),
                 ),
               ),
@@ -225,7 +216,7 @@ class CounterWidgetState extends State<CounterWidget>
           index: _currentIndex + 1,
           flex: 4,
           textAlign: TextAlign.left,
-          textStyle: secondaryNumberStyle,
+          textStyle: ThemeHelper.widgetContentSecondary(context),
         ),
       ],
     );
@@ -233,13 +224,8 @@ class CounterWidgetState extends State<CounterWidget>
 
   Widget _themedIcon(IconData? icon,
       {required BuildContext context, required String semanticLabel}) {
-    final iconTheme = Theme.of(context).iconTheme;
-    final textTheme = Theme.of(context).textTheme;
     return Icon(
       icon,
-      color: textTheme.displayLarge?.color,
-      shadows: iconTheme.shadows,
-      size: iconTheme.size,
       semanticLabel: semanticLabel,
     );
   }
@@ -260,10 +246,14 @@ class CounterWidgetState extends State<CounterWidget>
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: decoration,
+      decoration: BoxDecoration(
+        color: ThemeHelper.widgetBackgroundColor(context),
+        borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
+        boxShadow: const [BoxShadow()],
+      ),
       height: 240,
       width: 240,
-      padding: const EdgeInsets.all(10),
+      padding: ThemeHelper.cardPadding(),
       child: Stack(
         children: [
           Row(

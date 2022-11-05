@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../helpers.dart';
+import '../../../themes.dart';
 
 class CounterScaleDialog extends StatefulWidget {
   final void Function(IndexedEntry) setCurrentIndex;
@@ -71,13 +72,10 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
     final selected = TextButton.styleFrom(
         minimumSize: minSize,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
         textStyle: textStyle);
     final current = TextButton.styleFrom(
         minimumSize: minSize,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        foregroundColor: Colors.black,
         textStyle: textStyle);
     if (entry == widget.currentEntry) {
       return current;
@@ -91,6 +89,7 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Theme.of(context).colorScheme.background,
       content: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -115,16 +114,18 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        ThemeHelper.buttonPrimary(
+          context: context,
           onPressed: _selectedEntry.flatMap((entry) => () {
-                widget.setCurrentIndex(entry);
-                Navigator.of(context).pop();
-              }),
-          child: const Text("Confirm"),
+            widget.setCurrentIndex(entry);
+            Navigator.of(context).pop();
+          }),
+          label: "Confirm",
         ),
-        TextButton(
+        ThemeHelper.buttonSecondary(
+          context: context,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text("Cancel"),
+          label: "Cancel",
         ),
       ],
     );

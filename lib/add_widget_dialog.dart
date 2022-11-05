@@ -1,5 +1,5 @@
+import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class AddDialog extends StatefulWidget {
   const AddDialog({Key? key}) : super(key: key);
@@ -13,6 +13,7 @@ class _AddDialogState extends State<AddDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Theme.of(context).colorScheme.background,
       child: SizedBox(
         width: 600,
         child: SingleChildScrollView(
@@ -20,40 +21,34 @@ class _AddDialogState extends State<AddDialog> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                const Text("Add widget"),
-                const SizedBox(
-                  height: 10,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    "Add widget",
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
-                const SizedBox(
-                  height: 20,
+                ThemeHelper.buttonPrimary(
+                  context: context,
+                  label: "Counter",
+                  onPressed: () {
+                    Navigator.pop(context, 'counter');
+                  },
                 ),
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context, 'counter');
-                    },
-                    child: const Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-                      child: Text("Add Counter"),
-                    )),
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context, 'dice');
-                    },
-                    child: const Padding(
-                      padding:
-                      EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-                      child: Text("Add Dice"),
-                    )),
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context, 'timer');
-                    },
-                    child: const Padding(
-                      padding:
-                      EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-                      child: Text("Add Timer"),
-                    )),
+                ThemeHelper.buttonPrimary(
+                  context: context,
+                  label: "Dice",
+                  onPressed: () {
+                    Navigator.pop(context, 'dice');
+                  },
+                ),
+                ThemeHelper.buttonPrimary(
+                  context: context,
+                  label: "Timer",
+                  onPressed: () {
+                    Navigator.pop(context, 'timer');
+                  },
+                ),
                 const SizedBox(
                   height: 20,
                 ),
