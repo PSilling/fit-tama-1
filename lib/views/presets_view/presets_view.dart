@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:board_aid/views/presets_view/appbar/presets_more_button.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_sort_button.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/preset_model.dart';
 import '../../table_board.dart';
@@ -23,6 +25,7 @@ class _PresetsViewState extends State<PresetsView> {
   var searchText = '';
   var sortOption = PresetsSortOption.byName;
   var sortAscending = true;
+  late SharedPreferences storage;
 
   /// Creates a new Preset.
   void _createPreset() {
@@ -33,13 +36,20 @@ class _PresetsViewState extends State<PresetsView> {
       backgroundColor: Random().nextInt(2) == 1 ? Colors.blue : Colors.red,
     ));
     _updateRenderedPresets();
+    _storePresets();
   }
 
   // Removes the selected Preset.
-  void _removePreset(String id) {
+  void _removePreset(String id) async {
     // TODO: add confirmation dialog
     presets.removeWhere((preset) => preset.id == id);
     _updateRenderedPresets();
+    _storePresets();
+    storage = await SharedPreferences.getInstance();
+    storage.remove("init_$id");
+    for (var s in [2, 3]) {
+      storage.remove("preset_data_${id}_$s");
+    }
   }
 
   // Toggles favourite status of the selected Preset.
@@ -47,6 +57,7 @@ class _PresetsViewState extends State<PresetsView> {
     var index = presets.indexWhere((preset) => preset.id == id);
     presets[index].isFavourite = !presets[index].isFavourite;
     _updateRenderedPresets();
+    _storePresets();
   }
 
   /// Updates the ordered and filtered list of rendered Presets.
@@ -111,7 +122,7 @@ class _PresetsViewState extends State<PresetsView> {
   }
 
   /// Handles additional menu actions.
-  void _handleMoreSelected(PresetsMoreOption option) {
+  void _handleMoreSelected(PresetsMoreOption option) async {
     switch (option) {
       case PresetsMoreOption.removeAll:
         // TODO: add confirmation dialog
@@ -122,7 +133,36 @@ class _PresetsViewState extends State<PresetsView> {
         // TODO: show "About application" dialog (probably just a copy-paste of
         // TODO: app description from app store)
         break;
+      case PresetsMoreOption.clearStorage:
+        var storage = await SharedPreferences.getInstance();
+        await storage.clear();
+        break;
     }
+  }
+
+  /// Stores presets into the local storage
+  void _storePresets() async {
+    storage = await SharedPreferences.getInstance();
+    await storage.setString('presets', jsonEncode(presets));
+  }
+
+  /// Loads presets from local storage
+  Future<void> _loadPresets() async {
+    storage = await SharedPreferences.getInstance();
+    setState(() {
+      presets = List<PresetModel>.from(
+          jsonDecode(storage.getString('presets') ?? "[]").map(
+                  (model)=> PresetModel.fromJson(model)
+          )
+      );
+    });
+    _updateRenderedPresets();
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    _loadPresets();
   }
 
   @override

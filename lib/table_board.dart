@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import './storage.dart';
 import 'add_widget_dialog.dart';
-import 'data_widget.dart';
 import 'models/preset_model.dart';
 
 class DashboardWidget extends StatefulWidget {
@@ -21,52 +20,60 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   ///
   final ScrollController scrollController = ScrollController();
 
-  ///
-  late var itemController =
-      DashboardItemController<ColoredDashboardItem>.withDelegate(
-          itemStorageDelegate: storage);
+  late MyItemStorage storage;
 
-  var storage = MyItemStorage();
+  ///
+  late DashboardItemController<ColoredDashboardItem> itemController;
 
   int? slot;
 
+  @override
+  void initState(){
+    super.initState();
+    storage =  MyItemStorage(widget.preset.id);
+    itemController = DashboardItemController<ColoredDashboardItem>.withDelegate(
+        itemStorageDelegate: storage);
+  }
+
   setSlot() {
-    setState(() {
-      slot = 2;
-    });
+    slot = 2;
+    setState(() {});
   }
 
   ///
   @override
   Widget build(BuildContext context) {
-    slot = 2;
+    slot=2;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(widget.preset.name),
         actions: [
           IconButton(
-              onPressed: () {
-                itemController.clear();
-              },
-              icon: const Icon(Icons.delete)),
+            onPressed: () {
+              itemController.clear();
+            },
+            icon: const Icon(Icons.delete)),
           IconButton(
-              onPressed: () {
-                add(context);
-              },
-              icon: const Icon(Icons.add)),
+            onPressed: () {
+              add(context);
+            },
+            icon: const Icon(Icons.add)),
           IconButton(
-              onPressed: () {
-                itemController.isEditing = !itemController.isEditing;
-                setState(() {});
-              },
-              icon: const Icon(Icons.edit)),
+            onPressed: () {
+              itemController.isEditing = !itemController.isEditing;
+              storage.setWidgetsEditing(itemController.isEditing);
+              if(itemController.isEditing == false){
+                storage.onItemsUpdated([], slot!);
+              }
+            },
+            icon: const Icon(Icons.edit)),
         ],
       ),
       body: SafeArea(
         child: Dashboard<ColoredDashboardItem>(
           shrinkToPlace: false,
-          slideToTop: true,
+          slideToTop: false,
           absorbPointer: false,
           padding: const EdgeInsets.all(8),
           horizontalSpace: 8,
@@ -84,7 +91,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               clipBehavior: Clip.antiAliasWithSaveLayer,
               elevation: 5,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15))),
+                  borderRadius: BorderRadius.circular(15)
+              )
+          ),
           editModeSettings: EditModeSettings(
             paintBackgroundLines: false,
             fillEditingBackground: false,
@@ -94,59 +103,29 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             duration: const Duration(milliseconds: 300),
           ),
           itemBuilder: (ColoredDashboardItem item) {
-            var layout = item.layoutData;
-
-            if (item.data != null) {
-              return DataWidget(
-                item: item,
-              );
-            }
-
+            //print(storage.localItems![slot]![item.identifier]);
             return Stack(
               children: [
-                Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: item.color,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Text(
-                        "Subject to change \n ID: ${item.identifier}\n${[
-                          "x: ${layout.startX}",
-                          "y: ${layout.startY}",
-                          "w: ${layout.width}",
-                          "h: ${layout.height}",
-                          if (layout.minWidth != 1) "minW: ${layout.minWidth}",
-                          if (layout.minHeight != 1)
-                            "minH: ${layout.minHeight}",
-                          if (layout.maxWidth != null)
-                            "maxW: ${layout.maxWidth}",
-                          if (layout.maxHeight != null)
-                            "maxH : ${layout.maxHeight}"
-                        ].join("\n")}",
-                        style: const TextStyle(color: Colors.white),
-                      )),
-                ),
+                storage.widgets![item.identifier]!,
                 if (itemController.isEditing)
                   Positioned(
-                      right: 5,
-                      top: 5,
-                      child: InkResponse(
-                          radius: 20,
-                          onTap: () {
-                            itemController.delete(item.identifier);
-                          },
-                          child: const Icon(
-                            Icons.clear,
-                            color: Colors.white,
-                            size: 20,
-                          )))
-              ],
+                    right: 5,
+                    top: 5,
+                    child: InkResponse(
+                      radius: 20,
+                      onTap: () {
+                        itemController.delete(item.identifier);
+                      },
+                      child: const Icon(
+                        Icons.clear,
+                        color: Colors.black,
+                        size: 20,
+                      )
+                    )
+                  )
+                ]
             );
-          },
+          }
         ),
       ),
     );
@@ -161,14 +140,17 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
     if (res != null) {
       itemController.add(ColoredDashboardItem(
-          color: res[6],
-          width: res[0],
-          height: res[1],
-          identifier: (Random().nextInt(100000) + 4).toString(),
-          minWidth: res[2],
-          minHeight: res[3],
-          maxWidth: res[4] == 0 ? null : res[4],
-          maxHeight: res[5] == 0 ? null : res[5]));
+        color: Colors.blue,
+        width: 1,
+        height: 1,
+        identifier: Random().nextInt(1000).toString() +
+          DateTime.now().microsecondsSinceEpoch.toString(),
+        minWidth: 1,
+        minHeight: 1,
+        maxWidth: 2,
+        maxHeight: 1,
+        type:res,
+        data:storage.defaultData[res]!));
     }
   }
 }

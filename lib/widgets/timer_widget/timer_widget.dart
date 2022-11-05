@@ -37,6 +37,8 @@ class TimerWidgetState extends State<TimerWidget>
     });
   }
 
+  TimerWidgetData get data => _data;
+
   void run() {
     setState(() {
       _countdownTimer = Timer(const Duration(seconds: 1), update);

@@ -64,7 +64,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
   String? _scaleValidator(Key? key, {required List<KeyedEntry> scale}) {
     final isScaleEmpty = scale.every((element) => element.value == null);
     if (isScaleEmpty) {
-      return "Scale cannnot be empty";
+      return "Scale cannot be empty";
     } else if (key == null) {
       return "You have to choose a default value";
     } else {

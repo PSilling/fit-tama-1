@@ -46,6 +46,8 @@ class CounterWidgetState extends State<CounterWidget>
     _currentIndex = _data.defaultIndex;
   }
 
+  CounterWidgetData get data => _data;
+
   void increaseIndex() {
     setState(() {
       final newIndex = _currentIndex + 1;

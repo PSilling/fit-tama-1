@@ -16,7 +16,7 @@ class PresetModel {
     String? id,
     this.name = '',
     this.game = '',
-    this.image = const AssetImage('assets/placeholder.png'),
+    this.image = const AssetImage('assets/placeholder.png'),   //TODO - remove placeholder image
     this.isFavourite = false,
     this.openedCount = 0,
     this.backgroundColor = Colors.blue,
@@ -28,4 +28,22 @@ class PresetModel {
           DateTime.now().microsecondsSinceEpoch.toString();
     }
   }
+
+  PresetModel.fromJson(Map<String, dynamic> json)
+    : id = json['id'],
+      name = json['name'],
+      game = json['game'],
+      image = const AssetImage('assets/placeholder.png'), //TODO - remove placeholder image
+      isFavourite = json['isFavourite'],
+      openedCount = json['openedCount'],
+      backgroundColor = Color(json['backgroundColor']);
+
+  Map<String, dynamic> toJson() => {    //TODO - add saving image
+    'id': id,
+    'name': name,
+    'game': game,
+    'isFavourite': isFavourite,
+    'openedCount': openedCount,
+    'backgroundColor': backgroundColor.value
+  };
 }
