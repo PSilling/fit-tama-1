@@ -154,9 +154,12 @@ class CounterWidgetState extends State<CounterWidget>
   Widget _titleWidget(BuildContext context) {
     return IgnorePointer(
       ignoring: _isEditing,
-      child: Text(
-        _data.name,
-        style: ThemeHelper.widgetTitle(context),
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: Text(
+          _data.name,
+          style: ThemeHelper.widgetTitle(context),
+        ),
       ),
     );
   }
@@ -222,19 +225,17 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _themedIcon(IconData? icon,
-      {required BuildContext context, required String semanticLabel}) {
-    return Icon(
-      icon,
-      semanticLabel: semanticLabel,
-    );
-  }
+  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel}) => Icon(
+        icon,
+        semanticLabel: semanticLabel,
+      );
 
   Widget _buttonsSection(BuildContext context) {
-    return Center(
+    return FittedBox(
+      fit: BoxFit.contain,
       child: IgnorePointer(
         ignoring: _isEditing,
-        child: IconButton(
+          child: IconButton(
           onPressed: _showResetIndexConfirmation,
           icon: _themedIcon(Icons.replay,
               context: context, semanticLabel: "Reset the counter"),
@@ -251,8 +252,6 @@ class CounterWidgetState extends State<CounterWidget>
         borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
         boxShadow: const [BoxShadow()],
       ),
-      height: 240,
-      width: 240,
       padding: ThemeHelper.cardPadding(),
       child: Stack(
         children: [

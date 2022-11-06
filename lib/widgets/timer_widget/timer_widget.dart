@@ -118,12 +118,12 @@ class TimerWidgetState extends State<TimerWidget>
     );
   }
 
-  Widget _titleWidget(BuildContext context) {
-    return Text(
-      _data.name,
-      style: ThemeHelper.widgetTitle(context),
-    );
-  }
+  Widget _titleWidget(BuildContext context) => FittedBox(
+      fit: BoxFit.contain,
+      child: Text(
+        _data.name,
+        style: ThemeHelper.widgetTitle(context),
+      ));
 
   Widget _timeWidget(BuildContext context) {
     return Padding(
@@ -148,49 +148,57 @@ class TimerWidgetState extends State<TimerWidget>
             ]));
   }
 
-  Widget _themedIcon(IconData? icon,
-      {required BuildContext context, required String semanticLabel}) {
-    return Icon(
-      icon,
-      semanticLabel: semanticLabel,
-    );
-  }
+  Widget _themedIconButton(IconData? icon,
+          {required BuildContext context, void Function()? onPressed, required String semanticLabel}) =>
+      FittedBox(
+        fit: BoxFit.contain,
+        child: IconButton(
+          onPressed: onPressed,
+          icon: Icon(
+            icon,
+            semanticLabel: semanticLabel,
+          ),
+        ),
+      );
 
   Widget _buttonWidget(BuildContext context) {
-    return Center(
-      child: IgnorePointer(
+    return IgnorePointer(
         ignoring: _isEditing,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (_currentState == TimerWidgetTimerState.init)
-              IconButton(
+              _themedIconButton(
+                Icons.play_arrow,
                 onPressed: run,
-                icon: _themedIcon(Icons.play_arrow,
-                    context: context, semanticLabel: "Start the timer"),
+                context: context,
+                semanticLabel: "Start the timer",
               ),
             if (_currentState == TimerWidgetTimerState.running)
-              IconButton(
+              _themedIconButton(
+                Icons.pause,
                 onPressed: pause,
-                icon: _themedIcon(Icons.pause,
-                    context: context, semanticLabel: "Pause the timer"),
+                context: context,
+                semanticLabel: "Pause the timer",
               ),
             if (_currentState == TimerWidgetTimerState.paused)
-              IconButton(
+              _themedIconButton(
+                Icons.play_arrow,
                 onPressed: run,
-                icon: _themedIcon(Icons.play_arrow,
-                    context: context, semanticLabel: "Resume the timer"),
+                context: context,
+                semanticLabel: "Resume the timer",
               ),
             if (_currentState == TimerWidgetTimerState.paused)
-              IconButton(
+              _themedIconButton(
+                Icons.replay,
                 onPressed: reset,
-                icon: _themedIcon(Icons.replay,
-                    context: context, semanticLabel: "Reset the timer"),
+                context: context,
+                semanticLabel: "Reset the timer"
               ),
           ],
-        )),
+        ),
     );
   }
 
@@ -208,8 +216,6 @@ class TimerWidgetState extends State<TimerWidget>
           borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
           boxShadow: const [BoxShadow()],
         ),
-        height: 240,
-        width: 240,
         padding: ThemeHelper.cardPadding(),
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,

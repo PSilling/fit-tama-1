@@ -117,9 +117,8 @@ class DiceWidgetState extends State<DiceWidget>
     );
   }
 
-  Widget _titleWidget(BuildContext context) {
-    return Text(_data.name, style: ThemeHelper.widgetTitle(context));
-  }
+  Widget _titleWidget(BuildContext context) =>
+      FittedBox(fit: BoxFit.contain, child: Text(_data.name, style: ThemeHelper.widgetTitle(context)));
 
   Widget _rollWidget(BuildContext context) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -145,12 +144,13 @@ class DiceWidgetState extends State<DiceWidget>
             )
           ]));
 
-  Widget _configurationWidget(BuildContext context) {
-    return Text(
-      "${_data.numberOfSides}-sided",
-      style: ThemeHelper.widgetTitleBottom(context)
+  Widget _configurationWidget(BuildContext context) => FractionallySizedBox(
+      heightFactor: 0.65,
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: Text("${_data.numberOfSides}-sided", style: ThemeHelper.widgetTitleBottom(context)),
+      ),
     );
-  }
 
   @override
   Widget build(BuildContext context) => Container(
@@ -159,8 +159,6 @@ class DiceWidgetState extends State<DiceWidget>
           borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
           boxShadow: const [BoxShadow()],
         ),
-        height: 240,
-        width: 240,
         padding: ThemeHelper.cardPadding(),
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -181,7 +179,7 @@ class DiceWidgetState extends State<DiceWidget>
                 child: _rollWidget(context),
               ),
               Flexible(
-                flex: 0,
+                flex: 1,
                 fit: FlexFit.tight,
                 child: _configurationWidget(context),
               )
