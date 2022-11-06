@@ -140,7 +140,7 @@ class CounterWidgetState extends State<CounterWidget>
       final leftDeath = _data.isLeftDeath;
       final rightDeath = _data.isRightDeath;
       final deathIcon = _themedIcon(CounterWidget._death,
-          context: context, semanticLabel: "Death");
+          context: context, semanticLabel: "Death", style: style);
       if (leftDeath && index == -1) {
         return deathIcon;
       } else if (rightDeath && index == _data.scale.length) {
@@ -225,9 +225,10 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel}) => Icon(
+  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel, TextStyle? style}) => Icon(
         icon,
         semanticLabel: semanticLabel,
+        color: style?.color
       );
 
   Widget _buttonsSection(BuildContext context) {
@@ -237,8 +238,12 @@ class CounterWidgetState extends State<CounterWidget>
         ignoring: _isEditing,
           child: IconButton(
           onPressed: _showResetIndexConfirmation,
-          icon: _themedIcon(Icons.replay,
-              context: context, semanticLabel: "Reset the counter"),
+          icon: _themedIcon(
+            Icons.replay,
+            context: context,
+            semanticLabel: "Reset the counter",
+            style: ThemeHelper.widgetTitleBottom(context),
+          ),
         ),
       ),
     );

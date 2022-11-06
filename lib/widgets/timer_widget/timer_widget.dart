@@ -154,10 +154,7 @@ class TimerWidgetState extends State<TimerWidget>
         fit: BoxFit.contain,
         child: IconButton(
           onPressed: onPressed,
-          icon: Icon(
-            icon,
-            semanticLabel: semanticLabel,
-          ),
+          icon: Icon(icon, semanticLabel: semanticLabel, color: ThemeHelper.widgetTitleBottom(context).color),
         ),
       );
 
