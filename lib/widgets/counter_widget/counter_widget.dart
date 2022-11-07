@@ -108,6 +108,7 @@ class CounterWidgetState extends State<CounterWidget>
       builder: (context) => CounterScaleDialog(
         scaleLength: _data.scale.length,
         currentIndex: _currentIndex,
+        defaultIndex: _data.defaultIndex,
         isLeftDeath: _data.isLeftDeath,
         isRightDeath: _data.isRightDeath,
         setCurrentIndex: setIndex,

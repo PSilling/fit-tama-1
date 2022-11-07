@@ -35,6 +35,22 @@ class ThemeHelper {
     );
   }
 
+  static Color widgetDialogHighlightColor(BuildContext context) {
+    return Theme.of(context).colorScheme.primary;
+  }
+
+  static Color widgetDialogInverseColorForeground(BuildContext context) {
+    return Theme.of(context).colorScheme.onInverseSurface;
+  }
+
+  static Color widgetDialogInverseColorBackground(BuildContext context) {
+    return Theme.of(context).colorScheme.inverseSurface;
+  }
+
+  static Color widgetDialogNormalColorForeground(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface;
+  }
+
   /// Use this for game widget background color.
   /// Just a placeholder, widgets will have configurable colors, TODO: remove.
   static Color widgetBackgroundColor(BuildContext context) {
