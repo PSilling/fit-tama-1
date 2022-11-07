@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../helpers.dart';
+import '../../../helpers/extensions.dart';
 import '../../../themes.dart';
 
 class CounterResetDialog extends StatelessWidget {

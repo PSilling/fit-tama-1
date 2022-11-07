@@ -1,11 +1,14 @@
+import 'dart:math';
+
 import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
 
+import '../../helpers/measure_size.dart';
 import './counter_widget_data.dart';
 import './dialogs/counter_edit_dialog.dart';
 import './dialogs/counter_reset_dialog.dart';
 import './dialogs/counter_scale_dialog.dart';
-import '../../helpers.dart';
+import '../../helpers/extensions.dart';
 import '../editable.dart';
 
 class CounterWidget extends StatefulWidget {
@@ -18,12 +21,13 @@ class CounterWidget extends StatefulWidget {
   State<CounterWidget> createState() => CounterWidgetState();
 }
 
-class CounterWidgetState extends State<CounterWidget>
-    implements Editable<CounterWidget> {
-
+class CounterWidgetState extends State<CounterWidget> implements Editable<CounterWidget> {
   late CounterWidgetData _data;
   late int _currentIndex;
   var _isEditing = false;
+
+  _PanDirection? _panDirection;
+  final _numbersHeight = ValueNotifier<double?>(null);
 
   @override
   bool get isEditing => _isEditing;
@@ -92,6 +96,43 @@ class CounterWidgetState extends State<CounterWidget>
     }
   }
 
+  void _onPanEnd(DragEndDetails details) {
+    if (_isEditing || _panDirection == null) {
+      return;
+    }
+
+    switch (_panDirection!) {
+      case _PanDirection.left:
+        increaseIndex();
+        break;
+      case _PanDirection.right:
+        decreaseIndex();
+        break;
+      case _PanDirection.none:
+        break;
+    }
+    _panDirection = null;
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    if (_isEditing || _panDirection != null) {
+      return;
+    }
+    if (details.delta.dx.abs() > details.delta.dy.abs()) {
+      if (details.delta.dx < 0) {
+        _panDirection = _PanDirection.left;
+      } else {
+        _panDirection = _PanDirection.right;
+      }
+    } else {
+      _panDirection = _PanDirection.none;
+    }
+  }
+
+  void _onPanCancel() {
+    _panDirection = null;
+  }
+
   void _showResetIndexConfirmation() {
     showDialog(
       context: context,
@@ -108,6 +149,7 @@ class CounterWidgetState extends State<CounterWidget>
       builder: (context) => CounterScaleDialog(
         scaleLength: _data.scale.length,
         currentIndex: _currentIndex,
+        defaultIndex: _data.defaultIndex,
         isLeftDeath: _data.isLeftDeath,
         isRightDeath: _data.isRightDeath,
         setCurrentIndex: setIndex,
@@ -131,16 +173,14 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _getNumberWidgetAt(int index,
-      {TextAlign? textAlign, TextStyle? style}) {
+  Widget _getNumberWidgetAt(int index, {TextStyle? style}) {
     final number = _data.scale.elementAtOrNull(index);
     if (number != null) {
-      return Text("$number", textAlign: textAlign, style: style);
+      return Text("$number", style: style);
     } else {
       final leftDeath = _data.isLeftDeath;
       final rightDeath = _data.isRightDeath;
-      final deathIcon = _themedIcon(CounterWidget._death,
-          context: context, semanticLabel: "Death");
+      final deathIcon = _themedIcon(CounterWidget._death, context: context, semanticLabel: "Death", style: style);
       if (leftDeath && index == -1) {
         return deathIcon;
       } else if (rightDeath && index == _data.scale.length) {
@@ -154,29 +194,54 @@ class CounterWidgetState extends State<CounterWidget>
   Widget _titleWidget(BuildContext context) {
     return IgnorePointer(
       ignoring: _isEditing,
-      child: Text(
-        _data.name,
-        style: ThemeHelper.widgetTitle(context),
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: Text(
+          _data.name,
+          style: ThemeHelper.widgetTitle(context),
+        ),
+      ),
+    );
+  }
+
+  // Has size of widest displayed number, to keep the number positioning/size even
+  Widget _sizer({required TextStyle? style}) {
+    final numberOfDigits = [-1, 0, 1]
+        .compactMap((element) => _data.scale.elementAtOrNull(_currentIndex + element))
+        .map((element) => element.toString().length)
+        .reduce(max);
+    final ems = List.filled(numberOfDigits, "4").join(); // 4 is the widest number
+    return Text(
+      ems,
+      style: style?.copyWith(color: Colors.transparent),
+    );
+  }
+
+  Widget _fittingNumber({required int index, required TextStyle? textStyle, required AlignmentGeometry alignment}) {
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: Stack(
+        alignment: alignment,
+        children: [
+          _getNumberWidgetAt(index, style: textStyle),
+          _sizer(style: textStyle),
+        ],
       ),
     );
   }
 
   Widget _numberButton(
-      {required int index,
-      required TextStyle? textStyle,
-      required int flex,
-      TextAlign? textAlign}) {
+      {required int index, required TextStyle? textStyle, required int flex, required AlignmentGeometry alignment}) {
     return Expanded(
       flex: flex,
-      child: IgnorePointer(
-        child: FractionallySizedBox(
-          heightFactor: 0.5,
-          child: Opacity(
-            opacity: 0.4,
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: _getNumberWidgetAt(index,
-                  textAlign: textAlign, style: textStyle),
+      child: ValueListenableBuilder<double?>(
+        valueListenable: _numbersHeight,
+        builder: (context, height, child) => SizedBox(
+          height: height.flatMap((value) => value * 0.6),
+          child: IgnorePointer(
+            child: Opacity(
+              opacity: 0.4,
+              child: _fittingNumber(index: index, textStyle: textStyle, alignment: alignment),
             ),
           ),
         ),
@@ -190,23 +255,24 @@ class CounterWidgetState extends State<CounterWidget>
         _numberButton(
           index: _currentIndex - 1,
           flex: 4,
-          textAlign: TextAlign.right,
+          alignment: Alignment.centerRight,
           textStyle: ThemeHelper.widgetContentSecondary(context),
         ),
         Expanded(
           flex: 5,
-          child: IgnorePointer(
-            ignoring: _isEditing,
-            child: GestureDetector(
-              onTap: _showScale,
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
-                  child: _getNumberWidgetAt(
-                    _currentIndex,
-                    style: ThemeHelper.widgetContentMain(context),
-                  ),
+          child: MeasureSize(
+            onChange: (size) => _numbersHeight.value = size.height,
+            child: IgnorePointer(
+              ignoring: _isEditing,
+              child: GestureDetector(
+                onTap: _showScale,
+                onPanEnd: _onPanEnd,
+                onPanUpdate: _onPanUpdate,
+                onPanCancel: _onPanCancel,
+                child: _fittingNumber(
+                  index: _currentIndex,
+                  textStyle: ThemeHelper.widgetContentMain(context),
+                  alignment: Alignment.center,
                 ),
               ),
             ),
@@ -215,29 +281,29 @@ class CounterWidgetState extends State<CounterWidget>
         _numberButton(
           index: _currentIndex + 1,
           flex: 4,
-          textAlign: TextAlign.left,
+          alignment: Alignment.centerLeft,
           textStyle: ThemeHelper.widgetContentSecondary(context),
         ),
       ],
     );
   }
 
-  Widget _themedIcon(IconData? icon,
-      {required BuildContext context, required String semanticLabel}) {
-    return Icon(
-      icon,
-      semanticLabel: semanticLabel,
-    );
-  }
+  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel, TextStyle? style}) =>
+      Icon(icon, semanticLabel: semanticLabel, color: style?.color);
 
   Widget _buttonsSection(BuildContext context) {
-    return Center(
+    return FittedBox(
+      fit: BoxFit.contain,
       child: IgnorePointer(
         ignoring: _isEditing,
         child: IconButton(
           onPressed: _showResetIndexConfirmation,
-          icon: _themedIcon(Icons.replay,
-              context: context, semanticLabel: "Reset the counter"),
+          icon: _themedIcon(
+            Icons.replay,
+            context: context,
+            semanticLabel: "Reset the counter",
+            style: ThemeHelper.widgetTitleBottom(context),
+          ),
         ),
       ),
     );
@@ -251,8 +317,6 @@ class CounterWidgetState extends State<CounterWidget>
         borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
         boxShadow: const [BoxShadow()],
       ),
-      height: 240,
-      width: 240,
       padding: ThemeHelper.cardPadding(),
       child: Stack(
         children: [
@@ -262,12 +326,18 @@ class CounterWidgetState extends State<CounterWidget>
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: _onLeftTapped,
+                  onPanEnd: _onPanEnd,
+                  onPanUpdate: _onPanUpdate,
+                  onPanCancel: _onPanCancel,
                 ),
               ),
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: _onRightTapped,
+                  onPanEnd: _onPanEnd,
+                  onPanUpdate: _onPanUpdate,
+                  onPanCancel: _onPanCancel,
                 ),
               ),
             ],
@@ -298,3 +368,5 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 }
+
+enum _PanDirection { left, right, none }

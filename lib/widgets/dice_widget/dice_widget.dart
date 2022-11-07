@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:board_aid/helpers/measure_size.dart';
 import 'package:board_aid/themes.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../helpers.dart';
+import '../../helpers/extensions.dart';
 import '../editable.dart';
 import 'dice_edit_dialog.dart';
 import 'dice_widget_data.dart';
@@ -17,14 +19,14 @@ class DiceWidget extends StatefulWidget {
   State<StatefulWidget> createState() => DiceWidgetState();
 }
 
-class DiceWidgetState extends State<DiceWidget>
-    implements Editable<DiceWidget> {
-
+class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> {
   final _random = Random();
 
   late DiceWidgetData _data;
   List<int>? _currentRoll;
   bool _isEditing = false;
+
+  final _resultHeight = ValueNotifier<double?>(null);
 
   @override
   bool get isEditing => _isEditing;
@@ -53,8 +55,7 @@ class DiceWidgetState extends State<DiceWidget>
     });
     await Future.delayed(const Duration(milliseconds: 100));
     setState(() {
-      _currentRoll = List.generate(
-          _data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
+      _currentRoll = List.generate(_data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
     });
   }
 
@@ -91,35 +92,43 @@ class DiceWidgetState extends State<DiceWidget>
             .reduce((value, element) => "$value+$element")
             .flatMap((value) => "$value=") ??
         "";
-    return FittedBox(
-      fit: BoxFit.contain,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
-        child: Text(
-          rollText,
-          style: ThemeHelper.widgetContentSecondary(context),
-        ),
+    return ValueListenableBuilder(
+      valueListenable: _resultHeight,
+      builder: (context, height, child) => SizedBox(
+        height: height.flatMap((value) => value*0.6),
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Text(
+              rollText,
+              textAlign: TextAlign.right,
+              style: ThemeHelper.widgetContentSecondary(context),
+            ),
+          ),
+        //),
       ),
     );
   }
 
   Widget _resultText(BuildContext context) {
     final result = _currentRoll?.reduce((value, element) => value + element);
-    return FittedBox(
-      fit: BoxFit.contain,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
-        child: Text(
-          "${result ?? ""}",
-          style: ThemeHelper.widgetContentMain(context),
+    return MeasureSize(
+      onChange: (size) => _resultHeight.value = size.height,
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
+          child: Text(
+            "${result ?? ""}",
+            textAlign: TextAlign.left,
+            style: ThemeHelper.widgetContentMain(context),
+          ),
         ),
       ),
     );
   }
 
-  Widget _titleWidget(BuildContext context) {
-    return Text(_data.name, style: ThemeHelper.widgetTitle(context));
-  }
+  Widget _titleWidget(BuildContext context) =>
+      FittedBox(fit: BoxFit.contain, child: Text(_data.name, style: ThemeHelper.widgetTitle(context)));
 
   Widget _rollWidget(BuildContext context) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -130,27 +139,23 @@ class DiceWidgetState extends State<DiceWidget>
           children: [
             if (_data.numberOfDice > 1)
               Expanded(
-                flex: 2,
-                child: FractionallySizedBox(
-                  heightFactor: 0.5,
-                  child: Opacity(
-                    opacity: 0.4,
-                    child: _diceText(context),
-                  ),
+                child: Opacity(
+                  opacity: 0.4,
+                  child: _diceText(context),
                 ),
               ),
             Expanded(
-              flex: 1,
               child: _resultText(context),
             )
           ]));
 
-  Widget _configurationWidget(BuildContext context) {
-    return Text(
-      "${_data.numberOfSides}-sided",
-      style: ThemeHelper.widgetTitleBottom(context)
+  Widget _configurationWidget(BuildContext context) => FractionallySizedBox(
+      heightFactor: 0.65,
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: Text("${_data.numberOfSides}-sided", style: ThemeHelper.widgetTitleBottom(context)),
+      ),
     );
-  }
 
   @override
   Widget build(BuildContext context) => Container(
@@ -159,8 +164,6 @@ class DiceWidgetState extends State<DiceWidget>
           borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
           boxShadow: const [BoxShadow()],
         ),
-        height: 240,
-        width: 240,
         padding: ThemeHelper.cardPadding(),
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -181,7 +184,7 @@ class DiceWidgetState extends State<DiceWidget>
                 child: _rollWidget(context),
               ),
               Flexible(
-                flex: 0,
+                flex: 1,
                 fit: FlexFit.tight,
                 child: _configurationWidget(context),
               )
