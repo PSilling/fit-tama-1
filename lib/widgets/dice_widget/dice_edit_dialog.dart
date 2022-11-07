@@ -13,13 +13,13 @@ class DiceEditDialog extends StatelessWidget {
 
   final _formKey = GlobalKey<FormBuilderState>();
 
-  String? _numberValidator(String? value) {
+  String? _numberValidator(String? value, {int? minimalValue}) {
     final number = value.flatMap((value) => int.tryParse(value));
     if (number == null) {
       return "This field has to contain numbers only";
     }
-    if (number <= 0) {
-      return "It has to be a positive number";
+    if (minimalValue != null && number < minimalValue) {
+      return "It has to be greater than ${minimalValue - 1}";
     }
     return null;
   }
@@ -55,7 +55,7 @@ class DiceEditDialog extends StatelessWidget {
                   decoration: ThemeHelper.textInputDecoration(context, "Dice count"),
                   keyboardType: TextInputType.number,
                   initialValue: "${data.numberOfDice}",
-                  validator: _numberValidator,
+                  validator: (value) => _numberValidator(value, minimalValue: 1),
                   onSaved: (value) => data.numberOfDice = int.parse(value!),
                 ),
                 FormBuilderTextField(
@@ -63,7 +63,7 @@ class DiceEditDialog extends StatelessWidget {
                   decoration: ThemeHelper.textInputDecoration(context, "Side count"),
                   keyboardType: TextInputType.number,
                   initialValue: "${data.numberOfSides}",
-                  validator: _numberValidator,
+                  validator: (value) => _numberValidator(value, minimalValue: 2),
                   onSaved: (value) => data.numberOfSides = int.parse(value!),
                 ),
                 FormBuilderCheckbox(
