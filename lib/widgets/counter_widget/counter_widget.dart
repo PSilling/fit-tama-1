@@ -206,11 +206,13 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
 
   // Has size of widest displayed number, to keep the number positioning/size even
   Widget _sizer({required TextStyle? style}) {
-    final numberOfDigits = [-1, 0, 1]
-        .compactMap((element) => _data.scale.elementAtOrNull(_currentIndex + element))
-        .map((element) => element.toString().length)
-        .reduce(max);
-    final ems = List.filled(numberOfDigits, "4").join(); // 4 is the widest number
+    final center = _data.scale.elementAtOrNull(_currentIndex);
+    final numberOfDigits = center?.toString().length ??
+        [-1, 1]
+            .compactMap((element) => _data.scale.elementAtOrNull(_currentIndex + element))
+            .map((element) => element.toString().length)
+            .reduce(max);
+    final ems = List.filled(max(numberOfDigits, 1), "4").join(); // 4 is the widest number
     return Text(
       ems,
       style: style?.copyWith(color: Colors.transparent),
@@ -235,17 +237,21 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     return Expanded(
       flex: flex,
       child: ValueListenableBuilder<double?>(
-        valueListenable: _numbersHeight,
-        builder: (context, height, child) => SizedBox(
-          height: height.flatMap((value) => value * 0.6),
-          child: IgnorePointer(
-            child: Opacity(
-              opacity: 0.4,
-              child: _fittingNumber(index: index, textStyle: textStyle, alignment: alignment),
-            ),
-          ),
-        ),
-      ),
+          valueListenable: _numbersHeight,
+          builder: (context, height, child) {
+            if (height == null) {
+              return const SizedBox.expand();
+            }
+            return SizedBox(
+              height: height * 0.6,
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 0.4,
+                  child: _fittingNumber(index: index, textStyle: textStyle, alignment: alignment),
+                ),
+              ),
+            );
+          }),
     );
   }
 

@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:board_aid/helpers/measure_size.dart';
 import 'package:board_aid/themes.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../helpers/extensions.dart';
@@ -94,18 +93,22 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
         "";
     return ValueListenableBuilder(
       valueListenable: _resultHeight,
-      builder: (context, height, child) => SizedBox(
-        height: height.flatMap((value) => value*0.6),
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: Text(
+      builder: (context, height, child) {
+        if (height == null) {
+          return const SizedBox.expand();
+        }
+        return SizedBox(
+          height: height * 0.6,
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Text(
               rollText,
               textAlign: TextAlign.right,
               style: ThemeHelper.widgetContentSecondary(context),
             ),
           ),
-        //),
-      ),
+        );
+      }
     );
   }
 
@@ -131,31 +134,32 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
       FittedBox(fit: BoxFit.contain, child: Text(_data.name, style: ThemeHelper.widgetTitle(context)));
 
   Widget _rollWidget(BuildContext context) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.only(right: 10),
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (_data.numberOfDice > 1)
               Expanded(
+                flex: 3,
                 child: Opacity(
                   opacity: 0.4,
                   child: _diceText(context),
                 ),
               ),
             Expanded(
+              flex: 2,
               child: _resultText(context),
             )
-          ]));
+          ],
+        ),
+      );
 
   Widget _configurationWidget(BuildContext context) => FractionallySizedBox(
-      heightFactor: 0.65,
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: Text("${_data.numberOfSides}-sided", style: ThemeHelper.widgetTitleBottom(context)),
-      ),
-    );
+        heightFactor: 0.65,
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Text("${_data.numberOfSides}-sided", style: ThemeHelper.widgetTitleBottom(context)),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) => Container(
