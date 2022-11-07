@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
 
+import '../../helpers/measure_size.dart';
 import './counter_widget_data.dart';
 import './dialogs/counter_edit_dialog.dart';
 import './dialogs/counter_reset_dialog.dart';
@@ -22,8 +25,9 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
   late CounterWidgetData _data;
   late int _currentIndex;
   var _isEditing = false;
-  
+
   _PanDirection? _panDirection;
+  final _numbersHeight = ValueNotifier<double?>(null);
 
   @override
   bool get isEditing => _isEditing;
@@ -169,10 +173,10 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     );
   }
 
-  Widget _getNumberWidgetAt(int index, {TextAlign? textAlign, TextStyle? style}) {
+  Widget _getNumberWidgetAt(int index, {TextStyle? style}) {
     final number = _data.scale.elementAtOrNull(index);
     if (number != null) {
-      return Text("$number", textAlign: textAlign, style: style);
+      return Text("$number", style: style);
     } else {
       final leftDeath = _data.isLeftDeath;
       final rightDeath = _data.isRightDeath;
@@ -200,17 +204,44 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     );
   }
 
-  Widget _numberButton({required int index, required TextStyle? textStyle, required int flex, TextAlign? textAlign}) {
+  // Has size of widest displayed number, to keep the number positioning/size even
+  Widget _sizer({required TextStyle? style}) {
+    final numberOfDigits = [-1, 0, 1]
+        .compactMap((element) => _data.scale.elementAtOrNull(_currentIndex + element))
+        .map((element) => element.toString().length)
+        .reduce(max);
+    final ems = List.filled(numberOfDigits, "4").join(); // 4 is the widest number
+    return Text(
+      ems,
+      style: style?.copyWith(color: Colors.transparent),
+    );
+  }
+
+  Widget _fittingNumber({required int index, required TextStyle? textStyle, required AlignmentGeometry alignment}) {
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: Stack(
+        alignment: alignment,
+        children: [
+          _getNumberWidgetAt(index, style: textStyle),
+          _sizer(style: textStyle),
+        ],
+      ),
+    );
+  }
+
+  Widget _numberButton(
+      {required int index, required TextStyle? textStyle, required int flex, required AlignmentGeometry alignment}) {
     return Expanded(
       flex: flex,
-      child: IgnorePointer(
-        child: FractionallySizedBox(
-          heightFactor: 0.5,
-          child: Opacity(
-            opacity: 0.4,
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: _getNumberWidgetAt(index, textAlign: textAlign, style: textStyle),
+      child: ValueListenableBuilder<double?>(
+        valueListenable: _numbersHeight,
+        builder: (context, height, child) => SizedBox(
+          height: height.flatMap((value) => value * 0.6),
+          child: IgnorePointer(
+            child: Opacity(
+              opacity: 0.4,
+              child: _fittingNumber(index: index, textStyle: textStyle, alignment: alignment),
             ),
           ),
         ),
@@ -224,26 +255,24 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
         _numberButton(
           index: _currentIndex - 1,
           flex: 4,
-          textAlign: TextAlign.right,
+          alignment: Alignment.centerRight,
           textStyle: ThemeHelper.widgetContentSecondary(context),
         ),
         Expanded(
           flex: 5,
-          child: IgnorePointer(
-            ignoring: _isEditing,
-            child: GestureDetector(
-              onTap: _showScale,
-              onPanEnd: _onPanEnd,
-              onPanUpdate: _onPanUpdate,
-              onPanCancel: _onPanCancel,
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
-                  child: _getNumberWidgetAt(
-                    _currentIndex,
-                    style: ThemeHelper.widgetContentMain(context),
-                  ),
+          child: MeasureSize(
+            onChange: (size) => _numbersHeight.value = size.height,
+            child: IgnorePointer(
+              ignoring: _isEditing,
+              child: GestureDetector(
+                onTap: _showScale,
+                onPanEnd: _onPanEnd,
+                onPanUpdate: _onPanUpdate,
+                onPanCancel: _onPanCancel,
+                child: _fittingNumber(
+                  index: _currentIndex,
+                  textStyle: ThemeHelper.widgetContentMain(context),
+                  alignment: Alignment.center,
                 ),
               ),
             ),
@@ -252,7 +281,7 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
         _numberButton(
           index: _currentIndex + 1,
           flex: 4,
-          textAlign: TextAlign.left,
+          alignment: Alignment.centerLeft,
           textStyle: ThemeHelper.widgetContentSecondary(context),
         ),
       ],
