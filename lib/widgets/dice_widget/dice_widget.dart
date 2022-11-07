@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:board_aid/themes.dart';
 import 'package:flutter/material.dart';
 
-import '../../helpers.dart';
+import '../../helpers/extensions.dart';
 import '../editable.dart';
 import 'dice_edit_dialog.dart';
 import 'dice_widget_data.dart';

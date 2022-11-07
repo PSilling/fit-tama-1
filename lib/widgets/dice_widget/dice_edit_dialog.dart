@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../../helpers.dart';
+import '../../helpers/extensions.dart';
 import '../../themes.dart';
 import 'dice_widget_data.dart';
 

@@ -5,7 +5,7 @@ import './counter_widget_data.dart';
 import './dialogs/counter_edit_dialog.dart';
 import './dialogs/counter_reset_dialog.dart';
 import './dialogs/counter_scale_dialog.dart';
-import '../../helpers.dart';
+import '../../helpers/extensions.dart';
 import '../editable.dart';
 
 class CounterWidget extends StatefulWidget {
