@@ -18,12 +18,12 @@ class CounterWidget extends StatefulWidget {
   State<CounterWidget> createState() => CounterWidgetState();
 }
 
-class CounterWidgetState extends State<CounterWidget>
-    implements Editable<CounterWidget> {
-
+class CounterWidgetState extends State<CounterWidget> implements Editable<CounterWidget> {
   late CounterWidgetData _data;
   late int _currentIndex;
   var _isEditing = false;
+  
+  _PanDirection? _panDirection;
 
   @override
   bool get isEditing => _isEditing;
@@ -92,6 +92,43 @@ class CounterWidgetState extends State<CounterWidget>
     }
   }
 
+  void _onPanEnd(DragEndDetails details) {
+    if (_isEditing || _panDirection == null) {
+      return;
+    }
+
+    switch (_panDirection!) {
+      case _PanDirection.left:
+        increaseIndex();
+        break;
+      case _PanDirection.right:
+        decreaseIndex();
+        break;
+      case _PanDirection.none:
+        break;
+    }
+    _panDirection = null;
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    if (_isEditing || _panDirection != null) {
+      return;
+    }
+    if (details.delta.dx.abs() > details.delta.dy.abs()) {
+      if (details.delta.dx < 0) {
+        _panDirection = _PanDirection.left;
+      } else {
+        _panDirection = _PanDirection.right;
+      }
+    } else {
+      _panDirection = _PanDirection.none;
+    }
+  }
+
+  void _onPanCancel() {
+    _panDirection = null;
+  }
+
   void _showResetIndexConfirmation() {
     showDialog(
       context: context,
@@ -132,16 +169,14 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _getNumberWidgetAt(int index,
-      {TextAlign? textAlign, TextStyle? style}) {
+  Widget _getNumberWidgetAt(int index, {TextAlign? textAlign, TextStyle? style}) {
     final number = _data.scale.elementAtOrNull(index);
     if (number != null) {
       return Text("$number", textAlign: textAlign, style: style);
     } else {
       final leftDeath = _data.isLeftDeath;
       final rightDeath = _data.isRightDeath;
-      final deathIcon = _themedIcon(CounterWidget._death,
-          context: context, semanticLabel: "Death", style: style);
+      final deathIcon = _themedIcon(CounterWidget._death, context: context, semanticLabel: "Death", style: style);
       if (leftDeath && index == -1) {
         return deathIcon;
       } else if (rightDeath && index == _data.scale.length) {
@@ -165,11 +200,7 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _numberButton(
-      {required int index,
-      required TextStyle? textStyle,
-      required int flex,
-      TextAlign? textAlign}) {
+  Widget _numberButton({required int index, required TextStyle? textStyle, required int flex, TextAlign? textAlign}) {
     return Expanded(
       flex: flex,
       child: IgnorePointer(
@@ -179,8 +210,7 @@ class CounterWidgetState extends State<CounterWidget>
             opacity: 0.4,
             child: FittedBox(
               fit: BoxFit.contain,
-              child: _getNumberWidgetAt(index,
-                  textAlign: textAlign, style: textStyle),
+              child: _getNumberWidgetAt(index, textAlign: textAlign, style: textStyle),
             ),
           ),
         ),
@@ -203,6 +233,9 @@ class CounterWidgetState extends State<CounterWidget>
             ignoring: _isEditing,
             child: GestureDetector(
               onTap: _showScale,
+              onPanEnd: _onPanEnd,
+              onPanUpdate: _onPanUpdate,
+              onPanCancel: _onPanCancel,
               child: FittedBox(
                 fit: BoxFit.contain,
                 child: ConstrainedBox(
@@ -226,18 +259,15 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel, TextStyle? style}) => Icon(
-        icon,
-        semanticLabel: semanticLabel,
-        color: style?.color
-      );
+  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel, TextStyle? style}) =>
+      Icon(icon, semanticLabel: semanticLabel, color: style?.color);
 
   Widget _buttonsSection(BuildContext context) {
     return FittedBox(
       fit: BoxFit.contain,
       child: IgnorePointer(
         ignoring: _isEditing,
-          child: IconButton(
+        child: IconButton(
           onPressed: _showResetIndexConfirmation,
           icon: _themedIcon(
             Icons.replay,
@@ -267,12 +297,18 @@ class CounterWidgetState extends State<CounterWidget>
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: _onLeftTapped,
+                  onPanEnd: _onPanEnd,
+                  onPanUpdate: _onPanUpdate,
+                  onPanCancel: _onPanCancel,
                 ),
               ),
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: _onRightTapped,
+                  onPanEnd: _onPanEnd,
+                  onPanUpdate: _onPanUpdate,
+                  onPanCancel: _onPanCancel,
                 ),
               ),
             ],
@@ -303,3 +339,5 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 }
+
+enum _PanDirection { left, right, none }
