@@ -53,7 +53,7 @@ class DiceEditDialog extends StatelessWidget {
                 FormBuilderTextField(
                   name: "number_of_dice",
                   decoration: ThemeHelper.textInputDecoration(context, "Dice count"),
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
                   initialValue: "${data.numberOfDice}",
                   validator: (value) => _numberValidator(value, minimalValue: 1),
                   onSaved: (value) => data.numberOfDice = int.parse(value!),
@@ -61,7 +61,7 @@ class DiceEditDialog extends StatelessWidget {
                 FormBuilderTextField(
                   name: "number_of_sides",
                   decoration: ThemeHelper.textInputDecoration(context, "Side count"),
-                  keyboardType: TextInputType.number,
+                  keyboardType:  const TextInputType.numberWithOptions(signed: true),
                   initialValue: "${data.numberOfSides}",
                   validator: (value) => _numberValidator(value, minimalValue: 2),
                   onSaved: (value) => data.numberOfSides = int.parse(value!),

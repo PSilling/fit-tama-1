@@ -27,7 +27,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
 
   late final _rangeInitialValue = IntRange.from(scale: widget.data.scale);
   final _rangeDefaultSliderKey = GlobalKey<FormBuilderFieldState>();
-  static const _defaultEntryOption = FormBuilderChipOption<String>(value: "Default");
+  static const _defaultEntryOption = FormBuilderChipOption<String>(value: "Start");
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
       _keyedScale = defaultScale + [KeyedEntry(value: null)];
       _defaultIndexKey = defaultScale[widget.data.defaultIndex].checkKey;
     } else {
-      _keyedScale = [];
+      _keyedScale = [KeyedEntry(value: null)];
       _defaultIndexKey = null;
     }
     super.initState();
@@ -114,7 +114,11 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
     if (defaultSliderStateValue != null) {
       return defaultSliderStateValue;
     } else {
-      return range.toScale()[widget.data.defaultIndex].toDouble();
+      if (widget.data.isUneven) {
+        return range.start!.toDouble();
+      } else {
+        return range.toScale()[widget.data.defaultIndex].toDouble();
+      }
     }
   }
 
@@ -166,11 +170,11 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
     field.didChange(range);
   }
 
-  Widget _rangeField() => FormBuilderField<IntRange>(
+  Widget _rangeField(BuildContext context) => FormBuilderField<IntRange>(
         name: "range",
         initialValue: widget.data.isUneven ? null : _rangeInitialValue,
         builder: (FormFieldState<IntRange> field) => InputDecorator(
-          decoration: InputDecoration(errorText: field.errorText),
+          decoration: InputDecoration(errorText: field.errorText, border: InputBorder.none),
           child: Column(
             children: [
               FormBuilderTextField(
@@ -193,6 +197,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 FormBuilderSlider(
                   activeColor: Theme.of(context).colorScheme.onBackground,
                   inactiveColor: Theme.of(context).colorScheme.onBackground.withOpacity(0.25),
+                  decoration: ThemeHelper.textInputDecoration(context, "Starting value"),
                   key: _rangeDefaultSliderKey,
                   name: "range_default",
                   initialValue: _defaultSliderInitialValue(field: field),
@@ -212,14 +217,13 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         onSaved: (value) => widget.data.scale = value!.toScale(),
       );
 
-  Widget _scaleField() => FormBuilderField<GlobalKey>(
+  Widget _scaleField(BuildContext context) => FormBuilderField<GlobalKey>(
         name: "scale",
         initialValue: _defaultIndexKey,
         builder: (FormFieldState field) => InputDecorator(
-          decoration: InputDecoration(errorText: field.errorText),
+          decoration: InputDecoration(errorText: field.errorText, border: InputBorder.none, labelText: "Scale", isDense: true),
           child: Column(children: [
-            for (var entry in _keyedScale)
-              _scaleTextField(entry: entry, superField: field),
+            for (var entry in _keyedScale) _scaleTextField(context, entry: entry, superField: field),
           ]),
         ),
         validator: (value) => _scaleValidator(value, scale: _keyedScale),
@@ -229,32 +233,43 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         },
       );
 
-  Widget _scaleTextField({required KeyedEntry entry, required FormFieldState superField}) => FormBuilderField(
+  Widget _scaleTextField(BuildContext context, {required KeyedEntry entry, required FormFieldState superField}) =>
+      FormBuilderField(
         key: entry.mainKey,
         name: "scale_field_${entry.mainKey}",
         builder: (FormFieldState field) => InputDecorator(
-          decoration: InputDecoration(errorText: field.errorText),
+          decoration: InputDecoration(
+              errorText: field.errorText, border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
           child: Row(
             children: [
               Expanded(
                 child: FormBuilderTextField(
                   key: entry.textKey,
                   focusNode: entry.focusNode,
+                  decoration: const InputDecoration(isDense: false),
                   name: "scale_textfield_${entry.textKey}",
                   initialValue: entry.value.flatMap((value) => "$value"),
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
                   validator: (value) => _numberValidator(value, isRequired: false),
                   onChanged: (value) => _updateTempScale(value, entry, superField),
                   onTap: _cleanTempScale,
+                  textInputAction: TextInputAction.next,
+                  onEditingComplete: () {
+                    final index = _keyedScale.indexOf(entry);
+                    FocusScope.of(context).requestFocus(_keyedScale[index + 1].focusNode);
+                  },
                 ),
               ),
               if (entry.value != null)
-                Expanded(
+                SizedBox(
+                  width: 80,
                   child: FormBuilderChoiceChip<String>(
                     key: entry.checkKey,
+                    decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
                     name: "scale_checkbox_${entry.checkKey}",
                     options: const [_defaultEntryOption],
                     initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
+                    alignment: WrapAlignment.end,
                     onChanged: (value) {
                       if (value != null) {
                         superField.value?.currentState?.didChange(null);
@@ -314,7 +329,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                     _EvennessOptions.range.option,
                     _EvennessOptions.scale.option,
                   ]),
-              if (_isUneven) _scaleField() else _rangeField()
+              if (_isUneven) _scaleField(context) else _rangeField(context)
             ],
           ),
         ),
