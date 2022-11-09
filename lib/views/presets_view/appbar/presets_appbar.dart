@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'presets_more_button.dart';
-import 'presets_search_input.dart';
-import 'presets_sort_button.dart';
+import 'presets_appbar_more_button.dart';
+import 'presets_appbar_search_input.dart';
+import 'presets_appbar_sort_button.dart';
 
 /// Application bar for PresetsView.
 class PresetsAppbar extends StatefulWidget implements PreferredSizeWidget {
@@ -11,16 +11,16 @@ class PresetsAppbar extends StatefulWidget implements PreferredSizeWidget {
     required this.onSearchChanged,
     required this.onSortSelected,
     required this.onMoreSelected,
-    this.sortOption = PresetsSortOption.byName,
+    this.sortOption = PresetsAppbarSortOption.byName,
     this.sortAscending = true,
   }) : preferredSize = const Size.fromHeight(kToolbarHeight);
 
   @override
   final Size preferredSize;
   final Function(String searched) onSearchChanged;
-  final Function(PresetsSortOption option) onSortSelected;
-  final Function(PresetsMoreOption option) onMoreSelected;
-  final PresetsSortOption sortOption;
+  final Function(PresetsAppbarSortOption option) onSortSelected;
+  final Function(PresetsAppbarMoreOption option) onMoreSelected;
+  final PresetsAppbarSortOption sortOption;
   final bool sortAscending;
 
   @override
@@ -45,7 +45,7 @@ class _PresetsAppbarState extends State<PresetsAppbar> {
   Widget build(BuildContext context) {
     if (searchOpen) {
       return AppBar(
-        title: PresetsSearchInput(
+        title: PresetsAppbarSearchInput(
           onSearchChanged: widget.onSearchChanged,
           onCancel: _toggleSearch,
         ),
@@ -59,12 +59,12 @@ class _PresetsAppbarState extends State<PresetsAppbar> {
           onPressed: _toggleSearch,
           icon: const Icon(Icons.search),
         ),
-        PresetsSortButton(
+        PresetsAppbarSortButton(
           onSelected: widget.onSortSelected,
           sortOption: widget.sortOption,
           sortAscending: widget.sortAscending,
         ),
-        PresetsMoreButton(onSelected: widget.onMoreSelected),
+        PresetsAppbarMoreButton(onSelected: widget.onMoreSelected),
       ],
     );
   }

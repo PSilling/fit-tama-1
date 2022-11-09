@@ -39,14 +39,13 @@ class PresetsMoreButton extends StatelessWidget {
           ),
         ),
         PopupMenuItem(
-          value: PresetsMoreOption.clearStorage,
-          child: Text(
-            'DEV - Clear storage',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSecondary,
-            ),
-          )
-        )
+            value: PresetsMoreOption.clearStorage,
+            child: Text(
+              'DEV - Clear storage',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
+            ))
       ],
     );
   }

@@ -2,14 +2,17 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:board_aid/themes.dart';
-import 'package:board_aid/views/presets_view/appbar/presets_more_button.dart';
-import 'package:board_aid/views/presets_view/appbar/presets_sort_button.dart';
+import 'package:board_aid/views/presets_view/appbar/presets_appbar_about_dialog.dart';
+import 'package:board_aid/views/presets_view/appbar/presets_appbar_more_button.dart';
+import 'package:board_aid/views/presets_view/appbar/presets_appbar_sort_button.dart';
+import 'package:board_aid/widgets/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/preset_model.dart';
 import '../../table_board.dart';
 import 'appbar/presets_appbar.dart';
+import 'card/presets_card_more_button.dart';
 
 /// View widget providing a grid view of all available game Presets.
 class PresetsView extends StatefulWidget {
@@ -24,7 +27,7 @@ class _PresetsViewState extends State<PresetsView> {
   var presets = <PresetModel>[];
   var renderedPresets = <PresetModel>[];
   var searchText = '';
-  var sortOption = PresetsSortOption.byName;
+  var sortOption = PresetsAppbarSortOption.byName;
   var sortAscending = true;
   late SharedPreferences storage;
 
@@ -40,9 +43,8 @@ class _PresetsViewState extends State<PresetsView> {
     _storePresets();
   }
 
-  // Removes the selected Preset.
+  /// Removes the selected Preset.
   void _removePreset(String id) async {
-    // TODO: add confirmation dialog
     presets.removeWhere((preset) => preset.id == id);
     _updateRenderedPresets();
     _storePresets();
@@ -84,13 +86,13 @@ class _PresetsViewState extends State<PresetsView> {
       // Apply the selected sorting method.
       int compareResult;
       switch (sortOption) {
-        case PresetsSortOption.byName:
+        case PresetsAppbarSortOption.byName:
           compareResult = a.name.compareTo(b.name);
           break;
-        case PresetsSortOption.byGame:
+        case PresetsAppbarSortOption.byGame:
           compareResult = a.game.compareTo(b.game);
           break;
-        case PresetsSortOption.byOpenedCount:
+        case PresetsAppbarSortOption.byOpenedCount:
           compareResult = a.openedCount.compareTo(b.openedCount);
           break;
       }
@@ -111,7 +113,7 @@ class _PresetsViewState extends State<PresetsView> {
   }
 
   /// Handles changes in sort order and direction.
-  void _handleSortSelected(PresetsSortOption option) {
+  void _handleSortSelected(PresetsAppbarSortOption option) {
     // Reverse current sort order when the same sort option is selected.
     if (option == sortOption) {
       sortAscending = !sortAscending;
@@ -123,20 +125,63 @@ class _PresetsViewState extends State<PresetsView> {
   }
 
   /// Handles additional menu actions.
-  void _handleMoreSelected(PresetsMoreOption option) async {
+  void _handleMoreSelected(PresetsAppbarMoreOption option) async {
     switch (option) {
-      case PresetsMoreOption.removeAll:
-        // TODO: add confirmation dialog
-        presets.clear();
-        _updateRenderedPresets();
+      case PresetsAppbarMoreOption.removeAll:
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => ConfirmationDialog(
+            title: 'Remove All Presets',
+            message: 'Are you sure you want to remove all saved presets?',
+            onConfirm: () async {
+              presets.clear();
+              _updateRenderedPresets();
+              var storage = await SharedPreferences.getInstance();
+              await storage.clear();
+            },
+          ),
+        );
         break;
-      case PresetsMoreOption.showAbout:
-        // TODO: show "About application" dialog (probably just a copy-paste of
-        // TODO: app description from app store)
+      case PresetsAppbarMoreOption.showAbout:
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => const PresetsAppbarAboutDialog(),
+        );
         break;
-      case PresetsMoreOption.clearStorage:
+      case PresetsAppbarMoreOption.clearStorage:
         var storage = await SharedPreferences.getInstance();
         await storage.clear();
+        break;
+    }
+  }
+
+  /// Handles actions from Preset show more dropdowns.
+  void _handlePresetActionSelected(String id, PresetsCardMoreOption option) {
+    var index = presets.indexWhere((preset) => preset.id == id);
+    var preset = presets[index];
+    switch (option) {
+      case PresetsCardMoreOption.customise:
+        // TODO: add customise dialog
+        _storePresets();
+        _updateRenderedPresets();
+        break;
+      case PresetsCardMoreOption.edit:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DashboardWidget(preset: preset),
+          ),
+        );
+        break;
+      case PresetsCardMoreOption.remove:
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => ConfirmationDialog(
+            title: 'Remove Preset',
+            message: 'Are you sure you want to remove ${preset.name}?',
+            onConfirm: () => _removePreset(id),
+          ),
+        );
         break;
     }
   }
@@ -152,16 +197,14 @@ class _PresetsViewState extends State<PresetsView> {
     storage = await SharedPreferences.getInstance();
     setState(() {
       presets = List<PresetModel>.from(
-          jsonDecode(storage.getString('presets') ?? "[]").map(
-                  (model)=> PresetModel.fromJson(model)
-          )
-      );
+          jsonDecode(storage.getString('presets') ?? "[]")
+              .map((model) => PresetModel.fromJson(model)));
     });
     _updateRenderedPresets();
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _loadPresets();
   }
@@ -188,20 +231,21 @@ class _PresetsViewState extends State<PresetsView> {
         itemCount: renderedPresets.length,
         itemBuilder: (BuildContext context, index) {
           var preset = renderedPresets[index];
-          return Card(
-            elevation: ThemeHelper.cardElevation(),
-            color: preset.backgroundColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(ThemeHelper.borderRadius()),
-            ),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            DashboardWidget(preset: preset)));
-              },
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DashboardWidget(preset: preset),
+                ),
+              );
+            },
+            child: Card(
+              elevation: ThemeHelper.cardElevation(),
+              color: preset.backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeHelper.borderRadius()),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Stack(
@@ -224,9 +268,13 @@ class _PresetsViewState extends State<PresetsView> {
                               preset.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
                             ),
                           ),
                         ),
@@ -236,9 +284,13 @@ class _PresetsViewState extends State<PresetsView> {
                             preset.game,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
                           ),
                         ),
                       ],
@@ -249,7 +301,7 @@ class _PresetsViewState extends State<PresetsView> {
                       child: Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 8),
+                            padding: const EdgeInsets.only(left: 12),
                             child: InkResponse(
                               radius: 20,
                               onTap: () => _toggleFavourite(preset.id),
@@ -262,18 +314,10 @@ class _PresetsViewState extends State<PresetsView> {
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 6),
-                            child: InkResponse(
-                              radius: 20,
-                              // TODO: add real dropdown menu, not just delete
-                              onTap: () => _removePreset(preset.id),
-                              child: Icon(
-                                Icons.more_vert,
-                                size: 20,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
+                          PresetsCardMoreButton(
+                            onSelected: (option) =>
+                                _handlePresetActionSelected(preset.id, option),
+                            size: 20,
                           ),
                         ],
                       ),

@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 
 /// Options for sorting Presets on PresetsView.
-enum PresetsSortOption {
+enum PresetsAppbarSortOption {
   byName,
   byGame,
   byOpenedCount,
 }
 
 /// Popup sorting button for PresetsView.
-class PresetsSortButton extends StatelessWidget {
-  const PresetsSortButton({
+class PresetsAppbarSortButton extends StatelessWidget {
+  const PresetsAppbarSortButton({
     super.key,
     required this.onSelected,
-    this.sortOption = PresetsSortOption.byName,
+    this.sortOption = PresetsAppbarSortOption.byName,
     this.sortAscending = true,
   });
 
-  final Function(PresetsSortOption option) onSelected;
-  final PresetsSortOption sortOption;
+  final Function(PresetsAppbarSortOption option) onSelected;
+  final PresetsAppbarSortOption sortOption;
   final bool sortAscending;
 
-  PopupMenuItem<PresetsSortOption> _buildSortItem(
+  PopupMenuItem<PresetsAppbarSortOption> _buildSortItem(
     BuildContext context,
-    PresetsSortOption option,
+    PresetsAppbarSortOption option,
     String title,
   ) {
     var children = <Widget>[
@@ -49,24 +49,25 @@ class PresetsSortButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<PresetsSortOption>(
+    return PopupMenuButton<PresetsAppbarSortOption>(
       color: Theme.of(context).colorScheme.secondary,
       icon: const Icon(Icons.sort),
+      tooltip: 'Show sort options',
       onSelected: onSelected,
       itemBuilder: (BuildContext context) => [
         _buildSortItem(
           context,
-          PresetsSortOption.byName,
+          PresetsAppbarSortOption.byName,
           'Sort by preset name',
         ),
         _buildSortItem(
           context,
-          PresetsSortOption.byGame,
+          PresetsAppbarSortOption.byGame,
           'Sort by game title',
         ),
         _buildSortItem(
           context,
-          PresetsSortOption.byOpenedCount,
+          PresetsAppbarSortOption.byOpenedCount,
           'Sort by usage rate',
         ),
       ],

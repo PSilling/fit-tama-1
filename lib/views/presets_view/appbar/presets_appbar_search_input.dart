@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// PresetsView search text field accompanied by control buttons.
-class PresetsSearchInput extends StatelessWidget {
-  const PresetsSearchInput({
+class PresetsAppbarSearchInput extends StatelessWidget {
+  const PresetsAppbarSearchInput({
     super.key,
     required this.onSearchChanged,
     required this.onCancel,
@@ -29,10 +29,9 @@ class PresetsSearchInput extends StatelessWidget {
                 hintStyle: Theme.of(context).textTheme.titleMedium,
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.onBackground
+                    color: Theme.of(context).colorScheme.onBackground,
                   ),
                 ),
-                // TODO: maybe disable underline when focused?
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
                     color: Theme.of(context).colorScheme.onBackground,
