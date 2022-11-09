@@ -117,8 +117,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       onTap: () {
                         itemController.delete(item.identifier);
                       },
-                      child: const Icon(
+                      child: Icon(
                         Icons.clear,
+                        color: Theme.of(context).colorScheme.onSurface,
                       )
                     )
                   )

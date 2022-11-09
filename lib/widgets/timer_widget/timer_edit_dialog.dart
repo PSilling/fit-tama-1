@@ -45,20 +45,22 @@ class TimerEditDialog extends StatelessWidget {
               key: _formKey,
               child: Column(children: [
                 FormBuilderTextField(
-                  name: "name",
-                  decoration: const InputDecoration(
-                    labelText: 'Title',
-                    hintText: 'e.g. "Turn Timer"',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
+                  name: "name",
+                  decoration: ThemeHelper.textInputDecoration(context, "Title"),
                   initialValue: data.name,
                   onSaved: (value) => data.name = value ?? "",
                 ),
                 FormBuilderTextField(
-                  name: "initial_time",
-                  decoration: const InputDecoration(
-                    labelText: 'Initial time',
-                    hintText: 'e.g. 20 (time is in seconds)',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
+                  name: "initial_time",
+                  decoration: ThemeHelper.textInputDecoration(context, "Initial time"),
                   keyboardType: TextInputType.number,
                   initialValue: "${data.initialTime}",
                   validator: _numberValidator,

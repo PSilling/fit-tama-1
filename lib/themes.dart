@@ -36,15 +36,15 @@ class ThemeHelper {
   }
 
   static Color widgetDialogHighlightColor(BuildContext context) {
-    return Theme.of(context).colorScheme.primary;
+    return Theme.of(context).colorScheme.onSurfaceVariant;
   }
 
   static Color widgetDialogInverseColorForeground(BuildContext context) {
-    return Theme.of(context).colorScheme.onInverseSurface;
+    return Theme.of(context).colorScheme.surface;
   }
 
   static Color widgetDialogInverseColorBackground(BuildContext context) {
-    return Theme.of(context).colorScheme.inverseSurface;
+    return Theme.of(context).colorScheme.onSurface;
   }
 
   static Color widgetDialogNormalColorForeground(BuildContext context) {
@@ -52,9 +52,9 @@ class ThemeHelper {
   }
 
   /// Use this for game widget background color.
-  /// Just a placeholder, widgets will have configurable colors, TODO: remove.
+  /// Can be used as a default value, but widgets should have configurable colors.
   static Color widgetBackgroundColor(BuildContext context) {
-    return Theme.of(context).colorScheme.surface;
+    return Theme.of(context).colorScheme.tertiary;
   }
 
   /// Border radius to use across the application.
@@ -81,8 +81,26 @@ class ThemeHelper {
   static InputDecoration textInputDecoration(BuildContext context, String? label) {
     return InputDecoration(
       labelText: label,
-      focusColor: Theme.of(context).colorScheme.onPrimary,
-      hoverColor: Theme.of(context).colorScheme.onPrimary,
+      focusColor: Theme.of(context).colorScheme.onSurface,
+      hoverColor: Theme.of(context).colorScheme.onSurface,
+      labelStyle: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+        )
+      ),
+      focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.onSurface,
+          )
+      ),
+      focusedErrorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.onError,
+          )
+      ),
       contentPadding: const EdgeInsets.all(8.0),
     );
   }
@@ -92,6 +110,7 @@ class ThemeHelper {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       child: Text(label),
     );
@@ -102,6 +121,7 @@ class ThemeHelper {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: Theme.of(context).colorScheme.secondary,
+        foregroundColor: Theme.of(context).colorScheme.onSecondary,
       ),
       child: Text(label),
     );
@@ -112,6 +132,7 @@ class ThemeHelper {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: Theme.of(context).colorScheme.error,
+        foregroundColor: Theme.of(context).colorScheme.onError,
       ),
       child: Text(label),
     );
@@ -121,7 +142,7 @@ class ThemeHelper {
 const ColorScheme darkColorScheme = ColorScheme(
   brightness: Brightness.dark,
 
-  primary: Color(0xFF4752C4),
+  primary: Color(0xFF5865F2),
   onPrimary: Colors.white,
   secondary: Color(0xFF2F3136),
   onSecondary: Colors.white,
@@ -136,6 +157,7 @@ const ColorScheme darkColorScheme = ColorScheme(
 
   surface: Color(0xFF40444B),
   onSurface: Colors.white,
+  surfaceVariant: Color(0xFF8892f6),
 );
 
 /// Dark theme; use when building the app.
@@ -151,14 +173,16 @@ final ThemeData darkTheme = ThemeData(
   primaryColor: darkColorScheme.primary,
   backgroundColor: darkColorScheme.background,
 
+  unselectedWidgetColor: darkColorScheme.onSurface,
+  toggleableActiveColor: darkColorScheme.onSurface,
+
   textSelectionTheme: TextSelectionThemeData(
     cursorColor: darkColorScheme.onPrimary,
     selectionColor: darkColorScheme.onPrimary,
     selectionHandleColor: darkColorScheme.onPrimary,
   ),
 
-  iconTheme: IconThemeData(
-    color: darkColorScheme.onBackground,
+  iconTheme: const IconThemeData(
     size: 24,
   ),
 );
@@ -166,7 +190,7 @@ final ThemeData darkTheme = ThemeData(
 const ColorScheme lightColorScheme = ColorScheme(
   brightness: Brightness.light,
 
-  primary: Color(0xFF4752C4),
+  primary: Color(0xFF5865F2),
   onPrimary: Colors.white,
   secondary: Color(0xFF2F3136),
   onSecondary: Colors.white,
@@ -181,6 +205,7 @@ const ColorScheme lightColorScheme = ColorScheme(
 
   surface: Color(0xFFEBEDEF),
   onSurface: Colors.black,
+  surfaceVariant: Color(0xFF5865F2),
 );
 
 /// Light theme; use when building the app.
@@ -196,14 +221,64 @@ final ThemeData lightTheme = ThemeData(
   primaryColor: lightColorScheme.primary,
   backgroundColor: lightColorScheme.background,
 
+  unselectedWidgetColor: lightColorScheme.onSurface,
+  toggleableActiveColor: lightColorScheme.onSurface,
+
   textSelectionTheme: TextSelectionThemeData(
     cursorColor: lightColorScheme.onPrimary,
     selectionColor: lightColorScheme.onPrimary,
     selectionHandleColor: lightColorScheme.onPrimary,
   ),
 
-  iconTheme: IconThemeData(
-    color: lightColorScheme.onBackground,
+  iconTheme: const IconThemeData(
+    size: 24,
+  ),
+);
+
+ColorScheme debugColorScheme = ColorScheme(
+  brightness: Brightness.light,
+
+  primary: Colors.deepPurple.shade600,
+  onPrimary: Colors.deepPurple.shade200,
+  secondary: Colors.orange.shade600,
+  onSecondary: Colors.orange.shade200,
+  tertiary: Colors.green.shade600,
+  onTertiary: Colors.green.shade200,
+
+  error: Colors.red.shade600,
+  onError: Colors.red.shade200,
+
+  background: Colors.brown.shade600,
+  onBackground: Colors.brown.shade200,
+
+  surface: Colors.teal.shade600,
+  onSurface: Colors.teal.shade200,
+  surfaceVariant: Colors.tealAccent,
+);
+
+/// Debug theme; use when building the app (for finding theme inconsistencies).
+final ThemeData debugTheme = ThemeData(
+
+  textTheme: Typography.whiteCupertino.apply(
+    bodyColor: debugColorScheme.onPrimary,
+    displayColor: debugColorScheme.onPrimary,
+  ),
+
+  colorScheme: debugColorScheme,
+  brightness: debugColorScheme.brightness,
+  primaryColor: debugColorScheme.primary,
+  backgroundColor: debugColorScheme.background,
+
+  unselectedWidgetColor: debugColorScheme.onSurface,
+  toggleableActiveColor: debugColorScheme.onSurface,
+
+  textSelectionTheme: TextSelectionThemeData(
+    cursorColor: debugColorScheme.onPrimary,
+    selectionColor: debugColorScheme.onPrimary,
+    selectionHandleColor: debugColorScheme.onPrimary,
+  ),
+
+  iconTheme: const IconThemeData(
     size: 24,
   ),
 );

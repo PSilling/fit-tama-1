@@ -45,12 +45,20 @@ class DiceEditDialog extends StatelessWidget {
               key: _formKey,
               child: Column(children: [
                 FormBuilderTextField(
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
                   name: "name",
                   decoration: ThemeHelper.textInputDecoration(context, "Title"),
                   initialValue: data.name,
                   onSaved: (value) => data.name = value ?? "",
                 ),
                 FormBuilderTextField(
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
                   name: "number_of_dice",
                   decoration: ThemeHelper.textInputDecoration(context, "Dice count"),
                   keyboardType: TextInputType.number,
@@ -59,6 +67,10 @@ class DiceEditDialog extends StatelessWidget {
                   onSaved: (value) => data.numberOfDice = int.parse(value!),
                 ),
                 FormBuilderTextField(
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
                   name: "number_of_sides",
                   decoration: ThemeHelper.textInputDecoration(context, "Side count"),
                   keyboardType: TextInputType.number,
@@ -67,10 +79,14 @@ class DiceEditDialog extends StatelessWidget {
                   onSaved: (value) => data.numberOfSides = int.parse(value!),
                 ),
                 FormBuilderCheckbox(
-                  activeColor: Theme.of(context).colorScheme.onBackground,
-                  checkColor: Theme.of(context).colorScheme.primary,
+                  checkColor: Theme.of(context).colorScheme.onInverseSurface,
                   name: "long_press_required",
-                  title: const Text("Long press to reroll"),
+                  title: Text(
+                    "Long press to reroll",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                   initialValue: data.longPressToReroll,
                   onSaved: (value) => data.longPressToReroll = value!,
                 )

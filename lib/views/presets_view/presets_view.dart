@@ -224,7 +224,9 @@ class _PresetsViewState extends State<PresetsView> {
                               preset.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleLarge,
+                              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                             ),
                           ),
                         ),
@@ -234,7 +236,9 @@ class _PresetsViewState extends State<PresetsView> {
                             preset.game,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                         ),
                       ],
@@ -254,6 +258,7 @@ class _PresetsViewState extends State<PresetsView> {
                                     ? Icons.favorite
                                     : Icons.favorite_border,
                                 size: 20,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -263,9 +268,10 @@ class _PresetsViewState extends State<PresetsView> {
                               radius: 20,
                               // TODO: add real dropdown menu, not just delete
                               onTap: () => _removePreset(preset.id),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.more_vert,
                                 size: 20,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),

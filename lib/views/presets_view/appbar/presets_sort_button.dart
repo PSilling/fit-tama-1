@@ -27,7 +27,12 @@ class PresetsSortButton extends StatelessWidget {
   ) {
     var children = <Widget>[
       Expanded(
-        child: Text(title),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSecondary,
+          ),
+        ),
       ),
     ];
 
@@ -35,6 +40,7 @@ class PresetsSortButton extends StatelessWidget {
     if (option == sortOption) {
       children.add(Icon(
         sortAscending ? Icons.south : Icons.north,
+        color: Theme.of(context).colorScheme.onSecondary,
       ));
     }
 
@@ -44,6 +50,7 @@ class PresetsSortButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<PresetsSortOption>(
+      color: Theme.of(context).colorScheme.secondary,
       icon: const Icon(Icons.sort),
       onSelected: onSelected,
       itemBuilder: (BuildContext context) => [

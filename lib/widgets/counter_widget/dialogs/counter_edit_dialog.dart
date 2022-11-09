@@ -174,6 +174,10 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
           child: Column(
             children: [
               FormBuilderTextField(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "range_start",
                 decoration: ThemeHelper.textInputDecoration(context, "Minimum value"),
                 initialValue:
@@ -183,6 +187,10 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 validator: _numberValidator,
               ),
               FormBuilderTextField(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "range_end",
                 decoration: ThemeHelper.textInputDecoration(context, "Maximum value"),
                 initialValue:
@@ -193,8 +201,11 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               if (field.value.flatMap((value) => value.validate()) ?? false)
                 FormBuilderSlider(
-                  activeColor: Theme.of(context).colorScheme.onBackground,
-                  inactiveColor: Theme.of(context).colorScheme.onBackground.withOpacity(0.25),
+                  activeColor: Theme.of(context).colorScheme.onSurface,
+                  inactiveColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                  textStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                   key: _rangeDefaultSliderKey,
                   name: "range_default",
                   initialValue: field.value!
@@ -294,21 +305,24 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
           child: Column(
             children: [
               FormBuilderTextField(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "title",
                 decoration: ThemeHelper.textInputDecoration(context, "Title"),
                 initialValue: widget.data.name,
                 onSaved: (value) => widget.data.name = value ?? "",
               ),
               FormBuilderCheckboxGroup<String>(
-                activeColor: Theme.of(context).colorScheme.onBackground,
-                checkColor: Theme.of(context).colorScheme.primary,
+                checkColor: Theme.of(context).colorScheme.onInverseSurface,
                 name: "death",
                 initialValue: _DeathOptions.initialValue(
                     left: widget.data.isLeftDeath,
                     right: widget.data.isRightDeath),
                 options: [
-                  _DeathOptions.left.option,
-                  _DeathOptions.right.option,
+                  _DeathOptions.left.getOption(context),
+                  _DeathOptions.right.getOption(context),
                 ],
                 onSaved: (value) {
                   widget.data.isLeftDeath =
@@ -318,7 +332,6 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 },
               ),
               FormBuilderRadioGroup<String>(
-                  activeColor: Theme.of(context).colorScheme.onBackground,
                   name: "type",
                   initialValue:
                       _EvennessOptions.fromData(isUneven: _isUneven).label,
@@ -330,8 +343,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                   onSaved: (value) => widget.data.isUneven =
                       _EvennessOptions.isUneven(value: value),
                   options: [
-                    _EvennessOptions.range.option,
-                    _EvennessOptions.scale.option,
+                    _EvennessOptions.range.getOption(context),
+                    _EvennessOptions.scale.getOption(context),
                   ]),
               if (_isUneven) _scaleField() else _rangeField()
             ],
@@ -408,7 +421,17 @@ enum _EvennessOptions {
     return value == _EvennessOptions.scale.label;
   }
 
-  get option => FormBuilderFieldOption<String>(value: label);
+  FormBuilderFieldOption<String> getOption(BuildContext context) {
+    return FormBuilderFieldOption<String>(
+      value: label,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
 }
 
 enum _DeathOptions {
@@ -432,7 +455,17 @@ enum _DeathOptions {
     }
   }
 
-  get option => FormBuilderChipOption<String>(value: label);
+  FormBuilderChipOption<String> getOption(BuildContext context) {
+    return FormBuilderChipOption<String>(
+      value: label,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    );
+  }
 }
 
 class KeyedEntry {

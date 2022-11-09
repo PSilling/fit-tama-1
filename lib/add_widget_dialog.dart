@@ -25,7 +25,9 @@ class _AddDialogState extends State<AddDialog> {
                   padding: const EdgeInsets.all(16),
                   child: Text(
                     "Add widget",
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
                   ),
                 ),
                 ThemeHelper.buttonPrimary(

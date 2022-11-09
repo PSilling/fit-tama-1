@@ -16,20 +16,37 @@ class PresetsMoreButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<PresetsMoreOption>(
+      color: Theme.of(context).colorScheme.secondary,
       icon: const Icon(Icons.more_vert),
       onSelected: onSelected,
       itemBuilder: (BuildContext context) => [
-        const PopupMenuItem<PresetsMoreOption>(
+        PopupMenuItem<PresetsMoreOption>(
           value: PresetsMoreOption.removeAll,
-          child: Text('Remove all presets'),
+          child: Text(
+            'Remove all presets',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSecondary,
+            ),
+          ),
         ),
-        const PopupMenuItem<PresetsMoreOption>(
+        PopupMenuItem<PresetsMoreOption>(
           value: PresetsMoreOption.removeAll,
-          child: Text('About'),
+          child: Text(
+            'About',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSecondary,
+            ),
+          ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: PresetsMoreOption.clearStorage,
-          child: Text('DEV - Clear storage'))
+          child: Text(
+            'DEV - Clear storage',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSecondary,
+            ),
+          )
+        )
       ],
     );
   }
