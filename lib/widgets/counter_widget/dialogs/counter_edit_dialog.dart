@@ -112,13 +112,13 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
     final range = field.value!;
     final defaultSliderStateValue = _rangeDefaultSliderKey.currentState?.value;
     if (defaultSliderStateValue != null) {
-      return defaultSliderStateValue;
-    } else {
-      if (widget.data.isUneven) {
-        return range.start!.toDouble();
+      if (range.toScale().contains(defaultSliderStateValue)) {
+        return defaultSliderStateValue;
       } else {
-        return range.toScale()[widget.data.defaultIndex].toDouble();
+        return range.start!.toDouble();
       }
+    } else {
+      return range.toScale().elementAtOrNull(widget.data.defaultIndex)?.toDouble() ?? range.start!.toDouble();
     }
   }
 
@@ -181,7 +181,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 name: "range_start",
                 decoration: ThemeHelper.textInputDecoration(context, "Minimum value"),
                 initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.start}",
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(signed: true),
                 onChanged: (value) => _rangeStartChanged(value, field),
                 validator: _numberValidator,
               ),
@@ -189,7 +189,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 name: "range_end",
                 decoration: ThemeHelper.textInputDecoration(context, "Maximum value"),
                 initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.end}",
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(signed: true),
                 onChanged: (value) => _rangeEndChanged(value, field),
                 validator: _numberValidator,
               ),
@@ -265,7 +265,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                   width: 80,
                   child: FormBuilderChoiceChip<String>(
                     key: entry.checkKey,
-                    decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
+                    decoration:
+                        const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
                     name: "scale_checkbox_${entry.checkKey}",
                     options: const [_defaultEntryOption],
                     initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
