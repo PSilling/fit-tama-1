@@ -133,9 +133,12 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
 
   Widget _titleWidget(BuildContext context) => FittedBox(
       fit: BoxFit.contain,
-      child: Text(
-        _data.name,
-        style: ThemeHelper.widgetTitle(context),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
+        child: Text(
+          _data.name,
+          style: ThemeHelper.widgetTitle(context),
+        ),
       ),
     );
 

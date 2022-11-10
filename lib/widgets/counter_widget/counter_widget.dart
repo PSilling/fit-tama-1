@@ -201,9 +201,12 @@ class CounterWidgetState extends State<CounterWidget>
       ignoring: _isEditing,
       child: FittedBox(
         fit: BoxFit.contain,
-        child: Text(
-          _data.name,
-          style: ThemeHelper.widgetTitle(context),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
+          child: Text(
+            _data.name,
+            style: ThemeHelper.widgetTitle(context),
+          ),
         ),
       ),
     );

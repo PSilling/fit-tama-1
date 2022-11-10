@@ -140,7 +140,14 @@ class DiceWidgetState extends State<DiceWidget>
 
   Widget _titleWidget(BuildContext context) => FittedBox(
       fit: BoxFit.contain,
-      child: Text(_data.name, style: ThemeHelper.widgetTitle(context)));
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
+        child: Text(
+          _data.name,
+          style: ThemeHelper.widgetTitle(context),
+        ),
+      ),
+    );
 
   Widget _rollWidget(BuildContext context) => Padding(
         padding: _showDiceTextCondition() ? const EdgeInsets.only(right: 10) : EdgeInsets.zero,
