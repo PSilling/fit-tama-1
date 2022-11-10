@@ -181,8 +181,8 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
       child: IgnorePointer(
         ignoring: _isEditing,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (_currentState == TimerWidgetTimerState.init)
@@ -199,18 +199,20 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
                 context: context,
                 semanticLabel: "Pause the timer",
               ),
-            if (_currentState == TimerWidgetTimerState.paused)
+            if (_currentState == TimerWidgetTimerState.paused) ...[
               _themedIconButton(
                 Icons.play_arrow,
                 onPressed: run,
                 context: context,
                 semanticLabel: "Resume the timer",
               ),
-            if (_currentState == TimerWidgetTimerState.paused)
-              _themedIconButton(Icons.replay,
-                  onPressed: reset,
-                  context: context,
-                  semanticLabel: "Reset the timer"),
+              _themedIconButton(
+                Icons.replay,
+                onPressed: reset,
+                context: context,
+                semanticLabel: "Reset the timer"
+              ),
+            ],
           ],
         ),
       ),
