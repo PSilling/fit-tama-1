@@ -85,6 +85,10 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
     }
   }
 
+  bool _showDiceTextCondition() {
+    return _data.numberOfDice > 1 && _data.numberOfSides.toString().length * _data.numberOfDice <= 3;
+  }
+
   Widget _diceText(BuildContext context) {
     final rollText = _currentRoll
             ?.map((element) => "$element")
@@ -92,24 +96,23 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
             .flatMap((value) => "$value=") ??
         "";
     return ValueListenableBuilder(
-      valueListenable: _resultHeight,
-      builder: (context, height, child) {
-        if (height == null) {
-          return const SizedBox.expand();
-        }
-        return SizedBox(
-          height: height * 0.6,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: Text(
-              rollText,
-              textAlign: TextAlign.right,
-              style: ThemeHelper.widgetContentSecondary(context),
+        valueListenable: _resultHeight,
+        builder: (context, height, child) {
+          if (height == null) {
+            return const SizedBox.expand();
+          }
+          return SizedBox(
+            height: height * 0.6,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                rollText,
+                textAlign: TextAlign.right,
+                style: ThemeHelper.widgetContentSecondary(context),
+              ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
 
   Widget _resultText(BuildContext context) {
@@ -122,7 +125,7 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
           constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
           child: Text(
             "${result ?? ""}",
-            textAlign: TextAlign.left,
+            textAlign: _showDiceTextCondition() ? TextAlign.left : TextAlign.center,
             style: ThemeHelper.widgetContentMain(context),
           ),
         ),
@@ -134,10 +137,10 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
       FittedBox(fit: BoxFit.contain, child: Text(_data.name, style: ThemeHelper.widgetTitle(context)));
 
   Widget _rollWidget(BuildContext context) => Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: Row(
+        padding: _showDiceTextCondition() ? const EdgeInsets.only(right: 10) : EdgeInsets.zero,
+        child: Row(
           children: [
-            if (_data.numberOfDice > 1)
+            if (_showDiceTextCondition())
               Expanded(
                 flex: 3,
                 child: Opacity(
