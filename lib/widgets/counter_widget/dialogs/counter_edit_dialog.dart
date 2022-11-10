@@ -302,10 +302,10 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 initialValue: widget.data.name,
                 onSaved: (value) => widget.data.name = value ?? "",
               ),
-              FormBuilderCheckboxGroup<String>(
-                activeColor: Theme.of(context).colorScheme.onBackground,
-                checkColor: Theme.of(context).colorScheme.primary,
+              FormBuilderFilterChip<String>(
                 name: "death",
+                decoration: ThemeHelper.textInputDecoration(context, "End on a death icon"),
+                spacing: ThemeHelper.widgetDialogChipSpacing,
                 initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isRightDeath),
                 options: [
                   _DeathOptions.left.option,
@@ -448,9 +448,9 @@ enum _DeathOptions {
   String get label {
     switch (this) {
       case _DeathOptions.left:
-        return "Death icon on the left";
+        return "Left side";
       case _DeathOptions.right:
-        return "Death icon on the right";
+        return "Right side";
     }
   }
 

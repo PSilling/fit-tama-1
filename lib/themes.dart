@@ -51,6 +51,8 @@ class ThemeHelper {
     return Theme.of(context).colorScheme.onSurface;
   }
 
+  static const double widgetDialogChipSpacing = 10;
+
   /// Use this for game widget background color.
   /// Just a placeholder, widgets will have configurable colors, TODO: remove.
   static Color widgetBackgroundColor(BuildContext context) {

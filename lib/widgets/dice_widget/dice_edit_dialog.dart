@@ -61,18 +61,21 @@ class DiceEditDialog extends StatelessWidget {
                 FormBuilderTextField(
                   name: "number_of_sides",
                   decoration: ThemeHelper.textInputDecoration(context, "Side count"),
-                  keyboardType:  const TextInputType.numberWithOptions(signed: true),
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
                   initialValue: "${data.numberOfSides}",
                   validator: (value) => _numberValidator(value, minimalValue: 2),
                   onSaved: (value) => data.numberOfSides = int.parse(value!),
                 ),
-                FormBuilderCheckbox(
-                  activeColor: Theme.of(context).colorScheme.onBackground,
-                  checkColor: Theme.of(context).colorScheme.primary,
-                  name: "long_press_required",
-                  title: const Text("Long press to reroll"),
-                  initialValue: data.longPressToReroll,
-                  onSaved: (value) => data.longPressToReroll = value!,
+                FormBuilderChoiceChip<String>(
+                  decoration: ThemeHelper.textInputDecoration(context, "Action to reroll"),
+                  spacing: ThemeHelper.widgetDialogChipSpacing,
+                  name: "reroll_action",
+                  initialValue: _RerollOptions.fromData(longPressToReroll: data.longPressToReroll).label,
+                  onSaved: (value) => data.longPressToReroll = _RerollOptions.isLongPressToReroll(value: value),
+                  options: [
+                    _RerollOptions.tap.option,
+                    _RerollOptions.longpress.option,
+                  ],
                 )
               ]),
             )),
@@ -89,4 +92,28 @@ class DiceEditDialog extends StatelessWidget {
           ),
         ],
       );
+}
+
+enum _RerollOptions {
+  tap,
+  longpress;
+
+  factory _RerollOptions.fromData({required bool longPressToReroll}) {
+    return longPressToReroll ? _RerollOptions.longpress : _RerollOptions.tap;
+  }
+
+  String get label {
+    switch (this) {
+      case _RerollOptions.tap:
+        return "Tap";
+      case _RerollOptions.longpress:
+        return "Longpress";
+    }
+  }
+
+  static bool isLongPressToReroll({required String? value}) {
+    return value == _RerollOptions.longpress.label;
+  }
+
+  get option => FormBuilderChipOption<String>(value: label);
 }
