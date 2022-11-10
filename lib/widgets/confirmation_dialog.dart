@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../util/themes.dart';
+
 /// General purpose confirmation dialog.
 class ConfirmationDialog extends StatelessWidget {
   const ConfirmationDialog({
@@ -18,19 +20,22 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Theme.of(context).colorScheme.background,
       title: Text(title),
       content: Text(message),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, 'Cancel'),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
+        ThemeHelper.buttonPrimary(
+          context: context,
           onPressed: () {
             onConfirm();
-            Navigator.pop(context, confirmText);
+            Navigator.of(context).pop();
           },
-          child: Text(confirmText),
+          label: confirmText,
+        ),
+        ThemeHelper.buttonSecondary(
+          context: context,
+          onPressed: () => Navigator.of(context).pop(),
+          label: 'Cancel',
         ),
       ],
     );

@@ -7,7 +7,7 @@ class PresetModel {
   late final String id;
   String name;
   String game;
-  AssetImage image;
+  int iconCode;
   bool isFavourite;
   int openedCount;
   Color backgroundColor;
@@ -16,7 +16,7 @@ class PresetModel {
     String? id,
     this.name = '',
     this.game = '',
-    this.image = const AssetImage('assets/placeholder.png'),   //TODO - remove placeholder image
+    this.iconCode = 0xe046, // adb
     this.isFavourite = false,
     this.openedCount = 0,
     this.backgroundColor = Colors.blue,
@@ -29,21 +29,35 @@ class PresetModel {
     }
   }
 
-  PresetModel.fromJson(Map<String, dynamic> json)
-    : id = json['id'],
-      name = json['name'],
-      game = json['game'],
-      image = const AssetImage('assets/placeholder.png'), //TODO - remove placeholder image
-      isFavourite = json['isFavourite'],
-      openedCount = json['openedCount'],
-      backgroundColor = Color(json['backgroundColor']);
+  /// Loads a preset from its JSON representation.
+  PresetModel.fromJSON(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'],
+        game = json['game'],
+        iconCode = json['iconCode'],
+        isFavourite = json['isFavourite'],
+        openedCount = json['openedCount'],
+        backgroundColor = Color(json['backgroundColor']);
 
-  Map<String, dynamic> toJson() => {    //TODO - add saving image
-    'id': id,
-    'name': name,
-    'game': game,
-    'isFavourite': isFavourite,
-    'openedCount': openedCount,
-    'backgroundColor': backgroundColor.value
-  };
+  /// Generates a JSON representation of the preset.
+  Map<String, dynamic> toJSON() => {
+        'id': id,
+        'name': name,
+        'game': game,
+        'iconCode': iconCode,
+        'isFavourite': isFavourite,
+        'openedCount': openedCount,
+        'backgroundColor': backgroundColor.value,
+      };
+
+  /// Creates a deep copy of the preset.
+  PresetModel copy() => PresetModel(
+        id: id,
+        name: name,
+        game: game,
+        iconCode: iconCode,
+        isFavourite: isFavourite,
+        openedCount: openedCount,
+        backgroundColor: backgroundColor,
+      );
 }

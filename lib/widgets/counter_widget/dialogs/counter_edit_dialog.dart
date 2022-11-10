@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:board_aid/themes.dart';
+import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../../../helpers/extensions.dart';
+import '../../../util/extensions.dart';
 import '../counter_widget_data.dart';
 
 class CounterEditDialog extends StatefulWidget {
@@ -179,7 +179,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 ),
                 cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "range_start",
-                decoration: ThemeHelper.textInputDecoration(context, "Minimum value"),
+                decoration:
+                    ThemeHelper.textInputDecoration(context, "Minimum value"),
                 initialValue:
                     widget.data.isUneven ? null : "${_rangeInitialValue.start}",
                 keyboardType: TextInputType.number,
@@ -192,7 +193,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 ),
                 cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "range_end",
-                decoration: ThemeHelper.textInputDecoration(context, "Maximum value"),
+                decoration:
+                    ThemeHelper.textInputDecoration(context, "Maximum value"),
                 initialValue:
                     widget.data.isUneven ? null : "${_rangeInitialValue.end}",
                 keyboardType: TextInputType.number,
@@ -202,7 +204,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               if (field.value.flatMap((value) => value.validate()) ?? false)
                 FormBuilderSlider(
                   activeColor: Theme.of(context).colorScheme.onSurface,
-                  inactiveColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                  inactiveColor:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),

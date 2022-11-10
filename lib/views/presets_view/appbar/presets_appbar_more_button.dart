@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 enum PresetsAppbarMoreOption {
   removeAll,
   showAbout,
-  // TODO: Remove before production.
-  clearStorage,
 }
 
 /// Popup button for PresetsView containing additional menu options.
@@ -28,10 +26,6 @@ class PresetsAppbarMoreButton extends StatelessWidget {
         const PopupMenuItem<PresetsAppbarMoreOption>(
           value: PresetsAppbarMoreOption.showAbout,
           child: Text('About'),
-        ),
-        const PopupMenuItem(
-          value: PresetsAppbarMoreOption.clearStorage,
-          child: Text('DEV - Clear storage'),
         ),
       ],
     );

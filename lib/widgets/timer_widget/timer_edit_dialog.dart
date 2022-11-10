@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../../helpers/extensions.dart';
-import '../../themes.dart';
+import '../../util/extensions.dart';
+import '../../util/themes.dart';
 import 'timer_widget_data.dart';
 
 class TimerEditDialog extends StatelessWidget {
@@ -60,7 +60,8 @@ class TimerEditDialog extends StatelessWidget {
                   ),
                   cursorColor: Theme.of(context).colorScheme.onSurface,
                   name: "initial_time",
-                  decoration: ThemeHelper.textInputDecoration(context, "Initial time"),
+                  decoration:
+                      ThemeHelper.textInputDecoration(context, "Initial time"),
                   keyboardType: TextInputType.number,
                   initialValue: "${data.initialTime}",
                   validator: _numberValidator,

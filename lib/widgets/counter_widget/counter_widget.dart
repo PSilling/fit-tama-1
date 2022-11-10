@@ -1,14 +1,14 @@
 import 'dart:math';
 
-import 'package:board_aid/themes.dart';
+import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
-import '../../helpers/measure_size.dart';
 import './counter_widget_data.dart';
 import './dialogs/counter_edit_dialog.dart';
 import './dialogs/counter_reset_dialog.dart';
 import './dialogs/counter_scale_dialog.dart';
-import '../../helpers/extensions.dart';
+import '../../util/extensions.dart';
+import '../../util/measure_size.dart';
 import '../editable.dart';
 
 class CounterWidget extends StatefulWidget {
@@ -21,7 +21,8 @@ class CounterWidget extends StatefulWidget {
   State<CounterWidget> createState() => CounterWidgetState();
 }
 
-class CounterWidgetState extends State<CounterWidget> implements Editable<CounterWidget> {
+class CounterWidgetState extends State<CounterWidget>
+    implements Editable<CounterWidget> {
   late CounterWidgetData _data;
   late int _currentIndex;
   var _isEditing = false;
@@ -180,7 +181,8 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     } else {
       final leftDeath = _data.isLeftDeath;
       final rightDeath = _data.isRightDeath;
-      final deathIcon = _themedIcon(CounterWidget._death, context: context, semanticLabel: "Death", style: style);
+      final deathIcon = _themedIcon(CounterWidget._death,
+          context: context, semanticLabel: "Death", style: style);
       if (leftDeath && index == -1) {
         return deathIcon;
       } else if (rightDeath && index == _data.scale.length) {
@@ -209,17 +211,22 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     final center = _data.scale.elementAtOrNull(_currentIndex);
     final numberOfDigits = center?.toString().length ??
         [-1, 1]
-            .compactMap((element) => _data.scale.elementAtOrNull(_currentIndex + element))
+            .compactMap((element) =>
+                _data.scale.elementAtOrNull(_currentIndex + element))
             .map((element) => element.toString().length)
             .reduce(max);
-    final ems = List.filled(max(numberOfDigits, 1), "4").join(); // 4 is the widest number
+    final ems = List.filled(max(numberOfDigits, 1), "4")
+        .join(); // 4 is the widest number
     return Text(
       ems,
       style: style?.copyWith(color: Colors.transparent),
     );
   }
 
-  Widget _fittingNumber({required int index, required TextStyle? textStyle, required AlignmentGeometry alignment}) {
+  Widget _fittingNumber(
+      {required int index,
+      required TextStyle? textStyle,
+      required AlignmentGeometry alignment}) {
     return FittedBox(
       fit: BoxFit.contain,
       child: Stack(
@@ -233,7 +240,10 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
   }
 
   Widget _numberButton(
-      {required int index, required TextStyle? textStyle, required int flex, required AlignmentGeometry alignment}) {
+      {required int index,
+      required TextStyle? textStyle,
+      required int flex,
+      required AlignmentGeometry alignment}) {
     return Expanded(
       flex: flex,
       child: ValueListenableBuilder<double?>(
@@ -247,7 +257,8 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
               child: IgnorePointer(
                 child: Opacity(
                   opacity: 0.4,
-                  child: _fittingNumber(index: index, textStyle: textStyle, alignment: alignment),
+                  child: _fittingNumber(
+                      index: index, textStyle: textStyle, alignment: alignment),
                 ),
               ),
             );
@@ -294,7 +305,10 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     );
   }
 
-  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel, TextStyle? style}) =>
+  Widget _themedIcon(IconData? icon,
+          {required BuildContext context,
+          required String semanticLabel,
+          TextStyle? style}) =>
       Icon(icon, semanticLabel: semanticLabel, color: style?.color);
 
   Widget _buttonsSection(BuildContext context) {
@@ -320,7 +334,8 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     return Container(
       decoration: BoxDecoration(
         color: ThemeHelper.widgetBackgroundColor(context),
-        borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
+        borderRadius:
+            BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
         boxShadow: const [BoxShadow()],
       ),
       padding: ThemeHelper.cardPadding(),

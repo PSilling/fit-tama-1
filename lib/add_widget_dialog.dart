@@ -1,4 +1,4 @@
-import 'package:board_aid/themes.dart';
+import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
 class AddDialog extends StatefulWidget {
@@ -9,7 +9,6 @@ class AddDialog extends StatefulWidget {
 }
 
 class _AddDialogState extends State<AddDialog> {
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -26,8 +25,8 @@ class _AddDialogState extends State<AddDialog> {
                   child: Text(
                     "Add widget",
                     style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
-                    ),
+                          color: Theme.of(context).colorScheme.onBackground,
+                        ),
                   ),
                 ),
                 ThemeHelper.buttonPrimary(

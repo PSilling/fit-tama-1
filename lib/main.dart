@@ -1,4 +1,4 @@
-import 'package:board_aid/themes.dart';
+import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
 import 'views/presets_view/presets_view.dart';

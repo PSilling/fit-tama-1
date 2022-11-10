@@ -20,6 +20,7 @@ class PresetsAppbarSortButton extends StatelessWidget {
   final PresetsAppbarSortOption sortOption;
   final bool sortAscending;
 
+  /// Builds an sort option item based on text and sort direction arrow.
   PopupMenuItem<PresetsAppbarSortOption> _buildSortItem(
     BuildContext context,
     PresetsAppbarSortOption option,

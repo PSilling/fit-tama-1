@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../helpers/extensions.dart';
-import '../../../themes.dart';
+import '../../../util/extensions.dart';
+import '../../../util/themes.dart';
 
 class CounterScaleDialog extends StatefulWidget {
   final void Function(IndexedEntry) setCurrentIndex;
@@ -10,7 +10,11 @@ class CounterScaleDialog extends StatefulWidget {
   final IndexedEntry defaultEntry;
 
   const CounterScaleDialog._private(
-      {super.key, required this.scale, required this.currentEntry, required this.defaultEntry, required this.setCurrentIndex});
+      {super.key,
+      required this.scale,
+      required this.currentEntry,
+      required this.defaultEntry,
+      required this.setCurrentIndex});
 
   factory CounterScaleDialog(
       {Key? key,
@@ -21,14 +25,24 @@ class CounterScaleDialog extends StatefulWidget {
       required Widget Function(int) getNumberWidgetAt,
       required bool isLeftDeath,
       required bool isRightDeath}) {
-    final List<IndexedEntry> leftDeathEntry =
-        isLeftDeath ? [IndexedEntry.from(index: -1, getNumberAt: getNumberWidgetAt)] : [];
-    final List<IndexedEntry> rightDeathEntry =
-        isRightDeath ? [IndexedEntry.from(index: scaleLength, getNumberAt: getNumberWidgetAt)] : [];
-    final entryScale = List.generate(scaleLength, (index) => IndexedEntry(index: index, widget: getNumberWidgetAt(index)));
+    final List<IndexedEntry> leftDeathEntry = isLeftDeath
+        ? [IndexedEntry.from(index: -1, getNumberAt: getNumberWidgetAt)]
+        : [];
+    final List<IndexedEntry> rightDeathEntry = isRightDeath
+        ? [
+            IndexedEntry.from(
+                index: scaleLength, getNumberAt: getNumberWidgetAt)
+          ]
+        : [];
+    final entryScale = List.generate(
+        scaleLength,
+        (index) =>
+            IndexedEntry(index: index, widget: getNumberWidgetAt(index)));
     final fullScale = leftDeathEntry + entryScale + rightDeathEntry;
-    final currentEntry = fullScale.getEntry(at: currentIndex, isLeftDeath: isLeftDeath);
-    final defaultEntry = fullScale.getEntry(at: defaultIndex, isLeftDeath: isLeftDeath);
+    final currentEntry =
+        fullScale.getEntry(at: currentIndex, isLeftDeath: isLeftDeath);
+    final defaultEntry =
+        fullScale.getEntry(at: defaultIndex, isLeftDeath: isLeftDeath);
     return CounterScaleDialog._private(
       key: key,
       scale: fullScale,
@@ -48,16 +62,18 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => Scrollable.ensureVisible(
-          widget.currentEntry.key.currentContext!,
-          alignment: 0.5,
-        ));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => Scrollable.ensureVisible(
+              widget.currentEntry.key.currentContext!,
+              alignment: 0.5,
+            ));
   }
 
   ButtonStyle? _getButtonStyle({required IndexedEntry entry}) {
     const minSize = Size(55, 55);
     final textStyle = Theme.of(context).textTheme.headlineSmall;
-    Color? foregroundColor = ThemeHelper.widgetDialogNormalColorForeground(context);
+    Color? foregroundColor =
+        ThemeHelper.widgetDialogNormalColorForeground(context);
     Color? backgroundColor;
     bool hasBorder = false;
     if (entry == widget.currentEntry) {
@@ -73,7 +89,9 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
     return OutlinedButton.styleFrom(
       foregroundColor: foregroundColor,
       backgroundColor: backgroundColor,
-      side: hasBorder ? BorderSide(width: 2, color: Theme.of(context).colorScheme.onSurface) : BorderSide.none,
+      side: hasBorder
+          ? BorderSide(width: 2, color: Theme.of(context).colorScheme.onSurface)
+          : BorderSide.none,
       minimumSize: minSize,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       textStyle: textStyle,
@@ -133,11 +151,13 @@ class IndexedEntry {
 
   IndexedEntry({required this.index, required this.widget});
 
-  factory IndexedEntry.from({required int index, required Widget Function(int) getNumberAt}) {
+  factory IndexedEntry.from(
+      {required int index, required Widget Function(int) getNumberAt}) {
     return IndexedEntry(index: index, widget: getNumberAt(index));
   }
 }
 
 extension _IndexedEntryList on List<IndexedEntry> {
-  IndexedEntry getEntry({required int at, required bool isLeftDeath}) => this[at + (isLeftDeath ? 1 : 0)];
+  IndexedEntry getEntry({required int at, required bool isLeftDeath}) =>
+      this[at + (isLeftDeath ? 1 : 0)];
 }

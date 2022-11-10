@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../helpers/extensions.dart';
-import '../../../themes.dart';
+import '../../../util/extensions.dart';
+import '../../../util/themes.dart';
 
 class CounterResetDialog extends StatelessWidget {
   final void Function() resetIndex;

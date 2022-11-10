@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Popup menu button that does not create an InkWell for the child element.
-class InklessPopupMenuButton<T> extends PopupMenuButton<T> {
-  const InklessPopupMenuButton({
+/// Popup menu icon button that can be resized without restrictions.
+class ResizablePopupMenuButton<T> extends PopupMenuButton<T> {
+  const ResizablePopupMenuButton({
     super.key,
     required super.itemBuilder,
     super.initialValue,
@@ -23,11 +23,11 @@ class InklessPopupMenuButton<T> extends PopupMenuButton<T> {
   });
 
   @override
-  InklessPopupMenuButtonState<T> createState() =>
-      InklessPopupMenuButtonState<T>();
+  ResizablePopupMenuButtonState<T> createState() =>
+      ResizablePopupMenuButtonState<T>();
 }
 
-class InklessPopupMenuButtonState<T> extends PopupMenuButtonState<T> {
+class ResizablePopupMenuButtonState<T> extends PopupMenuButtonState<T> {
   @override
   Widget build(BuildContext context) {
     return Padding(

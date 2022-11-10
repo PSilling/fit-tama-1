@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:board_aid/themes.dart';
+import 'package:board_aid/util/themes.dart';
+import 'package:board_aid/views/customize_preset_view/customize_preset_view.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_appbar_about_dialog.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_appbar_more_button.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_appbar_sort_button.dart';
+import 'package:board_aid/views/presets_view/card/preset_card.dart';
 import 'package:board_aid/widgets/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/preset_model.dart';
 import '../../table_board.dart';
 import 'appbar/presets_appbar.dart';
-import 'card/presets_card_more_button.dart';
+import 'card/preset_card_more_button.dart';
 
 /// View widget providing a grid view of all available game Presets.
 class PresetsView extends StatefulWidget {
@@ -33,12 +35,34 @@ class _PresetsViewState extends State<PresetsView> {
 
   /// Creates a new Preset.
   void _createPreset() {
-    // TODO: open a new screen instead
-    presets.add(PresetModel(
-      name: 'Preset ${Random().nextInt(10000)}',
-      game: 'LCG',
-      backgroundColor: Random().nextInt(2) == 1 ? Colors.blue : Colors.red,
-    ));
+    // Create a randomised preset.
+    final random = Random();
+    final iconCodeIndex = random.nextInt(ThemeHelper.presetIconCodes.length);
+    final colorIndex = random.nextInt(ThemeHelper.backgroundColors.length);
+    var randomIconCode =
+        ThemeHelper.presetIconCodes.keys.elementAt(iconCodeIndex);
+    var randomColor = ThemeHelper.backgroundColors.keys.elementAt(colorIndex);
+    var newPreset = PresetModel(
+      name: 'Title (Tap to Edit)',
+      iconCode: randomIconCode,
+      backgroundColor: randomColor,
+    );
+
+    // Open Preset creation view.
+    // TODO: There should be a callback for preset list update from
+    // TODO: DashboardWidget (for auto-save, delayed preset creation etc.) or
+    // TODO: the preset storing should be global (possibly the better solution).
+    // TODO: See: https://stackoverflow.com/questions/48582963/flutter-how-to-execute-when-clicking-back-button
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DashboardWidget(preset: newPreset),
+      ),
+    );
+
+    // Save the new Preset (if not empty).
+    // TODO: Drop empty presets on creation.
+    presets.add(newPreset);
     _updateRenderedPresets();
     _storePresets();
   }
@@ -148,24 +172,30 @@ class _PresetsViewState extends State<PresetsView> {
           builder: (BuildContext context) => const PresetsAppbarAboutDialog(),
         );
         break;
-      case PresetsAppbarMoreOption.clearStorage:
-        var storage = await SharedPreferences.getInstance();
-        await storage.clear();
-        break;
     }
   }
 
   /// Handles actions from Preset show more dropdowns.
-  void _handlePresetActionSelected(String id, PresetsCardMoreOption option) {
+  void _handlePresetActionSelected(String id, PresetCardMoreOption option) {
     var index = presets.indexWhere((preset) => preset.id == id);
     var preset = presets[index];
     switch (option) {
-      case PresetsCardMoreOption.customise:
-        // TODO: add customise dialog
-        _storePresets();
-        _updateRenderedPresets();
+      case PresetCardMoreOption.customize:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CustomizePresetView(
+              preset: preset,
+              onSave: (updatedPreset) {
+                presets[index] = updatedPreset;
+                _storePresets();
+                _updateRenderedPresets();
+              },
+            ),
+          ),
+        );
         break;
-      case PresetsCardMoreOption.edit:
+      case PresetCardMoreOption.edit:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -173,7 +203,7 @@ class _PresetsViewState extends State<PresetsView> {
           ),
         );
         break;
-      case PresetsCardMoreOption.remove:
+      case PresetCardMoreOption.remove:
         showDialog(
           context: context,
           builder: (BuildContext context) => ConfirmationDialog(
@@ -189,6 +219,7 @@ class _PresetsViewState extends State<PresetsView> {
   /// Stores presets into the local storage
   void _storePresets() async {
     storage = await SharedPreferences.getInstance();
+    // TODO: jsonEncode seems to throw exceptions now after icons were added.
     await storage.setString('presets', jsonEncode(presets));
   }
 
@@ -198,7 +229,7 @@ class _PresetsViewState extends State<PresetsView> {
     setState(() {
       presets = List<PresetModel>.from(
           jsonDecode(storage.getString('presets') ?? "[]")
-              .map((model) => PresetModel.fromJson(model)));
+              .map((model) => PresetModel.fromJSON(model)));
     });
     _updateRenderedPresets();
   }
@@ -240,91 +271,11 @@ class _PresetsViewState extends State<PresetsView> {
                 ),
               );
             },
-            child: Card(
-              elevation: ThemeHelper.cardElevation(),
-              color: preset.backgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(ThemeHelper.borderRadius()),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Stack(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image(
-                            image: preset.image,
-                            width: 30,
-                            height: 30,
-                          ),
-                        ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Text(
-                              preset.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge!
-                                  .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            preset.game,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12),
-                            child: InkResponse(
-                              radius: 20,
-                              onTap: () => _toggleFavourite(preset.id),
-                              child: Icon(
-                                preset.isFavourite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                size: 20,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                          PresetsCardMoreButton(
-                            onSelected: (option) =>
-                                _handlePresetActionSelected(preset.id, option),
-                            size: 20,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            child: PresetCard(
+              preset: preset,
+              onFavouritePressed: () => _toggleFavourite(preset.id),
+              onMoreSelected: (option) =>
+                  _handlePresetActionSelected(preset.id, option),
             ),
           );
         },

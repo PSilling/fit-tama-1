@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:board_aid/helpers/measure_size.dart';
-import 'package:board_aid/themes.dart';
+import 'package:board_aid/util/measure_size.dart';
+import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
-import '../../helpers/extensions.dart';
+import '../../util/extensions.dart';
 import '../editable.dart';
 import 'dice_edit_dialog.dart';
 import 'dice_widget_data.dart';
@@ -18,7 +18,8 @@ class DiceWidget extends StatefulWidget {
   State<StatefulWidget> createState() => DiceWidgetState();
 }
 
-class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> {
+class DiceWidgetState extends State<DiceWidget>
+    implements Editable<DiceWidget> {
   final _random = Random();
 
   late DiceWidgetData _data;
@@ -54,7 +55,8 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
     });
     await Future.delayed(const Duration(milliseconds: 100));
     setState(() {
-      _currentRoll = List.generate(_data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
+      _currentRoll = List.generate(
+          _data.numberOfDice, (_) => _randIntFrom1(to: _data.numberOfSides));
     });
   }
 
@@ -92,24 +94,23 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
             .flatMap((value) => "$value=") ??
         "";
     return ValueListenableBuilder(
-      valueListenable: _resultHeight,
-      builder: (context, height, child) {
-        if (height == null) {
-          return const SizedBox.expand();
-        }
-        return SizedBox(
-          height: height * 0.6,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: Text(
-              rollText,
-              textAlign: TextAlign.right,
-              style: ThemeHelper.widgetContentSecondary(context),
+        valueListenable: _resultHeight,
+        builder: (context, height, child) {
+          if (height == null) {
+            return const SizedBox.expand();
+          }
+          return SizedBox(
+            height: height * 0.6,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                rollText,
+                textAlign: TextAlign.right,
+                style: ThemeHelper.widgetContentSecondary(context),
+              ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
 
   Widget _resultText(BuildContext context) {
@@ -130,12 +131,13 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
     );
   }
 
-  Widget _titleWidget(BuildContext context) =>
-      FittedBox(fit: BoxFit.contain, child: Text(_data.name, style: ThemeHelper.widgetTitle(context)));
+  Widget _titleWidget(BuildContext context) => FittedBox(
+      fit: BoxFit.contain,
+      child: Text(_data.name, style: ThemeHelper.widgetTitle(context)));
 
   Widget _rollWidget(BuildContext context) => Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: Row(
+        padding: const EdgeInsets.only(right: 10),
+        child: Row(
           children: [
             if (_data.numberOfDice > 1)
               Expanded(
@@ -157,7 +159,8 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
         heightFactor: 0.65,
         child: FittedBox(
           fit: BoxFit.contain,
-          child: Text("${_data.numberOfSides}-sided", style: ThemeHelper.widgetTitleBottom(context)),
+          child: Text("${_data.numberOfSides}-sided",
+              style: ThemeHelper.widgetTitleBottom(context)),
         ),
       );
 
@@ -165,7 +168,8 @@ class DiceWidgetState extends State<DiceWidget> implements Editable<DiceWidget> 
   Widget build(BuildContext context) => Container(
         decoration: BoxDecoration(
           color: ThemeHelper.widgetBackgroundColor(context),
-          borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
+          borderRadius:
+              BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
           boxShadow: const [BoxShadow()],
         ),
         padding: ThemeHelper.cardPadding(),
