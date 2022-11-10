@@ -183,7 +183,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 ),
                 cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "range_start",
-                decoration: ThemeHelper.textInputDecoration(context, "Left value"),
+                decoration: ThemeHelper.formInputDecoration(context, label: "Left value"),
                 initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.start}",
                 keyboardType: const TextInputType.numberWithOptions(signed: true),
                 onChanged: (value) => _rangeStartChanged(value, field),
@@ -195,7 +195,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 ),
                 cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "range_end",
-                decoration: ThemeHelper.textInputDecoration(context, "Right value"),
+                decoration: ThemeHelper.formInputDecoration(context, label: "Right value"),
                 initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.end}",
                 keyboardType: const TextInputType.numberWithOptions(signed: true),
                 onChanged: (value) => _rangeEndChanged(value, field),
@@ -204,12 +204,11 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               if (field.value.flatMap((value) => value.validate()) ?? false)
                 FormBuilderSlider(
                   activeColor: Theme.of(context).colorScheme.onSurface,
-                  inactiveColor:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                  inactiveColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-                  decoration: ThemeHelper.textInputDecoration(context, "Starting value"),
+                  decoration: ThemeHelper.formInputDecoration(context, label: "Starting value"),
                   key: _rangeDefaultSliderKey,
                   name: "range_default",
                   initialValue: _defaultSliderInitialValue(field: field),
@@ -233,7 +232,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         name: "scale",
         initialValue: _defaultIndexKey,
         builder: (FormFieldState field) => InputDecorator(
-          decoration: InputDecoration(errorText: field.errorText, border: InputBorder.none, labelText: "Values", isDense: true),
+          decoration: ThemeHelper.formInputDecoration(context,
+              errorText: field.errorText, label: "Values", hasBorder: false, isDense: true),
           child: Column(children: [
             for (var entry in _keyedScale) _scaleTextField(context, entry: entry, superField: field),
           ]),
@@ -250,15 +250,15 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         key: entry.mainKey,
         name: "scale_field_${entry.mainKey}",
         builder: (FormFieldState field) => InputDecorator(
-          decoration: InputDecoration(
-              errorText: field.errorText, border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
+          decoration: ThemeHelper.formInputDecoration(context,
+              errorText: field.errorText, hasBorder: false, isDense: true, hasPadding: false),
           child: Row(
             children: [
               Expanded(
                 child: FormBuilderTextField(
                   key: entry.textKey,
                   focusNode: entry.focusNode,
-                  decoration: const InputDecoration(isDense: false),
+                  decoration: ThemeHelper.formInputDecoration(context),
                   name: "scale_textfield_${entry.textKey}",
                   initialValue: entry.value.flatMap((value) => "$value"),
                   keyboardType: const TextInputType.numberWithOptions(signed: true),
@@ -277,8 +277,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                   width: 80,
                   child: FormBuilderChoiceChip<String>(
                     key: entry.checkKey,
-                    decoration:
-                        const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
+                    decoration: ThemeHelper.formInputDecoration(context, hasBorder: false, isDense: true, hasPadding: false),
                     name: "scale_checkbox_${entry.checkKey}",
                     options: const [_defaultEntryOption],
                     initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
@@ -314,13 +313,13 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 ),
                 cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "title",
-                decoration: ThemeHelper.textInputDecoration(context, "Title"),
+                decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
                 initialValue: widget.data.name,
                 onSaved: (value) => widget.data.name = value ?? "",
               ),
               FormBuilderFilterChip<String>(
                 name: "death",
-                decoration: ThemeHelper.textInputDecoration(context, "End on a death icon"),
+                decoration: ThemeHelper.formInputDecoration(context, label: "End on a death icon"),
                 spacing: ThemeHelper.widgetDialogChipSpacing,
                 initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isRightDeath),
                 options: [
@@ -334,7 +333,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               FormBuilderRadioGroup<String>(
                   activeColor: Theme.of(context).colorScheme.onBackground,
-                  decoration: ThemeHelper.textInputDecoration(context, "Scale"),
+                  decoration: ThemeHelper.formInputDecoration(context, label: "Scale"),
                   name: "type",
                   initialValue: _EvennessOptions.fromData(isUneven: _isUneven).label,
                   onChanged: (value) {

@@ -108,29 +108,36 @@ class ThemeHelper {
     return 8.0;
   }
 
-  /// Decoration for form text input fields.
-  static InputDecoration textInputDecoration(
-      BuildContext context, String? label) {
+  /// Decoration for form fields.
+  static InputDecoration formInputDecoration(BuildContext context,
+      {String? label,
+      bool? isDense, String? errorText,
+      bool hasBorder = true,
+      bool hasPadding = true}) {
     return InputDecoration(
       labelText: label,
+      errorText: errorText,
+      isDense: isDense,
       focusColor: Theme.of(context).colorScheme.onSurface,
       hoverColor: Theme.of(context).colorScheme.onSurface,
       labelStyle: TextStyle(
         color: Theme.of(context).colorScheme.onSurface,
       ),
-      enabledBorder: UnderlineInputBorder(
+      errorBorder: hasBorder ? null : InputBorder.none,
+      disabledBorder: hasBorder ? null : InputBorder.none,
+      enabledBorder: hasBorder ? UnderlineInputBorder(
           borderSide: BorderSide(
         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-      )),
-      focusedBorder: UnderlineInputBorder(
+      )) : InputBorder.none,
+      focusedBorder: hasBorder ? UnderlineInputBorder(
           borderSide: BorderSide(
         color: Theme.of(context).colorScheme.onSurface,
-      )),
-      focusedErrorBorder: UnderlineInputBorder(
+      )) : InputBorder.none,
+      focusedErrorBorder: hasBorder ? UnderlineInputBorder(
           borderSide: BorderSide(
         color: Theme.of(context).colorScheme.onError,
-      )),
-      contentPadding: const EdgeInsets.all(8.0),
+      )) : InputBorder.none,
+      contentPadding: hasPadding ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
     );
   }
 

@@ -50,7 +50,7 @@ class TimerEditDialog extends StatelessWidget {
                   ),
                   cursorColor: Theme.of(context).colorScheme.onSurface,
                   name: "name",
-                  decoration: ThemeHelper.textInputDecoration(context, "Title"),
+                  decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
                   initialValue: data.name,
                   onSaved: (value) => data.name = value ?? "",
                 ),
@@ -60,8 +60,7 @@ class TimerEditDialog extends StatelessWidget {
                   ),
                   cursorColor: Theme.of(context).colorScheme.onSurface,
                   name: "initial_time",
-                  decoration:
-                      ThemeHelper.textInputDecoration(context, "Initial time"),
+                  decoration: ThemeHelper.formInputDecoration(context, label: "Initial time"),
                   keyboardType: TextInputType.number,
                   initialValue: "${data.initialTime}",
                   validator: _numberValidator,

@@ -129,9 +129,9 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                       cursorColor: Theme.of(context).colorScheme.onSurface,
-                      decoration: ThemeHelper.textInputDecoration(
+                      decoration: ThemeHelper.formInputDecoration(
                         context,
-                        'Preset name',
+                        label: 'Preset name',
                       ),
                       initialValue: _updatedPreset.name,
                       validator: _nameValidator,
@@ -146,9 +146,9 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                       cursorColor: Theme.of(context).colorScheme.onSurface,
-                      decoration: ThemeHelper.textInputDecoration(
+                      decoration: ThemeHelper.formInputDecoration(
                         context,
-                        'Game title',
+                        label: 'Game title',
                       ),
                       initialValue: _updatedPreset.game,
                       onSaved: (value) => _updatedPreset.game = value ?? '',
