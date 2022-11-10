@@ -202,7 +202,7 @@ class DiceWidgetState extends State<DiceWidget>
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: _onTap,
-          onLongPress: _onLongPress,
+          onLongPress: _isEditing ? null : _onLongPress,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
