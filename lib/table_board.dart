@@ -98,14 +98,15 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     borderRadius:
                         BorderRadius.circular(ThemeHelper.borderRadius()))),
             editModeSettings: EditModeSettings(
-              paintBackgroundLines: false,
-              fillEditingBackground: false,
+              paintBackgroundLines: true,
+              fillEditingBackground: true,
               resizeCursorSide:
                   0, // when set to 0 user cannot change the shape of the widgets
               curve: Curves.easeIn,
               duration: const Duration(milliseconds: 300),
-              backgroundStyle: const EditModeBackgroundStyle(
+              backgroundStyle: EditModeBackgroundStyle(
                 lineColor: Colors.transparent,
+                fillRadius: ThemeHelper.borderRadius(),
               ),
             ),
             itemBuilder: (ColoredDashboardItem item) {
