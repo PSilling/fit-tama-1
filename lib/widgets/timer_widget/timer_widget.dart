@@ -18,8 +18,7 @@ class TimerWidget extends StatefulWidget {
 
 enum TimerWidgetTimerState { init, running, paused }
 
-class TimerWidgetState extends State<TimerWidget>
-    implements Editable<TimerWidget> {
+class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidget> {
   late int _currentTime = _data.initialTime;
   TimerWidgetTimerState _currentState = TimerWidgetTimerState.init;
   bool _isEditing = false;
@@ -117,35 +116,41 @@ class TimerWidgetState extends State<TimerWidget>
     );
   }
 
+  // Has size of widest displayed number, to keep the number positioning/size even
+  Widget _sizer({required TextStyle? style}) => Text(
+      formatTime(-data.initialTime.abs()),
+      style: style?.copyWith(color: Colors.transparent)
+    );
+
   Widget _titleWidget(BuildContext context) => FittedBox(
       fit: BoxFit.contain,
       child: Text(
         _data.name,
         style: ThemeHelper.widgetTitle(context),
-      ));
+      ),
+    );
 
   Widget _timeWidget(BuildContext context) {
     return Padding(
-        padding: ThemeHelper.cardPadding(),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
+      padding: ThemeHelper.cardPadding(),
+      child: SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              Expanded(
-                flex: 1,
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: Text(
-                    style: _currentTime <= 0
-                        ? ThemeHelper.widgetContentMain(context)
-                            .copyWith(color: Colors.yellow)
-                        : ThemeHelper.widgetContentMain(context),
-                    formatTime(_currentTime),
-                  ),
-                ),
-              )
-            ]));
+              Text(
+                formatTime(_currentTime),
+                style: _currentTime <= 0
+                    ? ThemeHelper.widgetContentMain(context).copyWith(color: Colors.yellow)
+                    : ThemeHelper.widgetContentMain(context),
+              ),
+              _sizer(style: ThemeHelper.widgetContentMain(context)),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _themedIconButton(IconData? icon,

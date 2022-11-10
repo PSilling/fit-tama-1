@@ -11,8 +11,7 @@ class CounterEditDialog extends StatefulWidget {
   final CounterWidgetData data;
   final void Function(CounterWidgetData) setData;
 
-  const CounterEditDialog(
-      {super.key, required this.data, required this.setData});
+  const CounterEditDialog({super.key, required this.data, required this.setData});
 
   @override
   State<StatefulWidget> createState() => _CounterEditDialogState();
@@ -28,20 +27,17 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
 
   late final _rangeInitialValue = IntRange.from(scale: widget.data.scale);
   final _rangeDefaultSliderKey = GlobalKey<FormBuilderFieldState>();
-  static const _defaultEntryOption =
-      FormBuilderChipOption<String>(value: "Default");
+  static const _defaultEntryOption = FormBuilderChipOption<String>(value: "Start");
 
   @override
   void initState() {
     _isUneven = widget.data.isUneven;
     if (widget.data.isUneven) {
-      final defaultScale = widget.data.scale
-          .map((element) => KeyedEntry(value: element))
-          .toList();
+      final defaultScale = widget.data.scale.map((element) => KeyedEntry(value: element)).toList();
       _keyedScale = defaultScale + [KeyedEntry(value: null)];
       _defaultIndexKey = defaultScale[widget.data.defaultIndex].checkKey;
     } else {
-      _keyedScale = [];
+      _keyedScale = [KeyedEntry(value: null)];
       _defaultIndexKey = null;
     }
     super.initState();
@@ -86,10 +82,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
   }
 
   void _cleanTempScale() {
-    final newState = _keyedScale.compactMap((element) =>
-        (element == _keyedScale.last || element.value != null)
-            ? element
-            : null);
+    final newState =
+        _keyedScale.compactMap((element) => (element == _keyedScale.last || element.value != null) ? element : null);
     setState(() {
       final focused = FocusScope.of(context).focusedChild;
       if (!newState.map((e) => e.focusNode).contains(focused)) {
@@ -101,9 +95,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
 
   void _updateTempScale(String? value, KeyedEntry entry, FormFieldState field) {
     final newValue = value.flatMap((value) => int.tryParse(value));
-    _keyedScale
-        .firstWhere((element) => element.textKey == entry.textKey)
-        .value = newValue;
+    _keyedScale.firstWhere((element) => element.textKey == entry.textKey).value = newValue;
     if (_keyedScale.last.textKey == entry.textKey && newValue != null) {
       _keyedScale.add(KeyedEntry(value: null));
     }
@@ -116,6 +108,20 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
     }
   }
 
+  double _defaultSliderInitialValue({required FormFieldState<IntRange> field}) {
+    final range = field.value!;
+    final defaultSliderStateValue = _rangeDefaultSliderKey.currentState?.value;
+    if (defaultSliderStateValue != null) {
+      if (range.toScale().contains(defaultSliderStateValue)) {
+        return defaultSliderStateValue;
+      } else {
+        return range.start!.toDouble();
+      }
+    } else {
+      return range.toScale().elementAtOrNull(widget.data.defaultIndex)?.toDouble() ?? range.start!.toDouble();
+    }
+  }
+
   void _rangeStartChanged(String? value, FormFieldState<IntRange> field) {
     if (value == null || value.isEmpty) {
       return;
@@ -125,17 +131,16 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
     final rangeStart = range.start;
     final rangeEnd = range.end;
     if (defaultSliderState != null && rangeStart != null && rangeEnd != null) {
-      final sliderValue = defaultSliderState.value;
-      final isStartToEnd = rangeStart < rangeEnd;
-      final isBelowStart = isStartToEnd && sliderValue < rangeStart;
-      final isAboveEnd = isStartToEnd && field.value!.end! < sliderValue;
-      final isEndToStart = rangeEnd < rangeStart;
-      final isAboveStart = isEndToStart && rangeStart < sliderValue;
-      final isBelowEnd = isEndToStart && sliderValue < rangeEnd;
-      if (isBelowStart || isAboveStart) {
-        defaultSliderState.didChange(rangeStart.toDouble());
-      } else if (isAboveEnd || isBelowEnd) {
-        defaultSliderState.didChange(rangeEnd.toDouble());
+      final sliderValue = defaultSliderState.value.toInt();
+      switch (range.juxtapose(value: sliderValue)!) {
+        case RangeJuxtaposition.outsideStart:
+          defaultSliderState.didChange(rangeStart.toDouble());
+          break;
+        case RangeJuxtaposition.outsideEnd:
+          defaultSliderState.didChange(rangeEnd.toDouble());
+          break;
+        case RangeJuxtaposition.inside:
+          break;
       }
     }
     field.didChange(range);
@@ -150,27 +155,26 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
     final rangeStart = range.start;
     final rangeEnd = range.end;
     if (defaultSliderState != null && rangeStart != null && rangeEnd != null) {
-      final sliderValue = defaultSliderState.value;
-      final isStartToEnd = rangeStart < rangeEnd;
-      final isAboveEnd = isStartToEnd && rangeEnd < sliderValue;
-      final isBelowStart = isStartToEnd && sliderValue < rangeStart;
-      final isEndToStart = rangeEnd < rangeStart;
-      final isBelowEnd = isEndToStart && sliderValue < rangeEnd;
-      final isAboveStart = isEndToStart && rangeStart < sliderValue;
-      if (isAboveEnd || isBelowEnd) {
-        defaultSliderState.didChange(rangeEnd.toDouble());
-      } else if (isBelowStart || isAboveStart) {
-        defaultSliderState.didChange(rangeStart.toDouble());
+      final sliderValue = defaultSliderState.value.toInt();
+      switch (range.juxtapose(value: sliderValue)!) {
+        case RangeJuxtaposition.outsideStart:
+          defaultSliderState.didChange(rangeStart.toDouble());
+          break;
+        case RangeJuxtaposition.outsideEnd:
+          defaultSliderState.didChange(rangeEnd.toDouble());
+          break;
+        case RangeJuxtaposition.inside:
+          break;
       }
     }
     field.didChange(range);
   }
 
-  Widget _rangeField() => FormBuilderField<IntRange>(
+  Widget _rangeField(BuildContext context) => FormBuilderField<IntRange>(
         name: "range",
         initialValue: widget.data.isUneven ? null : _rangeInitialValue,
         builder: (FormFieldState<IntRange> field) => InputDecorator(
-          decoration: InputDecoration(errorText: field.errorText),
+          decoration: InputDecoration(errorText: field.errorText, border: InputBorder.none),
           child: Column(
             children: [
               FormBuilderTextField(
@@ -179,11 +183,9 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 ),
                 cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "range_start",
-                decoration:
-                    ThemeHelper.textInputDecoration(context, "Minimum value"),
-                initialValue:
-                    widget.data.isUneven ? null : "${_rangeInitialValue.start}",
-                keyboardType: TextInputType.number,
+                decoration: ThemeHelper.textInputDecoration(context, "Left value"),
+                initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.start}",
+                keyboardType: const TextInputType.numberWithOptions(signed: true),
                 onChanged: (value) => _rangeStartChanged(value, field),
                 validator: _numberValidator,
               ),
@@ -193,11 +195,9 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 ),
                 cursorColor: Theme.of(context).colorScheme.onSurface,
                 name: "range_end",
-                decoration:
-                    ThemeHelper.textInputDecoration(context, "Maximum value"),
-                initialValue:
-                    widget.data.isUneven ? null : "${_rangeInitialValue.end}",
-                keyboardType: TextInputType.number,
+                decoration: ThemeHelper.textInputDecoration(context, "Right value"),
+                initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.end}",
+                keyboardType: const TextInputType.numberWithOptions(signed: true),
                 onChanged: (value) => _rangeEndChanged(value, field),
                 validator: _numberValidator,
               ),
@@ -209,20 +209,17 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
+                  decoration: ThemeHelper.textInputDecoration(context, "Starting value"),
                   key: _rangeDefaultSliderKey,
                   name: "range_default",
-                  initialValue: field.value!
-                      .toScale()[widget.data.defaultIndex]
-                      .toDouble(),
+                  initialValue: _defaultSliderInitialValue(field: field),
                   min: min(field.value!.start!, field.value!.end!).toDouble(),
                   max: max(field.value!.start!, field.value!.end!).toDouble(),
                   divisions: (field.value!.start! - field.value!.end!).abs(),
-                  valueTransformer: (value) =>
-                      value.flatMap((value) => value.toInt()),
+                  valueTransformer: (value) => value.flatMap((value) => value.toInt()),
                   onSaved: (value) {
                     final scale = field.value!.toScale();
-                    widget.data.defaultIndex =
-                        scale.indexWhere((element) => element == value);
+                    widget.data.defaultIndex = scale.indexWhere((element) => element == value);
                   },
                 ),
             ],
@@ -232,56 +229,60 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         onSaved: (value) => widget.data.scale = value!.toScale(),
       );
 
-  Widget _scaleField() => FormBuilderField<GlobalKey>(
+  Widget _scaleField(BuildContext context) => FormBuilderField<GlobalKey>(
         name: "scale",
         initialValue: _defaultIndexKey,
         builder: (FormFieldState field) => InputDecorator(
-          decoration: InputDecoration(errorText: field.errorText),
+          decoration: InputDecoration(errorText: field.errorText, border: InputBorder.none, labelText: "Values", isDense: true),
           child: Column(children: [
-            for (var entry in _keyedScale)
-              _scaleTextField(entry: entry, superField: field),
+            for (var entry in _keyedScale) _scaleTextField(context, entry: entry, superField: field),
           ]),
         ),
         validator: (value) => _scaleValidator(value, scale: _keyedScale),
         onSaved: (key) {
           widget.data.scale = _keyedScale.compactMap((e) => e.value).toList();
-          widget.data.defaultIndex =
-              _keyedScale.indexWhere((element) => element.checkKey == key);
+          widget.data.defaultIndex = _keyedScale.indexWhere((element) => element.checkKey == key);
         },
       );
 
-  Widget _scaleTextField(
-          {required KeyedEntry entry, required FormFieldState superField}) =>
+  Widget _scaleTextField(BuildContext context, {required KeyedEntry entry, required FormFieldState superField}) =>
       FormBuilderField(
         key: entry.mainKey,
         name: "scale_field_${entry.mainKey}",
         builder: (FormFieldState field) => InputDecorator(
-          decoration: InputDecoration(errorText: field.errorText),
+          decoration: InputDecoration(
+              errorText: field.errorText, border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
           child: Row(
             children: [
               Expanded(
                 child: FormBuilderTextField(
                   key: entry.textKey,
                   focusNode: entry.focusNode,
+                  decoration: const InputDecoration(isDense: false),
                   name: "scale_textfield_${entry.textKey}",
                   initialValue: entry.value.flatMap((value) => "$value"),
-                  keyboardType: TextInputType.number,
-                  validator: (value) =>
-                      _numberValidator(value, isRequired: false),
-                  onChanged: (value) =>
-                      _updateTempScale(value, entry, superField),
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
+                  validator: (value) => _numberValidator(value, isRequired: false),
+                  onChanged: (value) => _updateTempScale(value, entry, superField),
                   onTap: _cleanTempScale,
+                  textInputAction: TextInputAction.next,
+                  onEditingComplete: () {
+                    final index = _keyedScale.indexOf(entry);
+                    FocusScope.of(context).requestFocus(_keyedScale[index + 1].focusNode);
+                  },
                 ),
               ),
               if (entry.value != null)
-                Expanded(
+                SizedBox(
+                  width: 80,
                   child: FormBuilderChoiceChip<String>(
                     key: entry.checkKey,
+                    decoration:
+                        const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
                     name: "scale_checkbox_${entry.checkKey}",
                     options: const [_defaultEntryOption],
-                    initialValue: superField.value == entry.checkKey
-                        ? _defaultEntryOption.value
-                        : null,
+                    initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
+                    alignment: WrapAlignment.end,
                     onChanged: (value) {
                       if (value != null) {
                         superField.value?.currentState?.didChange(null);
@@ -317,39 +318,36 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 initialValue: widget.data.name,
                 onSaved: (value) => widget.data.name = value ?? "",
               ),
-              FormBuilderCheckboxGroup<String>(
-                checkColor: Theme.of(context).colorScheme.onInverseSurface,
+              FormBuilderFilterChip<String>(
                 name: "death",
-                initialValue: _DeathOptions.initialValue(
-                    left: widget.data.isLeftDeath,
-                    right: widget.data.isRightDeath),
+                decoration: ThemeHelper.textInputDecoration(context, "End on a death icon"),
+                spacing: ThemeHelper.widgetDialogChipSpacing,
+                initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isRightDeath),
                 options: [
                   _DeathOptions.left.getOption(context),
                   _DeathOptions.right.getOption(context),
                 ],
                 onSaved: (value) {
-                  widget.data.isLeftDeath =
-                      value!.contains(_DeathOptions.left.label);
-                  widget.data.isRightDeath =
-                      value.contains(_DeathOptions.right.label);
+                  widget.data.isLeftDeath = value!.contains(_DeathOptions.left.label);
+                  widget.data.isRightDeath = value.contains(_DeathOptions.right.label);
                 },
               ),
               FormBuilderRadioGroup<String>(
+                  activeColor: Theme.of(context).colorScheme.onBackground,
+                  decoration: ThemeHelper.textInputDecoration(context, "Scale"),
                   name: "type",
-                  initialValue:
-                      _EvennessOptions.fromData(isUneven: _isUneven).label,
+                  initialValue: _EvennessOptions.fromData(isUneven: _isUneven).label,
                   onChanged: (value) {
                     setState(() {
                       _isUneven = _EvennessOptions.isUneven(value: value);
                     });
                   },
-                  onSaved: (value) => widget.data.isUneven =
-                      _EvennessOptions.isUneven(value: value),
+                  onSaved: (value) => widget.data.isUneven = _EvennessOptions.isUneven(value: value),
                   options: [
                     _EvennessOptions.range.getOption(context),
                     _EvennessOptions.scale.getOption(context),
                   ]),
-              if (_isUneven) _scaleField() else _rangeField()
+              if (_isUneven) _scaleField(context) else _rangeField(context)
             ],
           ),
         ),
@@ -376,8 +374,7 @@ class IntRange {
 
   IntRange(this.start, this.end);
 
-  factory IntRange.from({required List<int> scale}) =>
-      IntRange(scale.first, scale.last);
+  factory IntRange.from({required List<int> scale}) => IntRange(scale.first, scale.last);
 
   bool validate() {
     final start = this.start;
@@ -401,6 +398,33 @@ class IntRange {
       return [for (var i = start; i >= end; i--) i];
     }
   }
+
+  RangeJuxtaposition? juxtapose({required int value}) {
+    final start = this.start;
+    final end = this.end;
+    if (start == null || end == null) {
+      return null;
+    }
+    final isStartToEnd = start < end;
+    final isAboveEnd = isStartToEnd && end < value;
+    final isBelowStart = isStartToEnd && value < start;
+    final isEndToStart = end < start;
+    final isBelowEnd = isEndToStart && value < end;
+    final isAboveStart = isEndToStart && start < value;
+    if (isBelowStart || isAboveStart) {
+      return RangeJuxtaposition.outsideStart;
+    } else if (isBelowEnd || isAboveEnd) {
+      return RangeJuxtaposition.outsideEnd;
+    } else {
+      return RangeJuxtaposition.inside;
+    }
+  }
+}
+
+enum RangeJuxtaposition {
+  outsideStart,
+  outsideEnd,
+  inside;
 }
 
 enum _EvennessOptions {
@@ -416,7 +440,7 @@ enum _EvennessOptions {
       case _EvennessOptions.range:
         return "Range";
       case _EvennessOptions.scale:
-        return "Scale";
+        return "Custom";
     }
   }
 
@@ -444,17 +468,15 @@ enum _DeathOptions {
   static List<String> initialValue({required bool left, required bool right}) {
     final leftOption = left ? _DeathOptions.left : null;
     final rightOption = right ? _DeathOptions.right : null;
-    return [leftOption, rightOption]
-        .compactMap((element) => element?.label)
-        .toList();
+    return [leftOption, rightOption].compactMap((element) => element?.label).toList();
   }
 
   String get label {
     switch (this) {
       case _DeathOptions.left:
-        return "Left causes death";
+        return "Left side";
       case _DeathOptions.right:
-        return "Right causes death";
+        return "Right side";
     }
   }
 

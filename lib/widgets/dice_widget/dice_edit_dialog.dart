@@ -60,9 +60,8 @@ class DiceEditDialog extends StatelessWidget {
                   ),
                   cursorColor: Theme.of(context).colorScheme.onSurface,
                   name: "number_of_dice",
-                  decoration:
-                      ThemeHelper.textInputDecoration(context, "Dice count"),
-                  keyboardType: TextInputType.number,
+                  decoration: ThemeHelper.textInputDecoration(context, "Dice count"),
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
                   initialValue: "${data.numberOfDice}",
                   validator: (value) =>
                       _numberValidator(value, minimalValue: 1),
@@ -74,25 +73,23 @@ class DiceEditDialog extends StatelessWidget {
                   ),
                   cursorColor: Theme.of(context).colorScheme.onSurface,
                   name: "number_of_sides",
-                  decoration:
-                      ThemeHelper.textInputDecoration(context, "Side count"),
-                  keyboardType: TextInputType.number,
+                  decoration: ThemeHelper.textInputDecoration(context, "Side count"),
+                  keyboardType: const TextInputType.numberWithOptions(signed: true),
                   initialValue: "${data.numberOfSides}",
                   validator: (value) =>
                       _numberValidator(value, minimalValue: 2),
                   onSaved: (value) => data.numberOfSides = int.parse(value!),
                 ),
-                FormBuilderCheckbox(
-                  checkColor: Theme.of(context).colorScheme.onInverseSurface,
-                  name: "long_press_required",
-                  title: Text(
-                    "Long press to reroll",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                  initialValue: data.longPressToReroll,
-                  onSaved: (value) => data.longPressToReroll = value!,
+                FormBuilderChoiceChip<String>(
+                  decoration: ThemeHelper.textInputDecoration(context, "Action to reroll"),
+                  spacing: ThemeHelper.widgetDialogChipSpacing,
+                  name: "reroll_action",
+                  initialValue: _RerollOptions.fromData(longPressToReroll: data.longPressToReroll).label,
+                  onSaved: (value) => data.longPressToReroll = _RerollOptions.isLongPressToReroll(value: value),
+                  options: [
+                    _RerollOptions.tap.option,
+                    _RerollOptions.longpress.option,
+                  ],
                 )
               ]),
             )),
@@ -109,4 +106,28 @@ class DiceEditDialog extends StatelessWidget {
           ),
         ],
       );
+}
+
+enum _RerollOptions {
+  tap,
+  longpress;
+
+  factory _RerollOptions.fromData({required bool longPressToReroll}) {
+    return longPressToReroll ? _RerollOptions.longpress : _RerollOptions.tap;
+  }
+
+  String get label {
+    switch (this) {
+      case _RerollOptions.tap:
+        return "Tap";
+      case _RerollOptions.longpress:
+        return "Longpress";
+    }
+  }
+
+  static bool isLongPressToReroll({required String? value}) {
+    return value == _RerollOptions.longpress.label;
+  }
+
+  get option => FormBuilderChipOption<String>(value: label);
 }

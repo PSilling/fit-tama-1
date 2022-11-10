@@ -85,6 +85,9 @@ class ThemeHelper {
     return 8.0;
   }
 
+  /// Spacing between chips in forms across the application
+  static const double widgetDialogChipSpacing = 10;
+
   /// Spacing between cards across the application.
   static double cardSpacing() {
     return 8.0;
