@@ -101,23 +101,27 @@ class DiceWidgetState extends State<DiceWidget>
             .flatMap((value) => "$value=") ??
         "";
     return ValueListenableBuilder(
-        valueListenable: _resultHeight,
-        builder: (context, height, child) {
-          if (height == null) {
-            return const SizedBox.expand();
-          }
-          return SizedBox(
-            height: height * 0.6,
-            child: FittedBox(
-              fit: BoxFit.contain,
+      valueListenable: _resultHeight,
+      builder: (context, height, child) {
+        if (height == null) {
+          return const SizedBox.expand();
+        }
+        return SizedBox(
+          height: height * 0.6,
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
               child: Text(
                 rollText,
                 textAlign: TextAlign.right,
                 style: ThemeHelper.widgetContentSecondary(context),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   Widget _resultText(BuildContext context) {
@@ -149,32 +153,40 @@ class DiceWidgetState extends State<DiceWidget>
       ),
     );
 
-  Widget _rollWidget(BuildContext context) => Padding(
-        padding: _showDiceTextCondition() ? const EdgeInsets.only(right: 10) : EdgeInsets.zero,
-        child: Row(
-          children: [
-            if (_showDiceTextCondition())
-              Expanded(
-                flex: 3,
-                child: Opacity(
-                  opacity: 0.4,
-                  child: _diceText(context),
+  Widget _rollWidget(BuildContext context) => FractionallySizedBox(
+        heightFactor: 0.7,
+        child: Padding(
+          padding: _showDiceTextCondition() ? const EdgeInsets.only(right: 10) : EdgeInsets.zero,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_showDiceTextCondition())
+                Flexible(
+                  flex: 3,
+                  child: Opacity(
+                    opacity: 0.4,
+                    child: _diceText(context),
+                  ),
                 ),
-              ),
-            Expanded(
-              flex: 2,
-              child: _resultText(context),
-            )
-          ],
+              Flexible(
+                flex: 2,
+                child: _resultText(context),
+              )
+            ],
+          ),
         ),
       );
 
   Widget _configurationWidget(BuildContext context) => FractionallySizedBox(
-        heightFactor: 0.65,
+        heightFactor: 0.8,
         child: FittedBox(
           fit: BoxFit.contain,
-          child: Text("${_data.numberOfSides}-sided",
-              style: ThemeHelper.widgetTitleBottom(context)),
+          child: Text(
+            "${_data.numberOfSides}-sided",
+            style: ThemeHelper.widgetTitleBottom(context),
+          ),
         ),
       );
 

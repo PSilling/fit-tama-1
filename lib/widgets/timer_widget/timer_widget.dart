@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:board_aid/util/themes.dart';
+import 'package:board_aid/widgets/font_spacer.dart';
 import 'package:flutter/material.dart';
 
 import '../editable.dart';
@@ -125,12 +126,6 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
     );
   }
 
-  // Has size of widest displayed number, to keep the number positioning/size even
-  Widget _sizer({required TextStyle? style}) => Text(
-      formatTime(-data.initialTime.abs()),
-      style: style?.copyWith(color: Colors.transparent)
-    );
-
   Widget _titleWidget(BuildContext context) => FittedBox(
       fit: BoxFit.contain,
       child: ConstrainedBox(
@@ -157,7 +152,7 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
                     ? ThemeHelper.widgetContentMain(context).copyWith(color: Colors.yellow)
                     : ThemeHelper.widgetContentMain(context),
               ),
-              _sizer(style: ThemeHelper.widgetContentMain(context)),
+              FontSpacer(text: formatTime(-data.initialTime.abs()), style: ThemeHelper.widgetContentMain(context)),
             ],
           ),
         ),
@@ -173,6 +168,7 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
         fit: BoxFit.contain,
         child: IconButton(
           onPressed: onPressed,
+          iconSize: 1000,
           icon: Icon(icon,
               semanticLabel: semanticLabel,
               color: ThemeHelper.widgetTitleBottom(context).color),
@@ -180,40 +176,43 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
       );
 
   Widget _buttonWidget(BuildContext context) {
-    return IgnorePointer(
-      ignoring: _isEditing,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (_currentState == TimerWidgetTimerState.init)
-            _themedIconButton(
-              Icons.play_arrow,
-              onPressed: run,
-              context: context,
-              semanticLabel: "Start the timer",
-            ),
-          if (_currentState == TimerWidgetTimerState.running)
-            _themedIconButton(
-              Icons.pause,
-              onPressed: pause,
-              context: context,
-              semanticLabel: "Pause the timer",
-            ),
-          if (_currentState == TimerWidgetTimerState.paused)
-            _themedIconButton(
-              Icons.play_arrow,
-              onPressed: run,
-              context: context,
-              semanticLabel: "Resume the timer",
-            ),
-          if (_currentState == TimerWidgetTimerState.paused)
-            _themedIconButton(Icons.replay,
-                onPressed: reset,
+    return FractionallySizedBox(
+      heightFactor: 0.8,
+      child: IgnorePointer(
+        ignoring: _isEditing,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (_currentState == TimerWidgetTimerState.init)
+              _themedIconButton(
+                Icons.play_arrow,
+                onPressed: run,
                 context: context,
-                semanticLabel: "Reset the timer"),
-        ],
+                semanticLabel: "Start the timer",
+              ),
+            if (_currentState == TimerWidgetTimerState.running)
+              _themedIconButton(
+                Icons.pause,
+                onPressed: pause,
+                context: context,
+                semanticLabel: "Pause the timer",
+              ),
+            if (_currentState == TimerWidgetTimerState.paused)
+              _themedIconButton(
+                Icons.play_arrow,
+                onPressed: run,
+                context: context,
+                semanticLabel: "Resume the timer",
+              ),
+            if (_currentState == TimerWidgetTimerState.paused)
+              _themedIconButton(Icons.replay,
+                  onPressed: reset,
+                  context: context,
+                  semanticLabel: "Reset the timer"),
+          ],
+        ),
       ),
     );
   }

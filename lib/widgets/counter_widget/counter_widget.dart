@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:board_aid/util/themes.dart';
+import 'package:board_aid/widgets/font_spacer.dart';
 import 'package:flutter/material.dart';
 
 import './counter_widget_data.dart';
@@ -23,8 +24,7 @@ class CounterWidget extends StatefulWidget {
   State<CounterWidget> createState() => CounterWidgetState();
 }
 
-class CounterWidgetState extends State<CounterWidget>
-    implements Editable<CounterWidget> {
+class CounterWidgetState extends State<CounterWidget> implements Editable<CounterWidget> {
   late CounterWidgetData _data;
   late int _currentIndex;
   var _isEditing = false;
@@ -184,8 +184,7 @@ class CounterWidgetState extends State<CounterWidget>
     } else {
       final leftDeath = _data.isLeftDeath;
       final rightDeath = _data.isRightDeath;
-      final deathIcon = _themedIcon(CounterWidget._death,
-          context: context, semanticLabel: "Death", style: style);
+      final deathIcon = _themedIcon(CounterWidget._death, context: context, semanticLabel: "Death", style: style);
       if (leftDeath && index == -1) {
         return deathIcon;
       } else if (rightDeath && index == _data.scale.length) {
@@ -194,6 +193,18 @@ class CounterWidgetState extends State<CounterWidget>
         return Container();
       }
     }
+  }
+
+
+  int _getSpacerWidth(int index) {
+    final center = _data.scale.elementAtOrNull(_currentIndex);
+    final numberOfDigits = center?.toString().length ??
+        [-1, 1]
+            .compactMap((element) => _data.scale.elementAtOrNull(_currentIndex + element))
+            .map((element) => element.toString().length)
+            .reduce(max);
+    final minimum = index == _currentIndex ? 1 : 2;
+    return max(numberOfDigits, minimum);
   }
 
   Widget _titleWidget(BuildContext context) {
@@ -212,123 +223,104 @@ class CounterWidgetState extends State<CounterWidget>
     );
   }
 
-  // Has size of widest displayed number, to keep the number positioning/size even
-  Widget _sizer({required TextStyle? style}) {
-    final center = _data.scale.elementAtOrNull(_currentIndex);
-    final numberOfDigits = center?.toString().length ??
-        [-1, 1]
-            .compactMap((element) =>
-                _data.scale.elementAtOrNull(_currentIndex + element))
-            .map((element) => element.toString().length)
-            .reduce(max);
-    final ems = List.filled(max(numberOfDigits, 1), "4")
-        .join(); // 4 is the widest number
-    return Text(
-      ems,
-      style: style?.copyWith(color: Colors.transparent),
-    );
-  }
-
-  Widget _fittingNumber(
-      {required int index,
-      required TextStyle? textStyle,
-      required AlignmentGeometry alignment}) {
+  Widget _fittingNumber({required int index, required TextStyle? textStyle, required AlignmentGeometry alignment}) {
     return FittedBox(
       fit: BoxFit.contain,
       child: Stack(
         alignment: alignment,
         children: [
           _getNumberWidgetAt(index, style: textStyle),
-          _sizer(style: textStyle),
+          FontSpacer.widest(characterWidth: _getSpacerWidth(index), purpose: FontSpacerPurpose.number, style: textStyle),
         ],
       ),
     );
   }
 
   Widget _numberButton(
-      {required int index,
-      required TextStyle? textStyle,
-      required int flex,
-      required AlignmentGeometry alignment}) {
+      {required int index, required TextStyle? textStyle, required int flex, required AlignmentGeometry alignment}) {
     return Expanded(
       flex: flex,
       child: ValueListenableBuilder<double?>(
-          valueListenable: _numbersHeight,
-          builder: (context, height, child) {
-            if (height == null) {
-              return const SizedBox.expand();
-            }
-            return SizedBox(
-              height: height * 0.6,
-              child: IgnorePointer(
-                child: Opacity(
-                  opacity: 0.4,
-                  child: _fittingNumber(
-                      index: index, textStyle: textStyle, alignment: alignment),
-                ),
+        valueListenable: _numbersHeight,
+        builder: (context, height, child) {
+          if (height == null) {
+            return const SizedBox.expand();
+          }
+          return SizedBox(
+            height: height * 0.6,
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.4,
+                child: _fittingNumber(index: index, textStyle: textStyle, alignment: alignment),
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _numbersSection(BuildContext context) {
-    return Row(
-      children: [
-        _numberButton(
-          index: _currentIndex - 1,
-          flex: 4,
-          alignment: Alignment.centerRight,
-          textStyle: ThemeHelper.widgetContentSecondary(context),
-        ),
-        Expanded(
-          flex: 5,
-          child: MeasureSize(
-            onChange: (size) => _numbersHeight.value = size.height,
-            child: IgnorePointer(
-              ignoring: _isEditing,
-              child: GestureDetector(
-                onTap: _showScale,
-                onPanEnd: _onPanEnd,
-                onPanUpdate: _onPanUpdate,
-                onPanCancel: _onPanCancel,
-                child: _fittingNumber(
-                  index: _currentIndex,
-                  textStyle: ThemeHelper.widgetContentMain(context),
-                  alignment: Alignment.center,
+    return FractionallySizedBox(
+      heightFactor: 0.7,
+      child: Row(
+        children: [
+          _numberButton(
+            index: _currentIndex - 1,
+            flex: 4,
+            alignment: Alignment.centerRight,
+            textStyle: ThemeHelper.widgetContentSecondary(context),
+          ),
+          Expanded(
+            flex: 5,
+            child: MeasureSize(
+              onChange: (size) => _numbersHeight.value = size.height,
+              child: IgnorePointer(
+                ignoring: _isEditing,
+                child: GestureDetector(
+                  onTap: _showScale,
+                  onPanEnd: _onPanEnd,
+                  onPanUpdate: _onPanUpdate,
+                  onPanCancel: _onPanCancel,
+                  child: _fittingNumber(
+                    index: _currentIndex,
+                    textStyle: ThemeHelper.widgetContentMain(context),
+                    alignment: Alignment.center,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        _numberButton(
-          index: _currentIndex + 1,
-          flex: 4,
-          alignment: Alignment.centerLeft,
-          textStyle: ThemeHelper.widgetContentSecondary(context),
-        ),
-      ],
+          _numberButton(
+            index: _currentIndex + 1,
+            flex: 4,
+            alignment: Alignment.centerLeft,
+            textStyle: ThemeHelper.widgetContentSecondary(context),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _themedIcon(IconData? icon,
-          {required BuildContext context,
-          required String semanticLabel,
-          TextStyle? style}) =>
+  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel, TextStyle? style}) =>
       Icon(icon, semanticLabel: semanticLabel, color: style?.color);
 
   Widget _buttonsSection(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.contain,
-      child: IgnorePointer(
-        ignoring: _isEditing,
-        child: IconButton(
-          onPressed: _showResetIndexConfirmation,
-          icon: _themedIcon(
-            Icons.replay,
-            context: context,
-            semanticLabel: "Reset the counter",
-            style: ThemeHelper.widgetTitleBottom(context),
+    return FractionallySizedBox(
+      heightFactor: 0.8,
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: IgnorePointer(
+          ignoring: _isEditing,
+          child: IconButton(
+            iconSize: 1000,
+            onPressed: _showResetIndexConfirmation,
+            icon: _themedIcon(
+              Icons.replay,
+              context: context,
+              semanticLabel: "Reset the counter",
+              style: ThemeHelper.widgetTitleBottom(context),
+            ),
           ),
         ),
       ),
@@ -340,8 +332,7 @@ class CounterWidgetState extends State<CounterWidget>
     return Container(
       decoration: BoxDecoration(
         color: ThemeHelper.widgetBackgroundColor(context),
-        borderRadius:
-            BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
+        borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
         boxShadow: const [BoxShadow()],
       ),
       padding: ThemeHelper.cardPadding(),
