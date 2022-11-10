@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../../util/extensions.dart';
@@ -25,6 +26,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
   late final GlobalKey? _defaultIndexKey;
   GlobalKey? _hiddenCurrentIndexKey;
 
+  final _controller = ScrollController();
   late final _rangeInitialValue = IntRange.from(scale: widget.data.scale);
   final _rangeDefaultSliderKey = GlobalKey<FormBuilderFieldState>();
   static const _defaultEntryOption = FormBuilderChipOption<String>(value: "Start");
@@ -67,6 +69,16 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
     } else {
       return null;
     }
+  }
+
+  String? _validateScaleAndScrollToError(Key? key, {required List<KeyedEntry> scale}) {
+    final error = _scaleValidator(key, scale: _keyedScale);
+    if (error != null) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _controller.jumpTo(_controller.position.maxScrollExtent);
+      });
+    }
+    return error;
   }
 
   void _validateSaveAndDismiss(BuildContext context) {
@@ -238,7 +250,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
             for (var entry in _keyedScale) _scaleTextField(context, entry: entry, superField: field),
           ]),
         ),
-        validator: (value) => _scaleValidator(value, scale: _keyedScale),
+        validator: (value) => _validateScaleAndScrollToError(value, scale: _keyedScale),
         onSaved: (key) {
           widget.data.scale = _keyedScale.compactMap((e) => e.value).toList();
           widget.data.defaultIndex = _keyedScale.indexWhere((element) => element.checkKey == key);
@@ -270,7 +282,11 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                   textInputAction: TextInputAction.next,
                   onEditingComplete: () {
                     final index = _keyedScale.indexOf(entry);
-                    FocusScope.of(context).requestFocus(_keyedScale[index + 1].focusNode);
+                    final nextEntry = _keyedScale.elementAtOrNull(index + 1);
+                    if (nextEntry == null) {
+                      return;
+                    }
+                    FocusScope.of(context).requestFocus(nextEntry.focusNode);
                   },
                 ),
               ),
@@ -304,6 +320,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
     return AlertDialog(
       backgroundColor: Theme.of(context).colorScheme.background,
       content: SingleChildScrollView(
+        controller: _controller,
         scrollDirection: Axis.vertical,
         child: FormBuilder(
           key: _formKey,
