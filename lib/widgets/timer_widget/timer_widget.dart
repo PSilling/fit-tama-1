@@ -9,8 +9,10 @@ import 'timer_widget_data.dart';
 
 class TimerWidget extends StatefulWidget {
   final TimerWidgetData initData;
+  final bool startEditing;
 
-  const TimerWidget({super.key, required this.initData});
+  const TimerWidget({super.key,
+    required this.initData, required this.startEditing});
 
   @override
   State<StatefulWidget> createState() => TimerWidgetState();
@@ -33,6 +35,13 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
     setState(() {
       _isEditing = editing;
     });
+  }
+
+  @override
+  void initState() {
+    _isEditing = widget.startEditing;
+    _data = widget.initData;
+    super.initState();
   }
 
   TimerWidgetData get data => _data;
@@ -204,12 +213,6 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
         ],
       ),
     );
-  }
-
-  @override
-  void initState() {
-    _data = widget.initData;
-    super.initState();
   }
 
   @override

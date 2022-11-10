@@ -11,8 +11,10 @@ import 'dice_widget_data.dart';
 
 class DiceWidget extends StatefulWidget {
   final DiceWidgetData initData;
+  final bool startEditing;
 
-  const DiceWidget({super.key, required this.initData});
+  const DiceWidget({super.key,
+    required this.initData, required this.startEditing});
 
   @override
   State<StatefulWidget> createState() => DiceWidgetState();
@@ -40,6 +42,7 @@ class DiceWidgetState extends State<DiceWidget>
 
   @override
   void initState() {
+    _isEditing = widget.startEditing;
     _data = widget.initData;
     rollDice();
     super.initState();

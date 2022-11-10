@@ -15,7 +15,9 @@ class CounterWidget extends StatefulWidget {
   static const _death = Icons.sentiment_very_dissatisfied_rounded;
 
   final CounterWidgetData initData;
-  const CounterWidget({super.key, required this.initData});
+  final bool startEditing;
+  const CounterWidget({super.key,
+    required this.initData, required this.startEditing});
 
   @override
   State<CounterWidget> createState() => CounterWidgetState();
@@ -43,6 +45,7 @@ class CounterWidgetState extends State<CounterWidget>
   @override
   void initState() {
     super.initState();
+    _isEditing = widget.startEditing;
     _data = widget.initData;
     _currentIndex = _data.defaultIndex;
   }

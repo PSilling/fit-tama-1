@@ -70,13 +70,22 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
   Map<String, dynamic>? widgets;
   bool _editing = false;
 
-  final Map<String, Widget Function(String i)> _widgetMap = {
-    "counter": (l) => CounterWidget(
-        key: GlobalKey(), initData: CounterWidgetData.fromJson(jsonDecode(l))),
-    "dice": (l) => DiceWidget(
-        key: GlobalKey(), initData: DiceWidgetData.fromJson(jsonDecode(l))),
-    "timer": (l) => TimerWidget(
-        key: GlobalKey(), initData: TimerWidgetData.fromJson(jsonDecode(l))),
+  final Map<String, Widget Function(String i, bool e)> _widgetMap = {
+    "counter": (l, e) => CounterWidget(
+      key: GlobalKey(),
+      initData: CounterWidgetData.fromJson(jsonDecode(l)),
+      startEditing: e,
+    ),
+    "dice": (l, e) => DiceWidget(
+      key: GlobalKey(),
+      initData: DiceWidgetData.fromJson(jsonDecode(l)),
+      startEditing: e,
+    ),
+    "timer": (l, e) => TimerWidget(
+      key: GlobalKey(),
+      initData: TimerWidgetData.fromJson(jsonDecode(l)),
+      startEditing: e,
+    ),
   };
 
   final Map<String, String> defaultData = {
@@ -124,8 +133,8 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
     ],
   };
 
-  dynamic buildWidget(item) {
-    return _widgetMap[item.type]!(item.data);
+  dynamic buildWidget(item){
+    return _widgetMap[item.type]!(item.data, _editing);
   }
 
   @override
@@ -217,12 +226,6 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
           "preset_data_${presetLink}_$s",
           json.encode(_localItems![s]!
               .map((key, value) => MapEntry(key, value.toMap()))));
-    }
-
-    if (_editing) {
-      for (var i in items) {
-        widgets![i.identifier].key.currentState.isEditing = _editing;
-      }
     }
   }
 
