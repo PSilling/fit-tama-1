@@ -229,7 +229,7 @@ class _PresetsViewState extends State<PresetsView> {
     setState(() {
       presets = List<PresetModel>.from(
           jsonDecode(storage.getString('presets') ?? "[]")
-              .map((model) => PresetModel.fromJSON(model)));
+              .map((model) => PresetModel.fromJson(model)));
     });
     _updateRenderedPresets();
   }

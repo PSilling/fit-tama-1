@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:board_aid/util/themes.dart';
 import 'package:dashboard/dashboard.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import './storage.dart';
@@ -36,7 +37,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         itemStorageDelegate: storage);
   }
 
-  setSlot() {
+  void setSlot() {
     slot = 2;
     setState(() {});
   }
@@ -82,9 +83,11 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             verticalSpace: ThemeHelper.cardSpacing() * 1.5,
             slotAspectRatio: 1,
             animateEverytime: true,
-            scrollController: ScrollController(),
+            scrollController: scrollController,
             dashboardItemController: itemController,
             slotCount: slot!,
+            physics: const RangeMaintainingScrollPhysics(),
+            dragStartBehavior: DragStartBehavior.down,
             errorPlaceholder: (e, s) {
               return Text("$e , $s");
             },
@@ -101,6 +104,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   0, // when set to 0 user cannot change the shape of the widgets
               curve: Curves.easeIn,
               duration: const Duration(milliseconds: 300),
+              backgroundStyle: const EditModeBackgroundStyle(
+                lineColor: Colors.transparent,
+              ),
             ),
             itemBuilder: (ColoredDashboardItem item) {
               //print(storage.localItems![slot]![item.identifier]);

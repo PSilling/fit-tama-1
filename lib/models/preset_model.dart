@@ -30,7 +30,7 @@ class PresetModel {
   }
 
   /// Loads a preset from its JSON representation.
-  PresetModel.fromJSON(Map<String, dynamic> json)
+  PresetModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         name = json['name'],
         game = json['game'],
@@ -40,7 +40,7 @@ class PresetModel {
         backgroundColor = Color(json['backgroundColor']);
 
   /// Generates a JSON representation of the preset.
-  Map<String, dynamic> toJSON() => {
+  Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
         'game': game,

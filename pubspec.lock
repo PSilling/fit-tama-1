@@ -46,10 +46,12 @@ packages:
   dashboard:
     dependency: "direct main"
     description:
-      name: dashboard
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.2+4"
+      path: "."
+      ref: HEAD
+      resolved-ref: "5be5314d362272b6c0995c76e9e5a7737e6e5219"
+      url: "https://github.com/xcoupe01/dashboard"
+    source: git
+    version: "0.0.2+3"
   fake_async:
     dependency: transitive
     description:
