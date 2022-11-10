@@ -58,6 +58,16 @@ class ThemeHelper {
         );
   }
 
+  /// Use this for textfields in edit dialog
+  static TextStyle textFieldStyle(BuildContext context) {
+    return TextStyle(color: Theme.of(context).colorScheme.onSurface);
+  }
+
+  /// Use this for the textfields in edit dialog for cursorColor
+  static Color textFieldCursorColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface;
+  }
+
   static Color widgetDialogHighlightColor(BuildContext context) {
     return Theme.of(context).colorScheme.onSurfaceVariant;
   }

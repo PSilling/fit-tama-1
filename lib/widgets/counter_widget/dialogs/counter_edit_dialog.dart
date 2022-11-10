@@ -258,6 +258,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 child: FormBuilderTextField(
                   key: entry.textKey,
                   focusNode: entry.focusNode,
+                  style: ThemeHelper.textFieldStyle(context),
+                  cursorColor: ThemeHelper.textFieldCursorColor(context),
                   decoration: ThemeHelper.formInputDecoration(context),
                   name: "scale_textfield_${entry.textKey}",
                   initialValue: entry.value.flatMap((value) => "$value"),
