@@ -179,7 +179,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
             children: [
               FormBuilderTextField(
                 name: "range_start",
-                decoration: ThemeHelper.textInputDecoration(context, "Minimum value"),
+                decoration: ThemeHelper.textInputDecoration(context, "Left value"),
                 initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.start}",
                 keyboardType: const TextInputType.numberWithOptions(signed: true),
                 onChanged: (value) => _rangeStartChanged(value, field),
@@ -187,7 +187,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               FormBuilderTextField(
                 name: "range_end",
-                decoration: ThemeHelper.textInputDecoration(context, "Maximum value"),
+                decoration: ThemeHelper.textInputDecoration(context, "Right value"),
                 initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.end}",
                 keyboardType: const TextInputType.numberWithOptions(signed: true),
                 onChanged: (value) => _rangeEndChanged(value, field),
@@ -221,7 +221,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         name: "scale",
         initialValue: _defaultIndexKey,
         builder: (FormFieldState field) => InputDecorator(
-          decoration: InputDecoration(errorText: field.errorText, border: InputBorder.none, labelText: "Scale", isDense: true),
+          decoration: InputDecoration(errorText: field.errorText, border: InputBorder.none, labelText: "Values", isDense: true),
           child: Column(children: [
             for (var entry in _keyedScale) _scaleTextField(context, entry: entry, superField: field),
           ]),
@@ -318,6 +318,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               FormBuilderRadioGroup<String>(
                   activeColor: Theme.of(context).colorScheme.onBackground,
+                  decoration: ThemeHelper.textInputDecoration(context, "Scale"),
                   name: "type",
                   initialValue: _EvennessOptions.fromData(isUneven: _isUneven).label,
                   onChanged: (value) {
@@ -423,7 +424,7 @@ enum _EvennessOptions {
       case _EvennessOptions.range:
         return "Range";
       case _EvennessOptions.scale:
-        return "Scale";
+        return "Custom";
     }
   }
 
@@ -447,9 +448,9 @@ enum _DeathOptions {
   String get label {
     switch (this) {
       case _DeathOptions.left:
-        return "Left causes death";
+        return "Death icon on the left";
       case _DeathOptions.right:
-        return "Right causes death";
+        return "Death icon on the right";
     }
   }
 
