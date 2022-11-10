@@ -72,9 +72,9 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
   ButtonStyle? _getButtonStyle({required IndexedEntry entry}) {
     const minSize = Size(55, 55);
     final textStyle = Theme.of(context).textTheme.headlineSmall;
-    Color? foregroundColor =
-        ThemeHelper.widgetDialogNormalColorForeground(context);
+    Color? foregroundColor = ThemeHelper.widgetDialogNormalColorForeground(context);
     Color? backgroundColor;
+    bool isBold = false;
     bool hasBorder = false;
     if (entry == widget.currentEntry) {
       hasBorder = true;
@@ -85,16 +85,15 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
     }
     if (entry == widget.defaultEntry) {
       foregroundColor = ThemeHelper.widgetDialogHighlightColor(context);
+      isBold = true;
     }
     return OutlinedButton.styleFrom(
       foregroundColor: foregroundColor,
       backgroundColor: backgroundColor,
-      side: hasBorder
-          ? BorderSide(width: 2, color: Theme.of(context).colorScheme.onSurface)
-          : BorderSide.none,
+      side: hasBorder ? BorderSide(width: 2, color: Theme.of(context).colorScheme.onSurface) : BorderSide.none,
       minimumSize: minSize,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      textStyle: textStyle,
+      textStyle: textStyle?.copyWith(fontWeight: isBold ? FontWeight.w600 : null),
     );
   }
 

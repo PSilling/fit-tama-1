@@ -208,7 +208,8 @@ const ColorScheme darkColorScheme = ColorScheme(
   onBackground: Colors.white,
   surface: Color(0xFF40444B),
   onSurface: Colors.white,
-  surfaceVariant: Color(0xFF8892f6),
+  surfaceVariant: Color(0xFF40444B),
+  onSurfaceVariant: Color(0xFFF092DD),
 );
 
 /// Dark theme; use when building the app.
@@ -247,7 +248,8 @@ const ColorScheme lightColorScheme = ColorScheme(
   onBackground: Colors.black,
   surface: Color(0xFFEBEDEF),
   onSurface: Colors.black,
-  surfaceVariant: Color(0xFF5865F2),
+  surfaceVariant: Color(0xFFEBEDEF),
+  onSurfaceVariant: Color(0xFFE36397),
 );
 
 /// Light theme; use when building the app.
