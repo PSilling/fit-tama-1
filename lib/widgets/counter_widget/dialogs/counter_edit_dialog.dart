@@ -258,7 +258,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 valueListenable: _scaleListEntryHeight,
                 builder: (context, height, child) {
                   if (height == null) {
-                    return const SizedBox(width: double.maxFinite, height: 1);
+                    return const SizedBox(width: double.maxFinite, height: 0);
                   }
                   return SizedBox(
                     height: (_keyedScale.length - 1) * height,
