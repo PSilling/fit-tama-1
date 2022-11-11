@@ -31,41 +31,31 @@ class ThemeHelper {
   /// Use this for game widget main titles.
   static TextStyle widgetTitle(BuildContext context) {
     return Theme.of(context).textTheme.headlineMedium!.copyWith(
-          color: Theme.of(context).colorScheme.onSurface,
-        );
+      color: Theme.of(context).colorScheme.onSurface,
+    );
   }
 
   /// Use this for game widget bottom titles.
   static TextStyle widgetTitleBottom(BuildContext context) {
     return Theme.of(context).textTheme.headlineSmall!.copyWith(
-          color: Theme.of(context).colorScheme.onSurface,
-        );
+      color: Theme.of(context).colorScheme.onSurface,
+    );
   }
 
   /// Use this for the main content of the game widget titles.
   /// Size should be adjusted based on the available space.
   static TextStyle widgetContentMain(BuildContext context) {
     return Theme.of(context).textTheme.titleLarge!.copyWith(
-          color: Theme.of(context).colorScheme.onSurface,
-        );
+      color: Theme.of(context).colorScheme.onSurface,
+    );
   }
 
   /// Use this for the secondary content of the game widget titles.
   /// Size should be adjusted based on the available space.
   static TextStyle widgetContentSecondary(BuildContext context) {
     return Theme.of(context).textTheme.headlineLarge!.copyWith(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-        );
-  }
-
-  /// Use this for textfields in edit dialog
-  static TextStyle textFieldStyle(BuildContext context) {
-    return TextStyle(color: Theme.of(context).colorScheme.onSurface);
-  }
-
-  /// Use this for the textfields in edit dialog for cursorColor
-  static Color textFieldCursorColor(BuildContext context) {
-    return Theme.of(context).colorScheme.onSurface;
+      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+    );
   }
 
   static Color widgetDialogHighlightColor(BuildContext context) {
@@ -84,19 +74,41 @@ class ThemeHelper {
     return Theme.of(context).colorScheme.onSurface;
   }
 
+  /// Spacing between chips in forms across the application
+  static const double widgetDialogChipSpacing = 10;
+
   /// Use this for game widget background color.
   /// Can be used as a default value, but widgets should have configurable colors.
   static Color widgetBackgroundColor(BuildContext context) {
     return Theme.of(context).colorScheme.tertiary;
   }
 
+  /// Used as a background color for pop-up menus across the application.
+  static Color popUpBackgroundColor(BuildContext context) {
+    return Theme.of(context).colorScheme.secondary;
+  }
+
+  // Used as a text style for pop-up menu items across the application.
+  static TextStyle popUpTextStyle(BuildContext context) {
+    return TextStyle(
+      color: Theme.of(context).colorScheme.onSecondary,
+    );
+  }
+
+  /// Use this for textfields in edit dialog
+  static TextStyle textFieldStyle(BuildContext context) {
+    return TextStyle(color: Theme.of(context).colorScheme.onSurface);
+  }
+
+  /// Use this for the textfields in edit dialog for cursorColor
+  static Color textFieldCursorColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface;
+  }
+
   /// Border radius to use across the application.
   static double borderRadius() {
     return 8.0;
   }
-
-  /// Spacing between chips in forms across the application
-  static const double widgetDialogChipSpacing = 10;
 
   /// Spacing between cards across the application.
   static double cardSpacing() {
@@ -276,18 +288,18 @@ final ThemeData lightTheme = ThemeData(
 
 ColorScheme debugColorScheme = ColorScheme(
   brightness: Brightness.light,
-  primary: Colors.deepPurple.shade600,
-  onPrimary: Colors.deepPurple.shade200,
-  secondary: Colors.orange.shade600,
-  onSecondary: Colors.orange.shade200,
-  tertiary: Colors.green.shade600,
-  onTertiary: Colors.green.shade200,
-  error: Colors.red.shade600,
-  onError: Colors.red.shade200,
-  background: Colors.brown.shade600,
-  onBackground: Colors.brown.shade200,
-  surface: Colors.teal.shade600,
-  onSurface: Colors.teal.shade200,
+  primary: Colors.deepPurple.shade700,
+  onPrimary: Colors.deepPurple.shade300,
+  secondary: Colors.orange.shade700,
+  onSecondary: Colors.orange.shade300,
+  tertiary: Colors.green.shade700,
+  onTertiary: Colors.green.shade300,
+  error: Colors.red.shade700,
+  onError: Colors.red.shade300,
+  background: Colors.brown.shade700,
+  onBackground: Colors.brown.shade300,
+  surface: Colors.teal.shade700,
+  onSurface: Colors.teal.shade300,
   surfaceVariant: Colors.tealAccent,
 );
 

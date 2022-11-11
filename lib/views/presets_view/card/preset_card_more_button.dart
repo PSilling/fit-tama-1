@@ -1,3 +1,4 @@
+import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
 import '../../../widgets/resizable_popup_menu_button.dart';
@@ -25,6 +26,7 @@ class PresetCardMoreButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResizablePopupMenuButton<PresetCardMoreOption>(
+      color: ThemeHelper.popUpBackgroundColor(context),
       tooltip: 'Show actions',
       icon: Icon(
         Icons.more_vert,
@@ -36,17 +38,26 @@ class PresetCardMoreButton extends StatelessWidget {
       position: PopupMenuPosition.under,
       enabled: enabled,
       itemBuilder: (BuildContext context) => [
-        const PopupMenuItem<PresetCardMoreOption>(
+        PopupMenuItem<PresetCardMoreOption>(
           value: PresetCardMoreOption.customize,
-          child: Text('Customize'),
+          child: Text(
+            'Customize',
+            style: ThemeHelper.popUpTextStyle(context),
+          ),
         ),
-        const PopupMenuItem<PresetCardMoreOption>(
+        PopupMenuItem<PresetCardMoreOption>(
           value: PresetCardMoreOption.edit,
-          child: Text('Edit'),
+          child: Text(
+            'Edit',
+            style: ThemeHelper.popUpTextStyle(context),
+          ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: PresetCardMoreOption.remove,
-          child: Text('Remove'),
+          child: Text(
+            'Remove',
+            style: ThemeHelper.popUpTextStyle(context),
+          ),
         ),
       ],
     );

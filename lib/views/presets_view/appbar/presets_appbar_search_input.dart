@@ -29,17 +29,17 @@ class PresetsAppbarSearchInput extends StatelessWidget {
                 hintStyle: Theme.of(context).textTheme.titleMedium,
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ),
               style: Theme.of(context).textTheme.titleMedium,
-              cursorColor: Theme.of(context).colorScheme.onBackground,
+              cursorColor: Theme.of(context).colorScheme.onPrimary,
               onChanged: onSearchChanged,
             ),
           ),

@@ -1,3 +1,4 @@
+import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
 /// Additional action option for PresetsView.
@@ -15,7 +16,7 @@ class PresetsMoreButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<PresetsMoreOption>(
-      color: Theme.of(context).colorScheme.secondary,
+      color: ThemeHelper.popUpBackgroundColor(context),
       icon: const Icon(Icons.more_vert),
       onSelected: onSelected,
       itemBuilder: (BuildContext context) => [
@@ -23,18 +24,14 @@ class PresetsMoreButton extends StatelessWidget {
           value: PresetsMoreOption.removeAll,
           child: Text(
             'Remove all presets',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSecondary,
-            ),
+            style: ThemeHelper.popUpTextStyle(context),
           ),
         ),
         PopupMenuItem<PresetsMoreOption>(
           value: PresetsMoreOption.removeAll,
           child: Text(
             'About',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSecondary,
-            ),
+            style: ThemeHelper.popUpTextStyle(context),
           ),
         ),
       ],

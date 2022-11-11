@@ -1,3 +1,4 @@
+import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
 /// Options for sorting Presets on PresetsView.
@@ -30,9 +31,7 @@ class PresetsAppbarSortButton extends StatelessWidget {
       Expanded(
         child: Text(
           title,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSecondary,
-          ),
+          style: ThemeHelper.popUpTextStyle(context),
         ),
       ),
     ];
@@ -51,7 +50,7 @@ class PresetsAppbarSortButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<PresetsAppbarSortOption>(
-      color: Theme.of(context).colorScheme.secondary,
+      color: ThemeHelper.popUpBackgroundColor(context),
       icon: const Icon(Icons.sort),
       tooltip: 'Show sort options',
       onSelected: onSelected,
