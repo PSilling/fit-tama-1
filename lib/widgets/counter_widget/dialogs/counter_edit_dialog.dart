@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:board_aid/util/measure_size.dart';
 import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -25,8 +26,10 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
   late List<KeyedEntry> _keyedScale;
   late final GlobalKey? _defaultIndexKey;
   GlobalKey? _hiddenCurrentIndexKey;
+  bool _isReordering = false;
 
   final _controller = ScrollController();
+  final _scaleListEntryHeight = ValueNotifier<double?>(null);
   late final _rangeInitialValue = IntRange.from(scale: widget.data.scale);
   final _rangeDefaultSliderKey = GlobalKey<FormBuilderFieldState>();
   static const _defaultEntryOption = FormBuilderChipOption<String>(value: "Start");
@@ -248,9 +251,73 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
         builder: (FormFieldState field) => InputDecorator(
           decoration: ThemeHelper.formInputDecoration(context,
               errorText: field.errorText, label: "Values", hasBorder: false, isDense: true),
-          child: Column(children: [
-            for (var entry in _keyedScale) _scaleTextField(context, entry: entry, superField: field),
-          ]),
+          child: Column(
+            children: [
+              ValueListenableBuilder(
+                valueListenable: _scaleListEntryHeight,
+                builder: (context, height, child) {
+                  if (height == null) {
+                    return const SizedBox(width: double.maxFinite, height: 1);
+                  }
+                  return SizedBox(
+                    height: (_keyedScale.length - 1) * height,
+                    width: double.maxFinite,
+                    child: ReorderableListView.builder(
+                      primary: false,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onReorderEnd: (index) => _isReordering = false,
+                      onReorderStart: (index) => _isReordering = true,
+                      onReorder: (int oldIndex, int newIndex) {
+                        setState(() {
+                          if (oldIndex < newIndex) newIndex--;
+
+                          final entry = _keyedScale.removeAt(oldIndex);
+                          _keyedScale.insert(newIndex, entry);
+                        });
+                      },
+                      itemCount: _keyedScale.length - 1,
+                      itemBuilder: (context, index) {
+                        final entry = _keyedScale[index];
+                        return Dismissible(
+                          key: entry.listKey,
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: Theme.of(context).colorScheme.error,
+                            alignment: AlignmentDirectional.centerEnd,
+                            child: const Text("Remove"),
+                          ),
+                          onDismissed: (direction) {
+                            setState(() {
+                              _keyedScale.removeAt(index);
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _scaleTextField(context, entry: entry, superField: field),
+                              ),
+                              Padding(
+                                padding: const EdgeInsetsDirectional.only(start: 5),
+                                child: Icon(
+                                  Icons.drag_handle,
+                                  color: ThemeHelper.widgetDialogNormalColorForeground(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+              MeasureSize(
+                onChange: (size) => _scaleListEntryHeight.value = size.height,
+                child: _scaleTextField(context, entry: _keyedScale.last, superField: field),
+              ),
+            ],
+          ),
         ),
         validator: (value) => _validateScaleAndScrollToError(value, scale: _keyedScale),
         onSaved: (key) {
@@ -261,47 +328,23 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
 
   Widget _scaleTextField(BuildContext context, {required KeyedEntry entry, required FormFieldState superField}) =>
       FormBuilderField(
-        key: entry.mainKey,
-        name: "scale_field_${entry.mainKey}",
+        key: entry.fieldKey,
+        name: "scale_field_${entry.fieldKey}",
         builder: (FormFieldState field) => InputDecorator(
           decoration: ThemeHelper.formInputDecoration(context,
               errorText: field.errorText, hasBorder: false, isDense: true, hasPadding: false),
           child: Row(
             children: [
-              Expanded(
-                child: FormBuilderTextField(
-                  key: entry.textKey,
-                  focusNode: entry.focusNode,
-                  style: ThemeHelper.textFieldStyle(context),
-                  cursorColor: ThemeHelper.textFieldCursorColor(context),
-                  decoration: ThemeHelper.formInputDecoration(context),
-                  name: "scale_textfield_${entry.textKey}",
-                  initialValue: entry.value.flatMap((value) => "$value"),
-                  keyboardType: const TextInputType.numberWithOptions(signed: true),
-                  validator: (value) => _numberValidator(value, isRequired: false),
-                  onChanged: (value) => _updateTempScale(value, entry, superField),
-                  onTap: _cleanTempScale,
-                  textInputAction: TextInputAction.next,
-                  onEditingComplete: () {
-                    final index = _keyedScale.indexOf(entry);
-                    final nextEntry = _keyedScale.elementAtOrNull(index + 1);
-                    if (nextEntry == null) {
-                      return;
-                    }
-                    FocusScope.of(context).requestFocus(nextEntry.focusNode);
-                  },
-                ),
-              ),
               if (entry.value != null)
                 SizedBox(
-                  width: 80,
+                  width: 70,
                   child: FormBuilderChoiceChip<String>(
                     key: entry.checkKey,
                     decoration: ThemeHelper.formInputDecoration(context, hasBorder: false, isDense: true, hasPadding: false),
                     name: "scale_checkbox_${entry.checkKey}",
                     options: const [_defaultEntryOption],
                     initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
-                    alignment: WrapAlignment.end,
+                    alignment: WrapAlignment.start,
                     onChanged: (value) {
                       if (value != null) {
                         superField.value?.currentState?.didChange(null);
@@ -312,6 +355,43 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                     },
                   ),
                 ),
+              Expanded(
+                child: Stack(
+                  alignment: AlignmentDirectional.centerStart,
+                  children: [
+                    if (_isReordering)
+                      Text(
+                        "${entry.textKey.currentState?.value ?? ""}",
+                        style: ThemeHelper.textFieldStyle(context),
+                      ),
+                    Opacity(
+                      opacity: _isReordering ? 0 : 1,
+                      child: FormBuilderTextField(
+                        key: entry.textKey,
+                        focusNode: entry.focusNode,
+                        style: ThemeHelper.textFieldStyle(context),
+                        cursorColor: ThemeHelper.textFieldCursorColor(context),
+                        decoration: ThemeHelper.formInputDecoration(context),
+                        name: "scale_textfield_${entry.textKey}",
+                        initialValue: entry.value.flatMap((value) => "$value"),
+                        keyboardType: const TextInputType.numberWithOptions(signed: true),
+                        validator: (value) => _numberValidator(value, isRequired: false),
+                        onChanged: (value) => _updateTempScale(value, entry, superField),
+                        onTap: _cleanTempScale,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () {
+                          final index = _keyedScale.indexOf(entry);
+                          final nextEntry = _keyedScale.elementAtOrNull(index + 1);
+                          if (nextEntry == null) {
+                            return;
+                          }
+                          FocusScope.of(context).requestFocus(nextEntry.focusNode);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -515,7 +595,8 @@ enum _DeathOptions {
 }
 
 class KeyedEntry {
-  final mainKey = GlobalKey();
+  final fieldKey = GlobalKey();
+  final listKey = GlobalKey();
   final textKey = GlobalKey<FormBuilderFieldState>();
   final checkKey = GlobalKey<FormBuilderFieldState>();
   final focusNode = FocusNode();
