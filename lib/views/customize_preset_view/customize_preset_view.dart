@@ -66,7 +66,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
     return WillPopScope(
       onWillPop: () => _onWillPop(context),
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: ThemeHelper.editViewBackground(context),
         appBar: CustomizePresetAppbar(
           onSave: () {
             if (_validateAndSave()) {
@@ -90,7 +90,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     child: Text(
                       'Preview',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: ThemeHelper.editViewForeground(context),
                       ),
                     ),
                   ),
@@ -108,7 +108,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Expanded(
                       child: Divider(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: ThemeHelper.editViewForeground(context),
                       ),
                     ),
                   ),
@@ -117,7 +117,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     child: Text(
                       'Settings',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: ThemeHelper.editViewForeground(context),
                       ),
                     ),
                   ),
@@ -126,10 +126,10 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     child: FormBuilderTextField(
                       name: 'name',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: ThemeHelper.editViewForeground(context),
                       ),
-                      cursorColor: Theme.of(context).colorScheme.onSurface,
-                      decoration: ThemeHelper.formInputDecoration(
+                      cursorColor: ThemeHelper.editViewForeground(context),
+                      decoration: ThemeHelper.editViewInputDecoration(
                         context,
                         label: 'Preset name',
                       ),
@@ -143,10 +143,10 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     child: FormBuilderTextField(
                       name: 'game',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: ThemeHelper.editViewForeground(context),
                       ),
-                      cursorColor: Theme.of(context).colorScheme.onSurface,
-                      decoration: ThemeHelper.formInputDecoration(
+                      cursorColor: ThemeHelper.editViewForeground(context),
+                      decoration: ThemeHelper.editViewInputDecoration(
                         context,
                         label: 'Game title',
                       ),
@@ -170,7 +170,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                       label: 'Icon',
                       dialogTitle: 'Pick an icon',
                       iconCode: _updatedPreset.iconCode,
-                      iconColor: ThemeHelper.dialogForeground(context),
+                      iconColor: ThemeHelper.editViewForeground(context),
                       iconSize: 30,
                     ),
                   ),

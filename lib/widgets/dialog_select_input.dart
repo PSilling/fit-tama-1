@@ -74,7 +74,7 @@ class DialogSelectInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       child: InputDecorator(
-        decoration: InputDecoration(
+        decoration: ThemeHelper.editViewInputDecoration(context).copyWith(
           labelText: label,
           prefixIcon: iconFromCode(
             iconCode: iconCode ?? 0xe046,

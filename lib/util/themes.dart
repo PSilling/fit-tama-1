@@ -73,6 +73,88 @@ class ThemeHelper {
     return Theme.of(context).colorScheme.surface;
   }
 
+  /// Decoration for form fields in dialogs.
+  static InputDecoration dialogInputDecoration(BuildContext context,
+      {String? label,
+        bool? isDense, String? errorText,
+        bool hasBorder = true,
+        bool hasPadding = true}) {
+    return InputDecoration(
+      labelText: label,
+      errorText: errorText,
+      isDense: isDense,
+      prefixStyle: TextStyle(
+        color: dialogForeground(context),
+      ),
+      focusColor: dialogForeground(context),
+      hoverColor: dialogForeground(context),
+      labelStyle: TextStyle(
+        color: dialogForeground(context),
+      ),
+      errorBorder: hasBorder ? null : InputBorder.none,
+      disabledBorder: hasBorder ? null : InputBorder.none,
+      enabledBorder: hasBorder ? UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: dialogForeground(context).withOpacity(0.5),
+          )) : InputBorder.none,
+      focusedBorder: hasBorder ? UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: dialogForeground(context),
+          )) : InputBorder.none,
+      focusedErrorBorder: hasBorder ? UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.onError,
+          )) : InputBorder.none,
+      contentPadding: hasPadding ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
+    );
+  }
+
+  /// Used for text in edit views across the application.
+  static Color editViewForeground(BuildContext context) {
+    return Theme.of(context).colorScheme.onBackground;
+  }
+
+  /// Used as a background color for edit views across the application.
+  static Color editViewBackground(BuildContext context) {
+    return Theme.of(context).colorScheme.background;
+  }
+
+  /// Decoration for form fields in edit views.
+  static InputDecoration editViewInputDecoration(BuildContext context,
+      {String? label,
+        bool? isDense, String? errorText,
+        bool hasBorder = true,
+        bool hasPadding = true}) {
+    return InputDecoration(
+      labelText: label,
+      errorText: errorText,
+      isDense: isDense,
+      prefixStyle: TextStyle(
+        color: editViewForeground(context),
+      ),
+      focusColor: editViewForeground(context),
+      hoverColor: editViewForeground(context),
+      labelStyle: TextStyle(
+        color: editViewForeground(context),
+      ),
+      errorBorder: hasBorder ? null : InputBorder.none,
+      disabledBorder: hasBorder ? null : InputBorder.none,
+      enabledBorder: hasBorder ? UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: editViewForeground(context).withOpacity(0.5),
+          )) : InputBorder.none,
+      focusedBorder: hasBorder ? UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: editViewForeground(context),
+          )) : InputBorder.none,
+      focusedErrorBorder: hasBorder ? UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.onError,
+          )) : InputBorder.none,
+      contentPadding: hasPadding ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
+    );
+  }
+
   /// Spacing between chips in forms across the application
   static const double dialogChipSpacing = 10;
 
@@ -127,39 +209,6 @@ class ThemeHelper {
   /// Spacing between items in selection dialogs.
   static double selectDialogItemSpacing() {
     return 8.0;
-  }
-
-  /// Decoration for form fields.
-  static InputDecoration formInputDecoration(BuildContext context,
-      {String? label,
-      bool? isDense, String? errorText,
-      bool hasBorder = true,
-      bool hasPadding = true}) {
-    return InputDecoration(
-      labelText: label,
-      errorText: errorText,
-      isDense: isDense,
-      focusColor: Theme.of(context).colorScheme.onSurface,
-      hoverColor: Theme.of(context).colorScheme.onSurface,
-      labelStyle: TextStyle(
-        color: Theme.of(context).colorScheme.onSurface,
-      ),
-      errorBorder: hasBorder ? null : InputBorder.none,
-      disabledBorder: hasBorder ? null : InputBorder.none,
-      enabledBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-      )) : InputBorder.none,
-      focusedBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-        color: Theme.of(context).colorScheme.onSurface,
-      )) : InputBorder.none,
-      focusedErrorBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-        color: Theme.of(context).colorScheme.onError,
-      )) : InputBorder.none,
-      contentPadding: hasPadding ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
-    );
   }
 
   static ElevatedButton buttonPrimary(
@@ -237,7 +286,7 @@ final ThemeData darkTheme = ThemeData(
   toggleableActiveColor: darkColorScheme.onSurface,
   textSelectionTheme: TextSelectionThemeData(
     cursorColor: darkColorScheme.onPrimary,
-    selectionColor: darkColorScheme.onPrimary,
+    selectionColor: darkColorScheme.onPrimary.withOpacity(0.5),
     selectionHandleColor: darkColorScheme.onPrimary,
   ),
   iconTheme: const IconThemeData(
@@ -277,7 +326,7 @@ final ThemeData lightTheme = ThemeData(
   toggleableActiveColor: lightColorScheme.onSurface,
   textSelectionTheme: TextSelectionThemeData(
     cursorColor: lightColorScheme.onPrimary,
-    selectionColor: lightColorScheme.onPrimary,
+    selectionColor: lightColorScheme.onPrimary.withOpacity(0.5),
     selectionHandleColor: lightColorScheme.onPrimary,
   ),
   iconTheme: const IconThemeData(
@@ -316,7 +365,7 @@ final ThemeData debugTheme = ThemeData(
   toggleableActiveColor: debugColorScheme.onSurface,
   textSelectionTheme: TextSelectionThemeData(
     cursorColor: debugColorScheme.onPrimary,
-    selectionColor: debugColorScheme.onPrimary,
+    selectionColor: debugColorScheme.onPrimary.withOpacity(0.5),
     selectionHandleColor: debugColorScheme.onPrimary,
   ),
   iconTheme: const IconThemeData(
