@@ -15,10 +15,15 @@ class CounterResetDialog extends StatelessWidget {
     final titleEnding =
         "${originalValue.flatMap((value) => " of $value") ?? ""}?";
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      title: Text("Reset counter to original value$titleEnding"),
+      backgroundColor: ThemeHelper.dialogBackground(context),
+      title: Text(
+        "Reset counter to original value$titleEnding",
+        style: TextStyle(
+          color: ThemeHelper.dialogForeground(context)
+        ),
+      ),
       actions: [
-        ThemeHelper.buttonWarn(
+        ThemeHelper.buttonPrimary(
           context: context,
           onPressed: () {
             resetIndex();

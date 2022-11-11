@@ -41,7 +41,7 @@ class TimerEditDialog extends StatelessWidget {
         behavior: HitTestBehavior.deferToChild,
         onTap: () => FocusScope.of(context).unfocus(),
         child: AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: ThemeHelper.dialogBackground(context),
           content: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: FormBuilder(
@@ -49,9 +49,9 @@ class TimerEditDialog extends StatelessWidget {
                 child: Column(children: [
                   FormBuilderTextField(
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: ThemeHelper.dialogForeground(context),
                     ),
-                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    cursorColor: ThemeHelper.dialogForeground(context),
                     name: "name",
                     decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
                     textInputAction: TextInputAction.next,
@@ -60,9 +60,9 @@ class TimerEditDialog extends StatelessWidget {
                   ),
                   FormBuilderTextField(
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: ThemeHelper.dialogForeground(context),
                     ),
-                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    cursorColor: ThemeHelper.dialogForeground(context),
                     name: "initial_time",
                     decoration: ThemeHelper.formInputDecoration(context, label: "Initial time"),
                     keyboardType: TextInputType.number,

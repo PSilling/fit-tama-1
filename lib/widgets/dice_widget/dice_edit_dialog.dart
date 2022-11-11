@@ -41,7 +41,7 @@ class DiceEditDialog extends StatelessWidget {
         behavior: HitTestBehavior.deferToChild,
         onTap: () => FocusScope.of(context).unfocus(),
         child: AlertDialog(
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: ThemeHelper.dialogBackground(context),
           content: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: FormBuilder(
@@ -49,9 +49,9 @@ class DiceEditDialog extends StatelessWidget {
                 child: Column(children: [
                   FormBuilderTextField(
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: ThemeHelper.dialogForeground(context),
                     ),
-                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    cursorColor: ThemeHelper.dialogForeground(context),
                     name: "name",
                     decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
                     textInputAction: TextInputAction.next,
@@ -60,9 +60,9 @@ class DiceEditDialog extends StatelessWidget {
                   ),
                   FormBuilderTextField(
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: ThemeHelper.dialogForeground(context),
                     ),
-                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    cursorColor: ThemeHelper.dialogForeground(context),
                     name: "number_of_dice",
                     decoration: ThemeHelper.formInputDecoration(context, label: "Dice count"),
                     keyboardType: const TextInputType.numberWithOptions(signed: true),
@@ -73,9 +73,9 @@ class DiceEditDialog extends StatelessWidget {
                   ),
                   FormBuilderTextField(
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: ThemeHelper.dialogForeground(context),
                     ),
-                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    cursorColor: ThemeHelper.dialogForeground(context),
                     name: "number_of_sides",
                     decoration: ThemeHelper.formInputDecoration(context, label: "Side count"),
                     keyboardType: const TextInputType.numberWithOptions(signed: true),
@@ -85,14 +85,16 @@ class DiceEditDialog extends StatelessWidget {
                     onSaved: (value) => data.numberOfSides = int.parse(value!),
                   ),
                   FormBuilderChoiceChip<String>(
+                    backgroundColor: ThemeHelper.dialogForeground(context).withOpacity(0.5),
+                    selectedColor: ThemeHelper.dialogForeground(context),
                     decoration: ThemeHelper.formInputDecoration(context, label: "Action to reroll"),
-                    spacing: ThemeHelper.widgetDialogChipSpacing,
+                    spacing: ThemeHelper.dialogChipSpacing,
                     name: "reroll_action",
                     initialValue: _RerollOptions.fromData(longPressToReroll: data.longPressToReroll).label,
                     onSaved: (value) => data.longPressToReroll = _RerollOptions.isLongPressToReroll(value: value),
                     options: [
-                      _RerollOptions.tap.option,
-                      _RerollOptions.longpress.option,
+                      _RerollOptions.tap.getOption(context),
+                      _RerollOptions.longpress.getOption(context),
                     ],
                   )
                 ]),
@@ -134,5 +136,15 @@ enum _RerollOptions {
     return value == _RerollOptions.longpress.label;
   }
 
-  get option => FormBuilderChipOption<String>(value: label);
+  FormBuilderChipOption<String> getOption(BuildContext context) {
+    return FormBuilderChipOption<String>(
+      value: label,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: ThemeHelper.dialogBackground(context),
+        ),
+      ),
+    );
+  }
 }

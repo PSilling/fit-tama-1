@@ -35,8 +35,13 @@ class DialogSelectInput extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text(dialogTitle ?? 'Select item'),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        title: Text(
+          dialogTitle ?? 'Select item',
+          style: TextStyle(
+            color: ThemeHelper.dialogForeground(context),
+          ),
+        ),
+        backgroundColor: ThemeHelper.dialogBackground(context),
         content: SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height / 3,

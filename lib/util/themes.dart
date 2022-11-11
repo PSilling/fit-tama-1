@@ -58,24 +58,23 @@ class ThemeHelper {
     );
   }
 
-  static Color widgetDialogHighlightColor(BuildContext context) {
+  /// Used for highlighting text in dialogs that should stand out.
+  static Color dialogForegroundHighlight(BuildContext context) {
     return Theme.of(context).colorScheme.onSurfaceVariant;
   }
 
-  static Color widgetDialogInverseColorForeground(BuildContext context) {
+  /// Used for text in dialogs across the application.
+  static Color dialogForeground(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface;
+  }
+
+  /// Used as a background color for dialogs across the application.
+  static Color dialogBackground(BuildContext context) {
     return Theme.of(context).colorScheme.surface;
   }
 
-  static Color widgetDialogInverseColorBackground(BuildContext context) {
-    return Theme.of(context).colorScheme.onSurface;
-  }
-
-  static Color widgetDialogNormalColorForeground(BuildContext context) {
-    return Theme.of(context).colorScheme.onSurface;
-  }
-
   /// Spacing between chips in forms across the application
-  static const double widgetDialogChipSpacing = 10;
+  static const double dialogChipSpacing = 10;
 
   /// Use this for game widget background color.
   /// Can be used as a default value, but widgets should have configurable colors.
@@ -300,7 +299,7 @@ ColorScheme debugColorScheme = ColorScheme(
   onBackground: Colors.brown.shade300,
   surface: Colors.teal.shade700,
   onSurface: Colors.teal.shade300,
-  surfaceVariant: Colors.tealAccent,
+  onSurfaceVariant: Colors.tealAccent,
 );
 
 /// Debug theme; use when building the app (for finding theme inconsistencies).

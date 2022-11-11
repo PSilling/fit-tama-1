@@ -194,9 +194,9 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
             children: [
               FormBuilderTextField(
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: ThemeHelper.dialogForeground(context),
                 ),
-                cursorColor: Theme.of(context).colorScheme.onSurface,
+                cursorColor: ThemeHelper.dialogForeground(context),
                 name: "range_start",
                 decoration: ThemeHelper.formInputDecoration(context, label: "Left value"),
                 initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.start}",
@@ -207,9 +207,9 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               FormBuilderTextField(
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: ThemeHelper.dialogForeground(context),
                 ),
-                cursorColor: Theme.of(context).colorScheme.onSurface,
+                cursorColor: ThemeHelper.dialogForeground(context),
                 name: "range_end",
                 decoration: ThemeHelper.formInputDecoration(context, label: "Right value"),
                 initialValue: widget.data.isUneven ? null : "${_rangeInitialValue.end}",
@@ -220,10 +220,10 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               ),
               if (field.value.flatMap((value) => value.validate()) ?? false)
                 FormBuilderSlider(
-                  activeColor: Theme.of(context).colorScheme.onSurface,
-                  inactiveColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                  activeColor: ThemeHelper.dialogForeground(context),
+                  inactiveColor: ThemeHelper.dialogForeground(context).withOpacity(0.25),
                   textStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: ThemeHelper.dialogForeground(context),
                   ),
                   decoration: ThemeHelper.formInputDecoration(context, label: "Starting value"),
                   key: _rangeDefaultSliderKey,
@@ -302,7 +302,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                                 padding: const EdgeInsetsDirectional.only(start: 5),
                                 child: Icon(
                                   Icons.drag_handle,
-                                  color: ThemeHelper.widgetDialogNormalColorForeground(context),
+                                  color: ThemeHelper.dialogForeground(context),
                                 ),
                               ),
                             ],
@@ -406,7 +406,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
       behavior: HitTestBehavior.deferToChild,
       onTap: () => FocusScope.of(context).unfocus(),
       child: AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: ThemeHelper.dialogBackground(context),
         content: SingleChildScrollView(
           controller: _controller,
           scrollDirection: Axis.vertical,
@@ -416,9 +416,9 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               children: [
                 FormBuilderTextField(
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: ThemeHelper.dialogForeground(context),
                   ),
-                  cursorColor: Theme.of(context).colorScheme.onSurface,
+                  cursorColor: ThemeHelper.dialogForeground(context),
                   name: "title",
                   decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
                   textInputAction: TextInputAction.next,
@@ -427,8 +427,11 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 ),
                 FormBuilderFilterChip<String>(
                   name: "death",
+                  checkmarkColor: ThemeHelper.dialogBackground(context),
+                  backgroundColor: ThemeHelper.dialogForeground(context),
+                  selectedColor: ThemeHelper.dialogForeground(context),
                   decoration: ThemeHelper.formInputDecoration(context, label: "End on a death icon"),
-                  spacing: ThemeHelper.widgetDialogChipSpacing,
+                  spacing: ThemeHelper.dialogChipSpacing,
                   initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isRightDeath),
                   options: [
                     _DeathOptions.left.getOption(context),
@@ -440,7 +443,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                   },
                 ),
                 FormBuilderRadioGroup<String>(
-                    activeColor: Theme.of(context).colorScheme.onBackground,
+                    activeColor: ThemeHelper.dialogForeground(context),
                     decoration: ThemeHelper.formInputDecoration(context, label: "Scale"),
                     name: "type",
                     initialValue: _EvennessOptions.fromData(isUneven: _isUneven).label,
@@ -562,7 +565,7 @@ enum _EvennessOptions {
       child: Text(
         label,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
+          color: ThemeHelper.dialogForeground(context),
         ),
       ),
     );
@@ -594,7 +597,7 @@ enum _DeathOptions {
       child: Text(
         label,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
+          color: ThemeHelper.dialogBackground(context),
         ),
       ),
     );

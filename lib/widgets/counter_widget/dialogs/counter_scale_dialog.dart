@@ -72,7 +72,7 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
   ButtonStyle? _getButtonStyle({required IndexedEntry entry}) {
     const minSize = Size(55, 55);
     final textStyle = Theme.of(context).textTheme.headlineSmall;
-    Color? foregroundColor = ThemeHelper.widgetDialogNormalColorForeground(context);
+    Color? foregroundColor = ThemeHelper.dialogForeground(context);
     Color? backgroundColor;
     bool isBold = false;
     bool hasBorder = false;
@@ -80,17 +80,17 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
       hasBorder = true;
     }
     if (entry == _selectedEntry) {
-      foregroundColor = ThemeHelper.widgetDialogInverseColorForeground(context);
-      backgroundColor = ThemeHelper.widgetDialogInverseColorBackground(context);
+      foregroundColor = ThemeHelper.dialogBackground(context);
+      backgroundColor = ThemeHelper.dialogForeground(context);
     }
     if (entry == widget.defaultEntry) {
-      foregroundColor = ThemeHelper.widgetDialogHighlightColor(context);
+      foregroundColor = ThemeHelper.dialogForegroundHighlight(context);
       isBold = true;
     }
     return OutlinedButton.styleFrom(
       foregroundColor: foregroundColor,
       backgroundColor: backgroundColor,
-      side: hasBorder ? BorderSide(width: 2, color: Theme.of(context).colorScheme.onSurface) : BorderSide.none,
+      side: hasBorder ? BorderSide(width: 2, color: ThemeHelper.dialogForeground(context)) : BorderSide.none,
       minimumSize: minSize,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       textStyle: textStyle?.copyWith(fontWeight: isBold ? FontWeight.w600 : null),
@@ -100,7 +100,7 @@ class _CounterScaleDialogState extends State<CounterScaleDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: ThemeHelper.dialogBackground(context),
       content: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(

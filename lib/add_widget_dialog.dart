@@ -12,7 +12,7 @@ class _AddDialogState extends State<AddDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: ThemeHelper.dialogBackground(context),
       child: SizedBox(
         width: 600,
         child: SingleChildScrollView(
@@ -25,8 +25,8 @@ class _AddDialogState extends State<AddDialog> {
                   child: Text(
                     "Add widget",
                     style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground,
-                        ),
+                      color: ThemeHelper.dialogForeground(context),
+                    ),
                   ),
                 ),
                 ThemeHelper.buttonPrimary(
