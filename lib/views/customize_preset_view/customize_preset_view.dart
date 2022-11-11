@@ -181,7 +181,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                       onSelected: (color) => setState(() {
                         _updatedPreset.backgroundColor = color;
                       }),
-                      itemLabelMap: ThemeHelper.backgroundColors,
+                      itemLabelMap: ThemeHelper.cardBackgroundColors,
                       itemBuilder: (item) => Icon(
                         Icons.circle,
                         color: item,

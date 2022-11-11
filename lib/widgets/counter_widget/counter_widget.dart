@@ -331,7 +331,7 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: ThemeHelper.widgetBackgroundColor(context),
+        color: ThemeHelper.cardBackgroundColor(context),
         borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
         boxShadow: const [BoxShadow()],
       ),

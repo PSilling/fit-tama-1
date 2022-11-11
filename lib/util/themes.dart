@@ -1,12 +1,41 @@
 import 'package:flutter/material.dart';
 
-/// Helper class for applying consistent styling across the app.
+/// Helper class for applying consistent styling across the application.
 /// Utilizes styles of the given [BuildContext] - which should be one of:
 /// [lightTheme], [darkTheme].
 class ThemeHelper {
+
+  /// Spacing between cards across the application.
+  static double cardSpacing() {
+    return 8.0;
+  }
+
+  /// Lower than [FloatingActionButton]'s default (6).
+  static double cardElevation() {
+    return 4.0;
+  }
+
+  /// Padding around card content.
+  static EdgeInsets cardPadding() {
+    return const EdgeInsets.all(8.0);
+  }
+
+  /// Use this for game widget background color.
+  /// Can be used as a default value, but widgets should have configurable colors.
+  static Color cardBackgroundColor(BuildContext context) {
+    return Theme.of(context).colorScheme.tertiary;
+  }
+
+  /// Use this for game widget background color.
+  /// Can be used as a default value, but widgets should have configurable colors.
+  static Color cardForegroundColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onTertiary;
+  }
+
   // TODO: Update the color list to fit our theme (both light and dark).
   /// Colors available as a preset card or widget background.
-  static final Map<Color, String> backgroundColors = {
+  /// Text with [cardForegroundColor] should be visible on these.
+  static final Map<Color, String> cardBackgroundColors = {
     Colors.red: 'Red',
     Colors.green: 'Green',
     Colors.blue: 'Blue',
@@ -31,14 +60,14 @@ class ThemeHelper {
   /// Use this for game widget main titles.
   static TextStyle widgetTitle(BuildContext context) {
     return Theme.of(context).textTheme.headlineMedium!.copyWith(
-      color: Theme.of(context).colorScheme.onSurface,
+      color: cardForegroundColor(context),
     );
   }
 
   /// Use this for game widget bottom titles.
   static TextStyle widgetTitleBottom(BuildContext context) {
     return Theme.of(context).textTheme.headlineSmall!.copyWith(
-      color: Theme.of(context).colorScheme.onSurface,
+      color: cardForegroundColor(context),
     );
   }
 
@@ -46,7 +75,7 @@ class ThemeHelper {
   /// Size should be adjusted based on the available space.
   static TextStyle widgetContentMain(BuildContext context) {
     return Theme.of(context).textTheme.titleLarge!.copyWith(
-      color: Theme.of(context).colorScheme.onSurface,
+      color: cardForegroundColor(context),
     );
   }
 
@@ -54,7 +83,7 @@ class ThemeHelper {
   /// Size should be adjusted based on the available space.
   static TextStyle widgetContentSecondary(BuildContext context) {
     return Theme.of(context).textTheme.headlineLarge!.copyWith(
-      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+      color: cardForegroundColor(context).withOpacity(0.7),
     );
   }
 
@@ -158,12 +187,6 @@ class ThemeHelper {
   /// Spacing between chips in forms across the application
   static const double dialogChipSpacing = 10;
 
-  /// Use this for game widget background color.
-  /// Can be used as a default value, but widgets should have configurable colors.
-  static Color widgetBackgroundColor(BuildContext context) {
-    return Theme.of(context).colorScheme.tertiary;
-  }
-
   /// Used as a background color for pop-up menus across the application.
   static Color popUpBackgroundColor(BuildContext context) {
     return Theme.of(context).colorScheme.secondary;
@@ -189,21 +212,6 @@ class ThemeHelper {
   /// Border radius to use across the application.
   static double borderRadius() {
     return 8.0;
-  }
-
-  /// Spacing between cards across the application.
-  static double cardSpacing() {
-    return 8.0;
-  }
-
-  /// Lower than [FloatingActionButton]'s default (6).
-  static double cardElevation() {
-    return 4.0;
-  }
-
-  /// Padding around card content.
-  static EdgeInsets cardPadding() {
-    return const EdgeInsets.all(8.0);
   }
 
   /// Spacing between items in selection dialogs.

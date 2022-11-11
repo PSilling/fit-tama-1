@@ -193,7 +193,7 @@ class DiceWidgetState extends State<DiceWidget>
   @override
   Widget build(BuildContext context) => Container(
         decoration: BoxDecoration(
-          color: ThemeHelper.widgetBackgroundColor(context),
+          color: ThemeHelper.cardBackgroundColor(context),
           borderRadius:
               BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
           boxShadow: const [BoxShadow()],

@@ -38,10 +38,10 @@ class _PresetsViewState extends State<PresetsView> {
     // Create a randomised preset.
     final random = Random();
     final iconCodeIndex = random.nextInt(ThemeHelper.presetIconCodes.length);
-    final colorIndex = random.nextInt(ThemeHelper.backgroundColors.length);
+    final colorIndex = random.nextInt(ThemeHelper.cardBackgroundColors.length);
     var randomIconCode =
         ThemeHelper.presetIconCodes.keys.elementAt(iconCodeIndex);
-    var randomColor = ThemeHelper.backgroundColors.keys.elementAt(colorIndex);
+    var randomColor = ThemeHelper.cardBackgroundColors.keys.elementAt(colorIndex);
     var newPreset = PresetModel(
       name: 'Title (Tap to Edit)',
       iconCode: randomIconCode,

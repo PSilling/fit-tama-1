@@ -124,7 +124,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           },
                           child: Icon(
                             Icons.clear,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: ThemeHelper.cardForegroundColor(context),
                           )))
               ]);
             }),

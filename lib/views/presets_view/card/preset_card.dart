@@ -38,7 +38,7 @@ class PresetCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: iconFromCode(
                     iconCode: preset.iconCode,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: ThemeHelper.cardForegroundColor(context),
                     size: 30,
                   ),
                 ),
@@ -50,8 +50,8 @@ class PresetCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                        color: ThemeHelper.cardForegroundColor(context),
+                      ),
                     ),
                   ),
                 ),
@@ -62,8 +62,8 @@ class PresetCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
+                      color: ThemeHelper.cardForegroundColor(context),
+                    ),
                   ),
                 ),
               ],
@@ -84,7 +84,7 @@ class PresetCard extends StatelessWidget {
                                   ? Icons.favorite
                                   : Icons.favorite_border,
                               size: 20,
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: ThemeHelper.cardForegroundColor(context),
                             ),
                           )
                         : Icon(
@@ -92,7 +92,7 @@ class PresetCard extends StatelessWidget {
                                 ? Icons.favorite
                                 : Icons.favorite_border,
                             size: 20,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: ThemeHelper.cardForegroundColor(context),
                           ),
                   ),
                   PresetCardMoreButton(

@@ -40,7 +40,7 @@ class PresetsAppbarSortButton extends StatelessWidget {
     if (option == sortOption) {
       children.add(Icon(
         sortAscending ? Icons.south : Icons.north,
-        color: Theme.of(context).colorScheme.onSecondary,
+        color: ThemeHelper.popUpTextStyle(context).color,
       ));
     }
 

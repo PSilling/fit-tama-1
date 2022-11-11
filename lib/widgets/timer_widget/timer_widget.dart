@@ -149,7 +149,7 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
               Text(
                 formatTime(_currentTime),
                 style: _currentTime <= 0
-                    ? ThemeHelper.widgetContentMain(context).copyWith(color: Colors.yellow)
+                    ? ThemeHelper.widgetContentMain(context).copyWith(color: Theme.of(context).colorScheme.error)
                     : ThemeHelper.widgetContentMain(context),
               ),
               FontSpacer(text: formatTime(-data.initialTime.abs()), style: ThemeHelper.widgetContentMain(context)),
@@ -223,7 +223,7 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
   Widget build(BuildContext context) {
     return Container(
         decoration: BoxDecoration(
-          color: ThemeHelper.widgetBackgroundColor(context),
+          color: ThemeHelper.cardBackgroundColor(context),
           borderRadius:
               BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
           boxShadow: const [BoxShadow()],

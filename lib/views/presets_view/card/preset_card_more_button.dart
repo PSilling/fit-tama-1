@@ -31,7 +31,7 @@ class PresetCardMoreButton extends StatelessWidget {
       icon: Icon(
         Icons.more_vert,
         size: size,
-        color: Theme.of(context).colorScheme.onSurface,
+        color: ThemeHelper.cardForegroundColor(context),
       ),
       onSelected: onSelected,
       padding: const EdgeInsets.only(left: 12),
