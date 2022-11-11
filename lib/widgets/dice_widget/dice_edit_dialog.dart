@@ -37,75 +37,79 @@ class DiceEditDialog extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.background,
-        content: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: FormBuilder(
-              key: _formKey,
-              child: Column(children: [
-                FormBuilderTextField(
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
+  Widget build(BuildContext context) => GestureDetector(
+        behavior: HitTestBehavior.deferToChild,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.background,
+          content: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: FormBuilder(
+                key: _formKey,
+                child: Column(children: [
+                  FormBuilderTextField(
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    name: "name",
+                    decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
+                    textInputAction: TextInputAction.next,
+                    initialValue: data.name,
+                    onSaved: (value) => data.name = value ?? "",
                   ),
-                  cursorColor: Theme.of(context).colorScheme.onSurface,
-                  name: "name",
-                  decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
-                  textInputAction: TextInputAction.next,
-                  initialValue: data.name,
-                  onSaved: (value) => data.name = value ?? "",
-                ),
-                FormBuilderTextField(
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
+                  FormBuilderTextField(
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    name: "number_of_dice",
+                    decoration: ThemeHelper.formInputDecoration(context, label: "Dice count"),
+                    keyboardType: const TextInputType.numberWithOptions(signed: true),
+                    textInputAction: TextInputAction.next,
+                    initialValue: "${data.numberOfDice}",
+                    validator: (value) => _numberValidator(value, minimalValue: 1),
+                    onSaved: (value) => data.numberOfDice = int.parse(value!),
                   ),
-                  cursorColor: Theme.of(context).colorScheme.onSurface,
-                  name: "number_of_dice",
-                  decoration: ThemeHelper.formInputDecoration(context, label: "Dice count"),
-                  keyboardType: const TextInputType.numberWithOptions(signed: true),
-                  textInputAction: TextInputAction.next,
-                  initialValue: "${data.numberOfDice}",
-                  validator: (value) => _numberValidator(value, minimalValue: 1),
-                  onSaved: (value) => data.numberOfDice = int.parse(value!),
-                ),
-                FormBuilderTextField(
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
+                  FormBuilderTextField(
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    cursorColor: Theme.of(context).colorScheme.onSurface,
+                    name: "number_of_sides",
+                    decoration: ThemeHelper.formInputDecoration(context, label: "Side count"),
+                    keyboardType: const TextInputType.numberWithOptions(signed: true),
+                    textInputAction: TextInputAction.done,
+                    initialValue: "${data.numberOfSides}",
+                    validator: (value) => _numberValidator(value, minimalValue: 2),
+                    onSaved: (value) => data.numberOfSides = int.parse(value!),
                   ),
-                  cursorColor: Theme.of(context).colorScheme.onSurface,
-                  name: "number_of_sides",
-                  decoration: ThemeHelper.formInputDecoration(context, label: "Side count"),
-                  keyboardType: const TextInputType.numberWithOptions(signed: true),
-                  textInputAction: TextInputAction.done,
-                  initialValue: "${data.numberOfSides}",
-                  validator: (value) => _numberValidator(value, minimalValue: 2),
-                  onSaved: (value) => data.numberOfSides = int.parse(value!),
-                ),
-                FormBuilderChoiceChip<String>(
-                  decoration: ThemeHelper.formInputDecoration(context, label: "Action to reroll"),
-                  spacing: ThemeHelper.widgetDialogChipSpacing,
-                  name: "reroll_action",
-                  initialValue: _RerollOptions.fromData(longPressToReroll: data.longPressToReroll).label,
-                  onSaved: (value) => data.longPressToReroll = _RerollOptions.isLongPressToReroll(value: value),
-                  options: [
-                    _RerollOptions.tap.option,
-                    _RerollOptions.longpress.option,
-                  ],
-                )
-              ]),
-            )),
-        actions: [
-          ThemeHelper.buttonPrimary(
-            context: context,
-            onPressed: () => _validateSaveAndDismiss(context),
-            label: "Save",
-          ),
-          ThemeHelper.buttonSecondary(
-            context: context,
-            onPressed: () => Navigator.of(context).pop(),
-            label: "Cancel",
-          ),
-        ],
+                  FormBuilderChoiceChip<String>(
+                    decoration: ThemeHelper.formInputDecoration(context, label: "Action to reroll"),
+                    spacing: ThemeHelper.widgetDialogChipSpacing,
+                    name: "reroll_action",
+                    initialValue: _RerollOptions.fromData(longPressToReroll: data.longPressToReroll).label,
+                    onSaved: (value) => data.longPressToReroll = _RerollOptions.isLongPressToReroll(value: value),
+                    options: [
+                      _RerollOptions.tap.option,
+                      _RerollOptions.longpress.option,
+                    ],
+                  )
+                ]),
+              )),
+          actions: [
+            ThemeHelper.buttonPrimary(
+              context: context,
+              onPressed: () => _validateSaveAndDismiss(context),
+              label: "Save",
+            ),
+            ThemeHelper.buttonSecondary(
+              context: context,
+              onPressed: () => Navigator.of(context).pop(),
+              label: "Cancel",
+            ),
+          ],
+        ),
       );
 }
 

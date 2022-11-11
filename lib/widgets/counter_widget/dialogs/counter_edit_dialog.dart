@@ -399,72 +399,76 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      content: SingleChildScrollView(
-        controller: _controller,
-        scrollDirection: Axis.vertical,
-        child: FormBuilder(
-          key: _formKey,
-          child: Column(
-            children: [
-              FormBuilderTextField(
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+    return GestureDetector(
+      behavior: HitTestBehavior.deferToChild,
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.background,
+        content: SingleChildScrollView(
+          controller: _controller,
+          scrollDirection: Axis.vertical,
+          child: FormBuilder(
+            key: _formKey,
+            child: Column(
+              children: [
+                FormBuilderTextField(
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  cursorColor: Theme.of(context).colorScheme.onSurface,
+                  name: "title",
+                  decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
+                  textInputAction: TextInputAction.next,
+                  initialValue: widget.data.name,
+                  onSaved: (value) => widget.data.name = value ?? "",
                 ),
-                cursorColor: Theme.of(context).colorScheme.onSurface,
-                name: "title",
-                decoration: ThemeHelper.formInputDecoration(context, label: "Title"),
-                textInputAction: TextInputAction.next,
-                initialValue: widget.data.name,
-                onSaved: (value) => widget.data.name = value ?? "",
-              ),
-              FormBuilderFilterChip<String>(
-                name: "death",
-                decoration: ThemeHelper.formInputDecoration(context, label: "End on a death icon"),
-                spacing: ThemeHelper.widgetDialogChipSpacing,
-                initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isRightDeath),
-                options: [
-                  _DeathOptions.left.getOption(context),
-                  _DeathOptions.right.getOption(context),
-                ],
-                onSaved: (value) {
-                  widget.data.isLeftDeath = value!.contains(_DeathOptions.left.label);
-                  widget.data.isRightDeath = value.contains(_DeathOptions.right.label);
-                },
-              ),
-              FormBuilderRadioGroup<String>(
-                  activeColor: Theme.of(context).colorScheme.onBackground,
-                  decoration: ThemeHelper.formInputDecoration(context, label: "Scale"),
-                  name: "type",
-                  initialValue: _EvennessOptions.fromData(isUneven: _isUneven).label,
-                  onChanged: (value) {
-                    setState(() {
-                      _isUneven = _EvennessOptions.isUneven(value: value);
-                    });
-                  },
-                  onSaved: (value) => widget.data.isUneven = _EvennessOptions.isUneven(value: value),
+                FormBuilderFilterChip<String>(
+                  name: "death",
+                  decoration: ThemeHelper.formInputDecoration(context, label: "End on a death icon"),
+                  spacing: ThemeHelper.widgetDialogChipSpacing,
+                  initialValue: _DeathOptions.initialValue(left: widget.data.isLeftDeath, right: widget.data.isRightDeath),
                   options: [
-                    _EvennessOptions.range.getOption(context),
-                    _EvennessOptions.scale.getOption(context),
-                  ]),
-              if (_isUneven) _scaleField(context) else _rangeField(context)
-            ],
+                    _DeathOptions.left.getOption(context),
+                    _DeathOptions.right.getOption(context),
+                  ],
+                  onSaved: (value) {
+                    widget.data.isLeftDeath = value!.contains(_DeathOptions.left.label);
+                    widget.data.isRightDeath = value.contains(_DeathOptions.right.label);
+                  },
+                ),
+                FormBuilderRadioGroup<String>(
+                    activeColor: Theme.of(context).colorScheme.onBackground,
+                    decoration: ThemeHelper.formInputDecoration(context, label: "Scale"),
+                    name: "type",
+                    initialValue: _EvennessOptions.fromData(isUneven: _isUneven).label,
+                    onChanged: (value) {
+                      setState(() {
+                        _isUneven = _EvennessOptions.isUneven(value: value);
+                      });
+                    },
+                    onSaved: (value) => widget.data.isUneven = _EvennessOptions.isUneven(value: value),
+                    options: [
+                      _EvennessOptions.range.getOption(context),
+                      _EvennessOptions.scale.getOption(context),
+                    ]),
+                if (_isUneven) _scaleField(context) else _rangeField(context)
+              ],
+            ),
           ),
         ),
+        actions: [
+          ThemeHelper.buttonPrimary(
+            context: context,
+            onPressed: () => _validateSaveAndDismiss(context),
+            label: "Save",
+          ),
+          ThemeHelper.buttonSecondary(
+            context: context,
+            onPressed: () => Navigator.of(context).pop(),
+            label: "Cancel",
+          ),
+        ],
       ),
-      actions: [
-        ThemeHelper.buttonPrimary(
-          context: context,
-          onPressed: () => _validateSaveAndDismiss(context),
-          label: "Save",
-        ),
-        ThemeHelper.buttonSecondary(
-          context: context,
-          onPressed: () => Navigator.of(context).pop(),
-          label: "Cancel",
-        ),
-      ],
     );
   }
 }
