@@ -253,6 +253,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
               errorText: field.errorText, label: "Values", hasBorder: false, isDense: true),
           child: Column(
             children: [
+              // HACK: Just because it's in Dialog
               ValueListenableBuilder(
                 valueListenable: _scaleListEntryHeight,
                 builder: (context, height, child) {
@@ -365,6 +366,8 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                         style: ThemeHelper.textFieldStyle(context),
                       ),
                     Opacity(
+                      // It cannot be removed when reordering, otherwise the keyboard will disappear
+                      // It cannot stay visible, because it causes exception with layers
                       opacity: _isReordering ? 0 : 1,
                       child: FormBuilderTextField(
                         key: entry.textKey,
