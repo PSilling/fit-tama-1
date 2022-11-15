@@ -32,7 +32,6 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
   final _scaleListEntryHeight = ValueNotifier<double?>(null);
   late final _rangeInitialValue = IntRange.from(scale: widget.data.scale);
   final _rangeDefaultSliderKey = GlobalKey<FormBuilderFieldState>();
-  static const _defaultEntryOption = FormBuilderChipOption<String>(value: "Start");
 
   @override
   void initState() {
@@ -46,6 +45,18 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
       _defaultIndexKey = null;
     }
     super.initState();
+  }
+
+  FormBuilderChipOption<String> _defaultEntryOption(BuildContext context) {
+    return FormBuilderChipOption<String>(
+      value: "Start",
+      child: Text(
+        "Start",
+        style: TextStyle(
+          color: ThemeHelper.dialogBackground(context),
+        ),
+      ),
+    );
   }
 
   String? _numberValidator(String? value, {bool isRequired = true}) {
@@ -340,11 +351,13 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 SizedBox(
                   width: 70,
                   child: FormBuilderChoiceChip<String>(
+                    backgroundColor: ThemeHelper.dialogForeground(context).withOpacity(0.5),
+                    selectedColor: ThemeHelper.dialogForeground(context),
                     key: entry.checkKey,
                     decoration: ThemeHelper.dialogInputDecoration(context, hasBorder: false, isDense: true, hasPadding: false),
                     name: "scale_checkbox_${entry.checkKey}",
-                    options: const [_defaultEntryOption],
-                    initialValue: superField.value == entry.checkKey ? _defaultEntryOption.value : null,
+                    options: [_defaultEntryOption(context)],
+                    initialValue: superField.value == entry.checkKey ? _defaultEntryOption(context).value : null,
                     alignment: WrapAlignment.start,
                     onChanged: (value) {
                       if (value != null) {
@@ -428,7 +441,7 @@ class _CounterEditDialogState extends State<CounterEditDialog> {
                 FormBuilderFilterChip<String>(
                   name: "death",
                   checkmarkColor: ThemeHelper.dialogBackground(context),
-                  backgroundColor: ThemeHelper.dialogForeground(context),
+                  backgroundColor: ThemeHelper.dialogForeground(context).withOpacity(0.5),
                   selectedColor: ThemeHelper.dialogForeground(context),
                   decoration: ThemeHelper.dialogInputDecoration(context, label: "End on a death icon"),
                   spacing: ThemeHelper.dialogChipSpacing,
