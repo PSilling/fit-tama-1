@@ -5,6 +5,14 @@ import 'package:flutter/material.dart';
 /// [lightTheme], [darkTheme].
 class ThemeHelper {
 
+  static Color floaterBackgroundColor(BuildContext context) {
+    return Theme.of(context).colorScheme.primary;
+  }
+
+  static Color floaterForegroundColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onPrimary;
+  }
+
   /// Spacing between cards across the application.
   static double cardSpacing() {
     return 8.0;
@@ -49,12 +57,39 @@ class ThemeHelper {
   // TODO: IconData codes: https://raw.githubusercontent.com/flutter/flutter/master/packages/flutter/lib/src/material/icons.dart
   /// Codes of available preset card icons.
   static const Map<int, String> presetIconCodes = {
-    0xe03d: 'Accessibility', // accessibility_new
-    0xee30: 'Account balance', // account_balance
-    0xe042: 'Account box', // account_box
-    0xe046: 'ADB', // adb
-    0xe749: 'Add alert', // add_alert_sharp,
-    0xf516: 'AC unit', // ac_unit_rounded,
+    0xe038: 'access_alarm',
+    0xe03d: 'accessibility_new',
+    0xe040: 'account_balance',
+    0xe044: 'account_tree',
+    0xe04e: 'add_chart',
+    0xe063: 'agriculture',
+    0xe064: 'air',
+    0xe06b: 'airline_seat_recline_extra',
+    0xf04bb: 'airline_stops',
+    0xe071: 'airport_shuttle',
+    0xe07e: 'all_inclusive',
+    0xe084: 'anchor',
+    0xe087: 'announcement',
+    0xe089: 'apartment',
+    0xe08c: 'app_registration',
+    0xe0ae: 'assistant_photo',
+    0xe0b2: 'attach_money',
+    0xe0b6: 'audiotrack',
+    0xeea9: 'auto_awesome_outlined',
+    0xe0bb: 'auto_fix_high',
+    0xe0bf: 'auto_stories',
+    0xf04c5: 'back_hand',
+    0xe0c9: 'bakery_dining',
+    0xf04c6: 'balance',
+    0xe0d6: 'beach_access',
+    0xe0db: 'bedtime',
+    0xe0ee: 'bolt',
+    0xe0ef: 'book',
+    0xe109: 'brightness_5',
+    0xe113: 'brush',
+    0xe115: 'bug_report',
+    0xe116: 'build',
+    0xe11c: 'business_center',
   };
 
   /// Use this for game widget main titles.

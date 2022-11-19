@@ -29,26 +29,33 @@ class _AddDialogState extends State<AddDialog> {
                     ),
                   ),
                 ),
-                ThemeHelper.buttonPrimary(
-                  context: context,
-                  label: "Counter",
-                  onPressed: () {
-                    Navigator.pop(context, 'counter');
-                  },
-                ),
-                ThemeHelper.buttonPrimary(
-                  context: context,
-                  label: "Dice",
-                  onPressed: () {
-                    Navigator.pop(context, 'dice');
-                  },
-                ),
-                ThemeHelper.buttonPrimary(
-                  context: context,
-                  label: "Timer",
-                  onPressed: () {
-                    Navigator.pop(context, 'timer');
-                  },
+                IntrinsicWidth(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ThemeHelper.buttonPrimary(
+                        context: context,
+                        label: "Counter",
+                        onPressed: () {
+                          Navigator.pop(context, 'counter');
+                        },
+                      ),
+                      ThemeHelper.buttonPrimary(
+                        context: context,
+                        label: "Dice",
+                        onPressed: () {
+                          Navigator.pop(context, 'dice');
+                        },
+                      ),
+                      ThemeHelper.buttonPrimary(
+                        context: context,
+                        label: "Timer",
+                        onPressed: () {
+                          Navigator.pop(context, 'timer');
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(
                   height: 20,

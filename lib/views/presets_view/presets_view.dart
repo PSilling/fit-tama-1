@@ -281,6 +281,8 @@ class _PresetsViewState extends State<PresetsView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: ThemeHelper.floaterBackgroundColor(context),
+        foregroundColor: ThemeHelper.floaterForegroundColor(context),
         onPressed: _createPreset,
         tooltip: 'New game preset',
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
