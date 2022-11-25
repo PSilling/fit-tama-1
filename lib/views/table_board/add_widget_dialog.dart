@@ -1,14 +1,9 @@
 import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
-class AddDialog extends StatefulWidget {
+class AddDialog extends StatelessWidget {
   const AddDialog({Key? key}) : super(key: key);
 
-  @override
-  State<AddDialog> createState() => _AddDialogState();
-}
-
-class _AddDialogState extends State<AddDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -29,6 +24,15 @@ class _AddDialogState extends State<AddDialog> {
                     ),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    "One position wide widgets",
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: ThemeHelper.dialogForeground(context),
+                    ),
+                  ),
+                ),
                 IntrinsicWidth(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -37,21 +41,44 @@ class _AddDialogState extends State<AddDialog> {
                         context: context,
                         label: "Counter",
                         onPressed: () {
-                          Navigator.pop(context, 'counter');
+                          Navigator.pop(context, ['counter', 1]);
                         },
                       ),
                       ThemeHelper.buttonPrimary(
                         context: context,
                         label: "Dice",
                         onPressed: () {
-                          Navigator.pop(context, 'dice');
+                          Navigator.pop(context, ['dice', 1]);
                         },
                       ),
                       ThemeHelper.buttonPrimary(
                         context: context,
                         label: "Timer",
                         onPressed: () {
-                          Navigator.pop(context, 'timer');
+                          Navigator.pop(context, ['timer', 1]);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    "Two positions wide widgets",
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: ThemeHelper.dialogForeground(context),
+                    ),
+                  ),
+                ),
+                IntrinsicWidth(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ThemeHelper.buttonPrimary(
+                        context: context,
+                        label: "Counter",
+                        onPressed: () {
+                          Navigator.pop(context, ['counter', 2]);
                         },
                       ),
                     ],

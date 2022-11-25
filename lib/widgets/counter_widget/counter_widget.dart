@@ -17,8 +17,12 @@ class CounterWidget extends StatefulWidget {
 
   final CounterWidgetData initData;
   final bool startEditing;
-  const CounterWidget({super.key,
-    required this.initData, required this.startEditing});
+  final int width;
+  const CounterWidget({
+    super.key,
+    required this.initData,
+    required this.startEditing,
+    required this.width});
 
   @override
   State<CounterWidget> createState() => CounterWidgetState();
@@ -28,6 +32,10 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
   late CounterWidgetData _data;
   late int _currentIndex;
   var _isEditing = false;
+  final Map<int, List<int>>_widthSettings = {
+    1: [1],
+    2: [1, 2, 3],
+  };
 
   _PanDirection? _panDirection;
   final _numbersHeight = ValueNotifier<double?>(null);
@@ -72,6 +80,28 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     });
   }
 
+  void increaseIndexBy(int num) {
+    setState(() {
+      final deathModifier = _data.isRightDeath ? 1 : 0;
+      final newIndex = _currentIndex + num < _data.scale.length + deathModifier
+          ? _currentIndex + num : _data.scale.length - 1;
+      if (newIndex < _data.scale.length + deathModifier) {
+        _currentIndex = newIndex;
+      }
+    });
+  }
+
+  void decreaseIndexBy(int num){
+    setState(() {
+      final deathModifier = _data.isLeftDeath ? 1 : 0;
+      final newIndex = _currentIndex - num >= 0 - deathModifier
+          ? _currentIndex - num : 0 - deathModifier;
+      if (newIndex >= 0 - deathModifier) {
+        _currentIndex = newIndex;
+      }
+    });
+  }
+
   void setIndex(int index) {
     setState(() {
       _currentIndex = index;
@@ -84,19 +114,25 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     });
   }
 
-  void _onLeftTapped() {
+  void _onLeftTapped(int num) {
     if (_isEditing) {
       _showEditingDialog();
     } else {
-      decreaseIndex();
+      decreaseIndexBy(num);
     }
   }
 
-  void _onRightTapped() {
+  void _onRightTapped(int num) {
     if (_isEditing) {
       _showEditingDialog();
     } else {
-      increaseIndex();
+      increaseIndexBy(num);
+    }
+  }
+
+  void _onMiddleTapped() {
+    if (_isEditing) {
+      _showEditingDialog();
     }
   }
 
@@ -260,13 +296,14 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     );
   }
 
-  Widget _numbersSection(BuildContext context) {
+  Widget _numbersSection(BuildContext context, List<int> sideNumbers) {
     return FractionallySizedBox(
       heightFactor: 0.7,
       child: Row(
         children: [
+          for (var i in sideNumbers.reversed.toList())
           _numberButton(
-            index: _currentIndex - 1,
+            index: _currentIndex - i,
             flex: 4,
             alignment: Alignment.centerRight,
             textStyle: ThemeHelper.widgetContentSecondary(context),
@@ -291,8 +328,9 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
               ),
             ),
           ),
+          for (var i in sideNumbers)
           _numberButton(
-            index: _currentIndex + 1,
+            index: _currentIndex + i,
             flex: 4,
             alignment: Alignment.centerLeft,
             textStyle: ThemeHelper.widgetContentSecondary(context),
@@ -340,10 +378,11 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
         children: [
           Row(
             children: [
+              for (var i in _widthSettings[widget.width]!.reversed.toList())
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onTap: _onLeftTapped,
+                  onTap: () {_onLeftTapped(i);},
                   onPanEnd: _isEditing ? null : _onPanEnd,
                   onPanUpdate: _isEditing ? null :  _onPanUpdate,
                   onPanCancel: _isEditing ? null :  _onPanCancel,
@@ -352,10 +391,17 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onTap: _onRightTapped,
+                  onTap: _onMiddleTapped,
+                ),
+              ),
+              for (var i in _widthSettings[widget.width]!)
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {_onRightTapped(i);},
                   onPanEnd: _isEditing ? null : _onPanEnd,
-                  onPanUpdate: _isEditing ? null : _onPanUpdate,
-                  onPanCancel: _isEditing ? null : _onPanCancel,
+                  onPanUpdate: _isEditing ? null :  _onPanUpdate,
+                  onPanCancel: _isEditing ? null :  _onPanCancel,
                 ),
               ),
             ],
@@ -372,7 +418,7 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
               ),
               Expanded(
                 flex: 3,
-                child: _numbersSection(context),
+                child: _numbersSection(context, _widthSettings[widget.width]!),
               ),
               Flexible(
                 flex: 1,

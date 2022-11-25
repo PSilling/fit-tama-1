@@ -5,12 +5,12 @@ import 'package:dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import './widgets/counter_widget/counter_widget.dart';
-import './widgets/counter_widget/counter_widget_data.dart';
-import './widgets/dice_widget/dice_widget.dart';
-import './widgets/dice_widget/dice_widget_data.dart';
-import './widgets/timer_widget/timer_widget.dart';
-import './widgets/timer_widget/timer_widget_data.dart';
+import '../../widgets/counter_widget/counter_widget.dart';
+import '../../widgets/counter_widget/counter_widget_data.dart';
+import '../../widgets/dice_widget/dice_widget.dart';
+import '../../widgets/dice_widget/dice_widget_data.dart';
+import '../../widgets/timer_widget/timer_widget.dart';
+import '../../widgets/timer_widget/timer_widget_data.dart';
 
 class ColoredDashboardItem extends DashboardItem {
   ColoredDashboardItem(
@@ -58,6 +58,11 @@ class ColoredDashboardItem extends DashboardItem {
 
     return sup;
   }
+
+  int getWidth() {
+    return super.toMap()['layout']['w'];
+  }
+
 }
 
 class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
@@ -70,18 +75,19 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
   Map<String, dynamic>? widgets;
   bool _editing = false;
 
-  final Map<String, Widget Function(String i, bool e)> _widgetMap = {
-    "counter": (l, e) => CounterWidget(
+  final Map<String, Widget Function(String i, bool e, int w)> _widgetMap = {
+    "counter": (l, e, w) => CounterWidget(
       key: GlobalKey(),
       initData: CounterWidgetData.fromJson(jsonDecode(l)),
       startEditing: e,
+      width: w,
     ),
-    "dice": (l, e) => DiceWidget(
+    "dice": (l, e, w) => DiceWidget(
       key: GlobalKey(),
       initData: DiceWidgetData.fromJson(jsonDecode(l)),
       startEditing: e,
     ),
-    "timer": (l, e) => TimerWidget(
+    "timer": (l, e, w) => TimerWidget(
       key: GlobalKey(),
       initData: TimerWidgetData.fromJson(jsonDecode(l)),
       startEditing: e,
@@ -90,22 +96,27 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
 
   final Map<String, String> defaultData = {
     'counter': jsonEncode(CounterWidgetData(
-        name: "Round",
+        name: "Counter",
         isUneven: false,
         scale: List<int>.generate(10, (i) => i + 1),
-        defaultIndex: 2,
+        defaultIndex: 4,
         isLeftDeath: false,
         isRightDeath: false)),
-    'dice': jsonEncode(
-        DiceWidgetData(name: 'Dice', numberOfDice: 2, numberOfSides: 2)),
-    'timer': jsonEncode(TimerWidgetData(name: 'Timer', initialTime: 90))
+    'dice': jsonEncode(DiceWidgetData(
+        name: 'Dice',
+        numberOfDice: 2,
+        numberOfSides: 2)),
+    'timer': jsonEncode(TimerWidgetData(
+        name: 'Timer',
+        initialTime: 90))
   };
 
   late final Map<int, List<ColoredDashboardItem>> _default = {
     2: <ColoredDashboardItem>[
       ColoredDashboardItem(
         color: Colors.blue,
-        width: 1,
+        width: 2,
+        minWidth: 2,
         height: 1,
         identifier: 'counter',
         startX: 0,
@@ -133,8 +144,8 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
     ],
   };
 
-  dynamic buildWidget(item){
-    return _widgetMap[item.type]!(item.data, _editing);
+  dynamic buildWidget(ColoredDashboardItem item){
+    return _widgetMap[item.type]!(item.data, _editing, item.getWidth());
   }
 
   @override

@@ -6,9 +6,10 @@ import 'package:dashboard/dashboard.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import './storage.dart';
-import 'add_widget_dialog.dart';
-import 'models/preset_model.dart';
+import 'storage.dart';
+import './add_widget_dialog.dart';
+import './remove_widget_dialog.dart';
+import '../../models/preset_model.dart';
 
 class DashboardWidget extends StatefulWidget {
   final PresetModel preset;
@@ -28,6 +29,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   late DashboardItemController<ColoredDashboardItem> itemController;
 
   int? slot;
+  bool clearVisible = false;
 
   @override
   void initState() {
@@ -51,9 +53,10 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       appBar: AppBar(
         title: Text(widget.preset.name),
         actions: [
+          if (clearVisible)
           IconButton(
               onPressed: () {
-                itemController.clear();
+                clear(context);
               },
               icon: const Icon(Icons.delete)),
           IconButton(
@@ -63,11 +66,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               icon: const Icon(Icons.add)),
           IconButton(
               onPressed: () {
+                clearVisible = !clearVisible;
                 itemController.isEditing = !itemController.isEditing;
                 storage.setWidgetsEditing(itemController.isEditing);
                 if (itemController.isEditing == false) {
                   storage.onItemsUpdated([], slot!);
                 }
+                setState(() {});
               },
               icon: const Icon(Icons.edit)),
         ],
@@ -100,6 +105,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             editModeSettings: EditModeSettings(
               paintBackgroundLines: true,
               fillEditingBackground: true,
+              editAnimationAngle: 0.5 * pi / 180,
               resizeCursorSide:
                   0, // when set to 0 user cannot change the shape of the widgets
               curve: Curves.easeIn,
@@ -112,20 +118,22 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             itemBuilder: (ColoredDashboardItem item) {
               //print(storage.localItems![slot]![item.identifier]);
               return Stack(children: [
-                storage.widgets![item.identifier]!,
+                storage.widgets![item.identifier],
                 if (itemController.isEditing)
                   Positioned(
-                      right: 5,
-                      top: 5,
-                      child: InkResponse(
-                          radius: 20,
-                          onTap: () {
-                            itemController.delete(item.identifier);
-                          },
-                          child: Icon(
-                            Icons.clear,
-                            color: ThemeHelper.cardForegroundColor(context),
-                          )))
+                    right: 5,
+                    top: 5,
+                    child: InkResponse(
+                      radius: 20,
+                      onTap: () {
+                        itemController.delete(item.identifier);
+                      },
+                      child: Icon(
+                        Icons.clear,
+                        color: ThemeHelper.cardForegroundColor(context),
+                      )
+                    )
+                  )
               ]);
             }),
       ),
@@ -142,16 +150,28 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     if (res != null) {
       itemController.add(ColoredDashboardItem(
           color: Colors.blue,
-          width: 1,
+          width: res[1],
           height: 1,
           identifier: Random().nextInt(1000).toString() +
               DateTime.now().microsecondsSinceEpoch.toString(),
-          minWidth: 1,
+          minWidth: res[1],
           minHeight: 1,
           maxWidth: 2,
           maxHeight: 1,
-          type: res,
-          data: storage.defaultData[res]!));
+          type: res[0],
+          data: storage.defaultData[res[0]]!));
+    }
+  }
+
+  Future<void> clear(BuildContext context) async {
+    var res = await showDialog(
+        context: context,
+        builder: (c) {
+          return const RemoveDialog();
+    });
+
+    if (res != null && res){
+      itemController.clear();
     }
   }
 }

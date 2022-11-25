@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/preset_model.dart';
-import '../../table_board.dart';
+import '../table_board/table_board.dart';
 import 'appbar/presets_appbar.dart';
 import 'card/preset_card_more_button.dart';
 
