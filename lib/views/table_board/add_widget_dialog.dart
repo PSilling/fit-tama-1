@@ -81,6 +81,13 @@ class AddDialog extends StatelessWidget {
                           Navigator.pop(context, ['counter', 2]);
                         },
                       ),
+                      ThemeHelper.buttonPrimary(
+                        context: context,
+                        label: "Chess Timer",
+                        onPressed: () {
+                          Navigator.pop(context, ['chess_timer', 2]);
+                        },
+                      ),
                     ],
                   ),
                 ),

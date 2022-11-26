@@ -56,8 +56,10 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
 
   void pause() {
     setState(() {
-      _currentState = TimerWidgetTimerState.paused;
-      _countdownTimer.cancel();
+      if(_currentState != TimerWidgetTimerState.init){
+        _currentState = TimerWidgetTimerState.paused;
+        _countdownTimer.cancel();
+      }
     });
   }
 

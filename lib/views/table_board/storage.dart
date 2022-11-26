@@ -11,6 +11,8 @@ import '../../widgets/dice_widget/dice_widget.dart';
 import '../../widgets/dice_widget/dice_widget_data.dart';
 import '../../widgets/timer_widget/timer_widget.dart';
 import '../../widgets/timer_widget/timer_widget_data.dart';
+import '../../widgets/chess_timer_widget/chess_timer_widget.dart';
+import '../../widgets/chess_timer_widget/chess_timer_widget_data.dart';
 
 class ColoredDashboardItem extends DashboardItem {
   ColoredDashboardItem(
@@ -76,22 +78,27 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
   bool _editing = false;
 
   final Map<String, Widget Function(String i, bool e, int w)> _widgetMap = {
-    "counter": (l, e, w) => CounterWidget(
+    'counter': (l, e, w) => CounterWidget(
       key: GlobalKey(),
       initData: CounterWidgetData.fromJson(jsonDecode(l)),
       startEditing: e,
       width: w,
     ),
-    "dice": (l, e, w) => DiceWidget(
+    'dice': (l, e, w) => DiceWidget(
       key: GlobalKey(),
       initData: DiceWidgetData.fromJson(jsonDecode(l)),
       startEditing: e,
     ),
-    "timer": (l, e, w) => TimerWidget(
+    'timer': (l, e, w) => TimerWidget(
       key: GlobalKey(),
       initData: TimerWidgetData.fromJson(jsonDecode(l)),
       startEditing: e,
     ),
+    'chess_timer': (l, e, w) => ChessTimerWidget(
+      key: GlobalKey(),
+      initData: ChessTimerWidgetData.fromJson(jsonDecode(l)),
+      startEditing: e,
+    )
   };
 
   final Map<String, String> defaultData = {
@@ -108,13 +115,15 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
         numberOfSides: 2)),
     'timer': jsonEncode(TimerWidgetData(
         name: 'Timer',
-        initialTime: 90))
+        initialTime: 90)),
+    'chess_timer': jsonEncode(ChessTimerWidgetData(
+        name: 'Chess timer',
+        initialTimes: [90, 90])),
   };
 
   late final Map<int, List<ColoredDashboardItem>> _default = {
     2: <ColoredDashboardItem>[
       ColoredDashboardItem(
-        color: Colors.blue,
         width: 2,
         minWidth: 2,
         height: 1,
@@ -140,7 +149,18 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
           startX: 0,
           startY: 1,
           type: 'timer',
-          data: defaultData['timer']!)
+          data: defaultData['timer']!
+      ),
+      ColoredDashboardItem(
+          width: 2,
+          minWidth: 2,
+          height: 1,
+          identifier: 'chess_timer',
+          startX: 0,
+          startY: 1,
+          type: 'chess_timer',
+          data: defaultData['chess_timer']!
+      ),
     ],
   };
 
@@ -214,6 +234,9 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
     }
 
     for (var id in widgets!.keys) {
+      if (widgets![id].key.currentState == null){
+        return;
+      }
       _localItems?[slotCount]?[id]?.data =
           jsonEncode(widgets![id].key.currentState.data);
     }

@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:board_aid/util/themes.dart';
+import 'package:board_aid/widgets/chess_timer_widget/chess_timer_widget.dart';
 import 'package:dashboard/dashboard.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+
+import '../../widgets/timer_widget/timer_widget.dart';
 import 'storage.dart';
 import './add_widget_dialog.dart';
 import './remove_widget_dialog.dart';
@@ -51,6 +54,21 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: (){
+            storage.onItemsUpdated([], slot!);
+            for(var id in storage.widgets!.keys){
+              switch (storage.widgets![id].runtimeType){
+                case TimerWidget:
+                case ChessTimerWidget:
+                  storage.widgets![id].key.currentState.pause();
+                  break;
+              }
+            }
+            Navigator.pop(context);
+            },
+        ),
         title: Text(widget.preset.name),
         actions: [
           if (clearVisible)

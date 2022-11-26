@@ -117,8 +117,9 @@ class ThemeHelper {
   /// Use this for the secondary content of the game widget titles.
   /// Size should be adjusted based on the available space.
   static TextStyle widgetContentSecondary(BuildContext context) {
-    return Theme.of(context).textTheme.headlineLarge!.copyWith(
+    return Theme.of(context).textTheme.titleLarge!.copyWith(
       color: cardForegroundColor(context).withOpacity(0.7),
+      fontWeight: Theme.of(context).textTheme.headlineLarge?.fontWeight,
     );
   }
 
