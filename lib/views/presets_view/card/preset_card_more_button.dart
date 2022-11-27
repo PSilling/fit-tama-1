@@ -6,7 +6,6 @@ import '../../../widgets/resizable_popup_menu_button.dart';
 /// Additional action option for Preset cards.
 enum PresetCardMoreOption {
   customize,
-  edit,
   remove,
 }
 
@@ -34,7 +33,7 @@ class PresetCardMoreButton extends StatelessWidget {
         color: ThemeHelper.cardForegroundColor(context),
       ),
       onSelected: onSelected,
-      padding: const EdgeInsets.only(left: 12),
+      padding: ThemeHelper.cardIconPadding(),
       position: PopupMenuPosition.under,
       enabled: enabled,
       itemBuilder: (BuildContext context) => [
@@ -42,13 +41,6 @@ class PresetCardMoreButton extends StatelessWidget {
           value: PresetCardMoreOption.customize,
           child: Text(
             'Customize',
-            style: ThemeHelper.popUpTextStyle(context),
-          ),
-        ),
-        PopupMenuItem<PresetCardMoreOption>(
-          value: PresetCardMoreOption.edit,
-          child: Text(
-            'Edit',
             style: ThemeHelper.popUpTextStyle(context),
           ),
         ),

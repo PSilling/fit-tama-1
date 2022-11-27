@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:board_aid/models/preset_model.dart';
 import 'package:board_aid/views/presets_view/card/preset_card.dart';
 import 'package:board_aid/widgets/dialog_select_input.dart';
@@ -6,7 +8,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../../util/themes.dart';
 import '../../util/icons.dart';
-import 'customize_preset_appbar.dart';
 
 /// Preset card customization view.
 class CustomizePresetView extends StatefulWidget {
@@ -25,7 +26,7 @@ class CustomizePresetView extends StatefulWidget {
 
 class _CustomizePresetViewState extends State<CustomizePresetView> {
   final _formKey = GlobalKey<FormBuilderState>();
-  late PresetModel _updatedPreset;
+  late Timer _updateTimer;
 
   /// Handles navigator pop and preset saving on back button press.
   Future<bool> _onWillPop(context) {
@@ -46,7 +47,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
     final formState = _formKey.currentState;
     if (formState != null && formState.validate()) {
       formState.save();
-      widget.onSave(_updatedPreset);
+      widget.onSave(widget.preset);
       return true;
     }
     return false;
@@ -55,7 +56,16 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
   @override
   void initState() {
     super.initState();
-    _updatedPreset = widget.preset.copy();
+    _updateTimer = Timer.periodic(
+      const Duration(seconds: 2),
+      (timer) => _validateAndSave(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _updateTimer.cancel();
+    super.dispose();
   }
 
   @override
@@ -63,19 +73,15 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
     final presetCardWidth =
         MediaQuery.of(context).size.width / 2 - 2 * ThemeHelper.cardSpacing();
     final presetCardHeight = presetCardWidth * 2 / 3;
+    final iconSize = (Theme.of(context).iconTheme.size ?? 24) *
+        ThemeHelper.largeIconSizeModifier;
+
     return WillPopScope(
       onWillPop: () => _onWillPop(context),
       child: Scaffold(
         backgroundColor: ThemeHelper.editViewBackground(context),
-        appBar: CustomizePresetAppbar(
-          onSave: () {
-            if (_validateAndSave()) {
-              Navigator.pop(context);
-            }
-          },
-          onRevert: () => setState(() {
-            _updatedPreset = widget.preset.copy();
-          }),
+        appBar: AppBar(
+          title: const Text('Customize Preset'),
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -90,6 +96,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     child: Text(
                       'Preview',
                       style: TextStyle(
+                        fontSize: ThemeHelper.subtitleFontSize,
                         color: ThemeHelper.editViewForeground(context),
                       ),
                     ),
@@ -99,17 +106,15 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                       width: presetCardWidth,
                       height: presetCardHeight,
                       child: PresetCard(
-                        preset: _updatedPreset,
+                        preset: widget.preset,
                         enabled: false,
                       ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Expanded(
-                      child: Divider(
-                        color: ThemeHelper.editViewForeground(context),
-                      ),
+                    child: Divider(
+                      color: ThemeHelper.editViewForeground(context),
                     ),
                   ),
                   Padding(
@@ -117,6 +122,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     child: Text(
                       'Settings',
                       style: TextStyle(
+                        fontSize: ThemeHelper.subtitleFontSize,
                         color: ThemeHelper.editViewForeground(context),
                       ),
                     ),
@@ -133,9 +139,9 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                         context,
                         label: 'Preset name',
                       ),
-                      initialValue: _updatedPreset.name,
+                      initialValue: widget.preset.name,
                       validator: _nameValidator,
-                      onSaved: (value) => _updatedPreset.name = value ?? '',
+                      onSaved: (value) => widget.preset.name = value ?? '',
                     ),
                   ),
                   Padding(
@@ -150,48 +156,52 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                         context,
                         label: 'Game title',
                       ),
-                      initialValue: _updatedPreset.game,
-                      onSaved: (value) => _updatedPreset.game = value ?? '',
+                      initialValue: widget.preset.game,
+                      onSaved: (value) => widget.preset.game = value ?? '',
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: DialogSelectInput(
-                      value: _updatedPreset.iconCode,
+                      value: widget.preset.iconCode,
                       onSelected: (iconCode) => setState(() {
-                        _updatedPreset.iconCode = iconCode;
+                        widget.preset.iconCode = iconCode;
                       }),
                       itemLabelMap: ThemeHelper.presetIconCodes,
                       itemBuilder: (item) => iconFromCode(
                         iconCode: item,
                         color: ThemeHelper.dialogForeground(context),
-                        size: 30,
+                        size: iconSize,
                       ),
                       label: 'Icon',
-                      dialogTitle: 'Pick an icon',
-                      iconCode: _updatedPreset.iconCode,
+                      dialogTitle: 'Pick an Icon',
+                      iconCode: widget.preset.iconCode,
                       iconColor: ThemeHelper.editViewForeground(context),
-                      iconSize: 30,
+                      iconSize: iconSize,
+                      heightDivisor: 2,
+                      itemsPerRow: 6,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: DialogSelectInput(
-                      value: _updatedPreset.backgroundColor,
+                      value: widget.preset.backgroundColor,
                       onSelected: (color) => setState(() {
-                        _updatedPreset.backgroundColor = color;
+                        widget.preset.backgroundColor = color;
                       }),
                       itemLabelMap: ThemeHelper.cardBackgroundColors,
                       itemBuilder: (item) => Icon(
                         Icons.circle,
                         color: item,
-                        size: 30,
+                        size: iconSize * 1.8, // larger for easier selection
                       ),
                       label: 'Color',
-                      dialogTitle: 'Pick a color',
+                      dialogTitle: 'Pick a Color',
                       iconCode: Icons.circle.codePoint,
-                      iconColor: _updatedPreset.backgroundColor,
-                      iconSize: 30,
+                      iconColor: widget.preset.backgroundColor,
+                      iconSize: iconSize,
+                      heightDivisor: 4.0,
+                      itemsPerRow: 4,
                     ),
                   ),
                 ],

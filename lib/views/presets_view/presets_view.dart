@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/preset_model.dart';
-import '../table_board/table_board.dart';
+import '../preset_dashboard_view/preset_dashboard_view.dart';
 import 'appbar/presets_appbar.dart';
 import 'card/preset_card_more_button.dart';
 
@@ -41,7 +41,8 @@ class _PresetsViewState extends State<PresetsView> {
     final colorIndex = random.nextInt(ThemeHelper.cardBackgroundColors.length);
     var randomIconCode =
         ThemeHelper.presetIconCodes.keys.elementAt(iconCodeIndex);
-    var randomColor = ThemeHelper.cardBackgroundColors.keys.elementAt(colorIndex);
+    var randomColor =
+        ThemeHelper.cardBackgroundColors.keys.elementAt(colorIndex);
     var newPreset = PresetModel(
       name: 'Title (Tap to Edit)',
       iconCode: randomIconCode,
@@ -49,22 +50,24 @@ class _PresetsViewState extends State<PresetsView> {
     );
 
     // Open Preset creation view.
-    // TODO: There should be a callback for preset list update from
-    // TODO: DashboardWidget (for auto-save, delayed preset creation etc.) or
-    // TODO: the preset storing should be global (possibly the better solution).
-    // TODO: See: https://stackoverflow.com/questions/48582963/flutter-how-to-execute-when-clicking-back-button
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DashboardWidget(preset: newPreset),
+        builder: (context) => PresetDashboardView(
+          preset: newPreset,
+          onClose: (updatedPreset, widgets) {
+            // Save the new Preset (if not empty).
+            if (widgets.isNotEmpty) {
+              presets.add(updatedPreset);
+              _updateRenderedPresets();
+              _storePresets();
+            } else {
+              _removePreset(updatedPreset.id);
+            }
+          },
+        ),
       ),
     );
-
-    // Save the new Preset (if not empty).
-    // TODO: Drop empty presets on creation.
-    presets.add(newPreset);
-    _updateRenderedPresets();
-    _storePresets();
   }
 
   /// Removes the selected Preset.
@@ -117,7 +120,7 @@ class _PresetsViewState extends State<PresetsView> {
           compareResult = a.game.compareTo(b.game);
           break;
         case PresetsAppbarSortOption.byOpenedCount:
-          compareResult = a.openedCount.compareTo(b.openedCount);
+          compareResult = b.openedCount.compareTo(a.openedCount);
           break;
       }
 
@@ -195,14 +198,6 @@ class _PresetsViewState extends State<PresetsView> {
           ),
         );
         break;
-      case PresetCardMoreOption.edit:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DashboardWidget(preset: preset),
-          ),
-        );
-        break;
       case PresetCardMoreOption.remove:
         showDialog(
           context: context,
@@ -216,10 +211,24 @@ class _PresetsViewState extends State<PresetsView> {
     }
   }
 
+  /// Updates preset state on preset dashboard view close.
+  void _handleExistingPresetClose(
+    PresetModel updatedPreset,
+    Map<String, dynamic> _,
+  ) {
+    // Increase preset usage count.
+    updatedPreset.openedCount++;
+
+    // Save the preset.
+    var index = presets.indexWhere((preset) => preset.id == updatedPreset.id);
+    presets[index] = updatedPreset;
+    _storePresets();
+    _updateRenderedPresets();
+  }
+
   /// Stores presets into the local storage
   void _storePresets() async {
     storage = await SharedPreferences.getInstance();
-    // TODO: jsonEncode seems to throw exceptions now after icons were added.
     await storage.setString('presets', jsonEncode(presets));
   }
 
@@ -267,7 +276,10 @@ class _PresetsViewState extends State<PresetsView> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DashboardWidget(preset: preset),
+                  builder: (context) => PresetDashboardView(
+                    preset: preset,
+                    onClose: _handleExistingPresetClose,
+                  ),
                 ),
               );
             },

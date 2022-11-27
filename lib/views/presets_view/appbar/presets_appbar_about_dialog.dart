@@ -14,7 +14,6 @@ class PresetsAppbarAboutDialog extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(top: 20),
-          // TODO: Proper description
           child: Text(
               'Board Aid provides customisable presets of widgets that can be '
               'modified to satisfy all of you board game needs!'),

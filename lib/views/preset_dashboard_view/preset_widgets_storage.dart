@@ -5,70 +5,19 @@ import 'package:dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../widgets/chess_timer_widget/chess_timer_widget.dart';
+import '../../widgets/chess_timer_widget/chess_timer_widget_data.dart';
 import '../../widgets/counter_widget/counter_widget.dart';
 import '../../widgets/counter_widget/counter_widget_data.dart';
 import '../../widgets/dice_widget/dice_widget.dart';
 import '../../widgets/dice_widget/dice_widget_data.dart';
 import '../../widgets/timer_widget/timer_widget.dart';
 import '../../widgets/timer_widget/timer_widget_data.dart';
-import '../../widgets/chess_timer_widget/chess_timer_widget.dart';
-import '../../widgets/chess_timer_widget/chess_timer_widget_data.dart';
+import 'colored_dashboard_item.dart';
 
-class ColoredDashboardItem extends DashboardItem {
-  ColoredDashboardItem(
-      {this.color,
-      required int width,
-      required int height,
-      required String identifier,
-      required this.type,
-      required this.data,
-      int minWidth = 1,
-      int minHeight = 1,
-      int? maxHeight = 1,
-      int? maxWidth = 2,
-      int? startX,
-      int? startY})
-      : super(
-            startX: startX,
-            startY: startY,
-            width: width,
-            height: height,
-            identifier: identifier,
-            maxHeight: maxHeight,
-            maxWidth: maxWidth,
-            minWidth: minWidth,
-            minHeight: minHeight);
-
-  ColoredDashboardItem.fromMap(Map<String, dynamic> map)
-      : color = map["color"] != null ? Color(map["color"]) : null,
-        type = map['type'],
-        data = map['data'],
-        super.withLayout(map["item_id"], ItemLayout.fromMap(map["layout"]));
-
-  Color? color;
-  String type;
-  String data;
-
-  @override
-  Map<String, dynamic> toMap() {
-    var sup = super.toMap();
-    if (color != null) {
-      sup["color"] = color?.value;
-    }
-    sup['type'] = type;
-    sup['data'] = data;
-
-    return sup;
-  }
-
-  int getWidth() {
-    return super.toMap()['layout']['w'];
-  }
-
-}
-
-class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
-  MyItemStorage(this.presetLink);
+class PresetWidgetsStorage
+    extends DashboardItemStorageDelegate<ColoredDashboardItem> {
+  PresetWidgetsStorage(this.presetLink);
 
   String presetLink;
   late SharedPreferences _preferences;
@@ -79,26 +28,26 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
 
   final Map<String, Widget Function(String i, bool e, int w)> _widgetMap = {
     'counter': (l, e, w) => CounterWidget(
-      key: GlobalKey(),
-      initData: CounterWidgetData.fromJson(jsonDecode(l)),
-      startEditing: e,
-      width: w,
-    ),
+          key: GlobalKey(),
+          initData: CounterWidgetData.fromJson(jsonDecode(l)),
+          startEditing: e,
+          width: w,
+        ),
     'dice': (l, e, w) => DiceWidget(
-      key: GlobalKey(),
-      initData: DiceWidgetData.fromJson(jsonDecode(l)),
-      startEditing: e,
-    ),
+          key: GlobalKey(),
+          initData: DiceWidgetData.fromJson(jsonDecode(l)),
+          startEditing: e,
+        ),
     'timer': (l, e, w) => TimerWidget(
-      key: GlobalKey(),
-      initData: TimerWidgetData.fromJson(jsonDecode(l)),
-      startEditing: e,
-    ),
+          key: GlobalKey(),
+          initData: TimerWidgetData.fromJson(jsonDecode(l)),
+          startEditing: e,
+        ),
     'chess_timer': (l, e, w) => ChessTimerWidget(
-      key: GlobalKey(),
-      initData: ChessTimerWidgetData.fromJson(jsonDecode(l)),
-      startEditing: e,
-    )
+          key: GlobalKey(),
+          initData: ChessTimerWidgetData.fromJson(jsonDecode(l)),
+          startEditing: e,
+        )
   };
 
   final Map<String, String> defaultData = {
@@ -109,16 +58,11 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
         defaultIndex: 4,
         isLeftDeath: false,
         isRightDeath: false)),
-    'dice': jsonEncode(DiceWidgetData(
-        name: 'Dice',
-        numberOfDice: 2,
-        numberOfSides: 2)),
-    'timer': jsonEncode(TimerWidgetData(
-        name: 'Timer',
-        initialTime: 90)),
-    'chess_timer': jsonEncode(ChessTimerWidgetData(
-        name: 'Chess timer',
-        initialTimes: [90, 90])),
+    'dice': jsonEncode(
+        DiceWidgetData(name: 'Dice', numberOfDice: 2, numberOfSides: 2)),
+    'timer': jsonEncode(TimerWidgetData(name: 'Timer', initialTime: 90)),
+    'chess_timer': jsonEncode(
+        ChessTimerWidgetData(name: 'Chess timer', initialTimes: [90, 90])),
   };
 
   late final Map<int, List<ColoredDashboardItem>> _default = {
@@ -149,8 +93,7 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
           startX: 0,
           startY: 1,
           type: 'timer',
-          data: defaultData['timer']!
-      ),
+          data: defaultData['timer']!),
       ColoredDashboardItem(
           width: 2,
           minWidth: 2,
@@ -159,12 +102,11 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
           startX: 0,
           startY: 1,
           type: 'chess_timer',
-          data: defaultData['chess_timer']!
-      ),
+          data: defaultData['chess_timer']!),
     ],
   };
 
-  dynamic buildWidget(ColoredDashboardItem item){
+  dynamic buildWidget(ColoredDashboardItem item) {
     return _widgetMap[item.type]!(item.data, _editing, item.getWidth());
   }
 
@@ -234,7 +176,7 @@ class MyItemStorage extends DashboardItemStorageDelegate<ColoredDashboardItem> {
     }
 
     for (var id in widgets!.keys) {
-      if (widgets![id].key.currentState == null){
+      if (widgets![id].key.currentState == null) {
         return;
       }
       _localItems?[slotCount]?[id]?.data =

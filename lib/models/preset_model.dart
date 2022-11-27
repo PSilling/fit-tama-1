@@ -49,15 +49,4 @@ class PresetModel {
         'openedCount': openedCount,
         'backgroundColor': backgroundColor.value,
       };
-
-  /// Creates a deep copy of the preset.
-  PresetModel copy() => PresetModel(
-        id: id,
-        name: name,
-        game: game,
-        iconCode: iconCode,
-        isFavourite: isFavourite,
-        openedCount: openedCount,
-        backgroundColor: backgroundColor,
-      );
 }

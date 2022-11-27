@@ -16,6 +16,8 @@ class DialogSelectInput extends StatelessWidget {
     this.iconCode,
     this.iconColor,
     this.iconSize,
+    this.heightDivisor = 2,
+    this.itemsPerRow = 6,
   });
 
   final dynamic value;
@@ -27,6 +29,8 @@ class DialogSelectInput extends StatelessWidget {
   final int? iconCode;
   final Color? iconColor;
   final double? iconSize;
+  final double heightDivisor;
+  final int itemsPerRow;
 
   /// Opens the icon selection dialog.
   void _openSelectDialog(BuildContext context) {
@@ -44,11 +48,11 @@ class DialogSelectInput extends StatelessWidget {
         backgroundColor: ThemeHelper.dialogBackground(context),
         content: SizedBox(
           width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height / 3,
+          height: MediaQuery.of(context).size.height / heightDivisor,
           child: GridView.builder(
             padding: EdgeInsets.all(ThemeHelper.selectDialogItemSpacing()),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 8,
+              crossAxisCount: itemsPerRow,
               childAspectRatio: 1,
               crossAxisSpacing: ThemeHelper.selectDialogItemSpacing() / 2,
               mainAxisSpacing: ThemeHelper.selectDialogItemSpacing() / 2,

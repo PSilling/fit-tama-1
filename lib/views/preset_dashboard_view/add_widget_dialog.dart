@@ -1,8 +1,8 @@
 import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
-class AddDialog extends StatelessWidget {
-  const AddDialog({Key? key}) : super(key: key);
+class AddWidgetDialog extends StatelessWidget {
+  const AddWidgetDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +20,8 @@ class AddDialog extends StatelessWidget {
                   child: Text(
                     "Add widget",
                     style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      color: ThemeHelper.dialogForeground(context),
-                    ),
+                          color: ThemeHelper.dialogForeground(context),
+                        ),
                   ),
                 ),
                 Padding(
@@ -29,8 +29,8 @@ class AddDialog extends StatelessWidget {
                   child: Text(
                     "One position wide widgets",
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: ThemeHelper.dialogForeground(context),
-                    ),
+                          color: ThemeHelper.dialogForeground(context),
+                        ),
                   ),
                 ),
                 IntrinsicWidth(
@@ -66,8 +66,8 @@ class AddDialog extends StatelessWidget {
                   child: Text(
                     "Two positions wide widgets",
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: ThemeHelper.dialogForeground(context),
-                    ),
+                          color: ThemeHelper.dialogForeground(context),
+                        ),
                   ),
                 ),
                 IntrinsicWidth(

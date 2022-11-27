@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 /// Utilizes styles of the given [BuildContext] - which should be one of:
 /// [lightTheme], [darkTheme].
 class ThemeHelper {
-
   static Color floaterBackgroundColor(BuildContext context) {
     return Theme.of(context).colorScheme.primary;
   }
@@ -40,21 +39,44 @@ class ThemeHelper {
     return Theme.of(context).colorScheme.onTertiary;
   }
 
-  // TODO: Update the color list to fit our theme (both light and dark).
+  /// Padding for horizontally adjacent card action icons.
+  static EdgeInsets cardIconPadding() {
+    return const EdgeInsets.only(left: 14.0);
+  }
+
+  /// Padding for icons in select dialogs.
+  static EdgeInsets selectDialogIconPadding() {
+    return const EdgeInsets.all(8.0);
+  }
+
+  /// Spacing between items in selection dialogs.
+  static double selectDialogItemSpacing() {
+    return 8.0;
+  }
+
   /// Colors available as a preset card or widget background.
   /// Text with [cardForegroundColor] should be visible on these.
   static final Map<Color, String> cardBackgroundColors = {
-    Colors.red: 'Red',
-    Colors.green: 'Green',
-    Colors.blue: 'Blue',
-    Colors.orange: 'Orange',
-    Colors.brown: 'Brown',
-    Colors.pink: 'Pink',
-    Colors.purple: 'Purple',
+    Colors.pink.shade300: 'Pink',
+    Colors.red.shade500: 'Red',
+    Colors.redAccent.shade200: 'Red Variant',
+    Colors.orange.shade600: 'Orange',
+    Colors.amber.shade900: 'Amber',
+    Colors.lime.shade700: 'Lime',
+    Colors.green.shade500: 'Green',
+    Colors.lightGreen.shade700: 'Green Variant',
+    Colors.teal.shade400: 'Teal',
+    Colors.cyan.shade600: 'Cyan',
+    Colors.green.shade500: 'Green',
+    Colors.blue.shade500: 'Blue',
+    Colors.lightBlue.shade600: 'Blue Variant',
+    Colors.indigo.shade300: 'Indigo',
+    Colors.purple.shade300: 'Purple',
+    Colors.green.shade500: 'Green',
+    Colors.blueGrey.shade400: 'Blue-Gray',
+    Colors.brown.shade400: 'Brown',
   };
 
-  // TODO: Update the icon list so that it makes more sense.
-  // TODO: IconData codes: https://raw.githubusercontent.com/flutter/flutter/master/packages/flutter/lib/src/material/icons.dart
   /// Codes of available preset card icons.
   static const Map<int, String> presetIconCodes = {
     0xe038: 'access_alarm',
@@ -90,37 +112,76 @@ class ThemeHelper {
     0xe115: 'bug_report',
     0xe116: 'build',
     0xe11c: 'business_center',
+    0xe11d: 'cabin',
+    0xe12e: 'call_to_action',
+    0xe130: 'camera_alt',
+    0xe132: 'camera_front',
+    0xe138: 'campaign',
+    0xf04ca: 'candlestick_chart',
+    0xe13f: 'card_membership',
+    0xe140: 'card_travel',
+    0xf04cb: 'castle',
+    0xe148: 'category',
+    0xe149: 'celebration',
+    0xe14d: 'chair',
+    0xe154: 'chat_bubble',
+    0xe15d: 'checkroom',
+    0xe160: 'child_care',
+    0xe162: 'chrome_reader_mode',
+    0xe164: 'circle_notifications',
+    0xf641: 'class_rounded',
+    0xe16f: 'cloud',
+    0xf04d1: 'co_present',
+    0xf04d9: 'cookie',
+    0xe19b: 'cottage',
+    0xf0796: 'curtains_closed',
+    0xef80: 'cut_outlined',
+    0xf0797: 'cyclone',
+    0xe1b1: 'dashboard',
+    0xf0798: 'dataset',
+    0xe1b6: 'date_range',
+    0xf04ed: 'diamond',
+    0xe1d7: 'directions_car',
+    0xe1d5: 'directions_bus',
+    0xe1d3: 'directions_boat',
+    0xe1e5: 'dns',
+    0xe1f1: 'dock',
+    0xf04f8: 'egg',
+    0xe22b: 'emoji_emotions',
+    0xe22c: 'emoji_events',
+    0xe22d: 'emoji_flags',
+    0xe230: 'emoji_objects',
   };
 
   /// Use this for game widget main titles.
   static TextStyle widgetTitle(BuildContext context) {
     return Theme.of(context).textTheme.headlineMedium!.copyWith(
-      color: cardForegroundColor(context),
-    );
+          color: cardForegroundColor(context),
+        );
   }
 
   /// Use this for game widget bottom titles.
   static TextStyle widgetTitleBottom(BuildContext context) {
     return Theme.of(context).textTheme.headlineSmall!.copyWith(
-      color: cardForegroundColor(context),
-    );
+          color: cardForegroundColor(context),
+        );
   }
 
   /// Use this for the main content of the game widget titles.
   /// Size should be adjusted based on the available space.
   static TextStyle widgetContentMain(BuildContext context) {
     return Theme.of(context).textTheme.titleLarge!.copyWith(
-      color: cardForegroundColor(context),
-    );
+          color: cardForegroundColor(context),
+        );
   }
 
   /// Use this for the secondary content of the game widget titles.
   /// Size should be adjusted based on the available space.
   static TextStyle widgetContentSecondary(BuildContext context) {
     return Theme.of(context).textTheme.titleLarge!.copyWith(
-      color: cardForegroundColor(context).withOpacity(0.7),
-      fontWeight: Theme.of(context).textTheme.headlineLarge?.fontWeight,
-    );
+          color: cardForegroundColor(context).withOpacity(0.7),
+          fontWeight: Theme.of(context).textTheme.headlineLarge?.fontWeight,
+        );
   }
 
   /// Used for highlighting text in dialogs that should stand out.
@@ -141,9 +202,10 @@ class ThemeHelper {
   /// Decoration for form fields in dialogs.
   static InputDecoration dialogInputDecoration(BuildContext context,
       {String? label,
-        bool? isDense, String? errorText,
-        bool hasBorder = true,
-        bool hasPadding = true}) {
+      bool? isDense,
+      String? errorText,
+      bool hasBorder = true,
+      bool hasPadding = true}) {
     return InputDecoration(
       labelText: label,
       errorText: errorText,
@@ -158,18 +220,24 @@ class ThemeHelper {
       ),
       errorBorder: hasBorder ? null : InputBorder.none,
       disabledBorder: hasBorder ? null : InputBorder.none,
-      enabledBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: dialogForeground(context).withOpacity(0.5),
-          )) : InputBorder.none,
-      focusedBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: dialogForeground(context),
-          )) : InputBorder.none,
-      focusedErrorBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.onError,
-          )) : InputBorder.none,
+      enabledBorder: hasBorder
+          ? UnderlineInputBorder(
+              borderSide: BorderSide(
+              color: dialogForeground(context).withOpacity(0.5),
+            ))
+          : InputBorder.none,
+      focusedBorder: hasBorder
+          ? UnderlineInputBorder(
+              borderSide: BorderSide(
+              color: dialogForeground(context),
+            ))
+          : InputBorder.none,
+      focusedErrorBorder: hasBorder
+          ? UnderlineInputBorder(
+              borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.onError,
+            ))
+          : InputBorder.none,
       contentPadding: hasPadding ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
     );
   }
@@ -187,9 +255,10 @@ class ThemeHelper {
   /// Decoration for form fields in edit views.
   static InputDecoration editViewInputDecoration(BuildContext context,
       {String? label,
-        bool? isDense, String? errorText,
-        bool hasBorder = true,
-        bool hasPadding = true}) {
+      bool? isDense,
+      String? errorText,
+      bool hasBorder = true,
+      bool hasPadding = true}) {
     return InputDecoration(
       labelText: label,
       errorText: errorText,
@@ -204,21 +273,33 @@ class ThemeHelper {
       ),
       errorBorder: hasBorder ? null : InputBorder.none,
       disabledBorder: hasBorder ? null : InputBorder.none,
-      enabledBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: editViewForeground(context).withOpacity(0.5),
-          )) : InputBorder.none,
-      focusedBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: editViewForeground(context),
-          )) : InputBorder.none,
-      focusedErrorBorder: hasBorder ? UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.onError,
-          )) : InputBorder.none,
+      enabledBorder: hasBorder
+          ? UnderlineInputBorder(
+              borderSide: BorderSide(
+              color: editViewForeground(context).withOpacity(0.5),
+            ))
+          : InputBorder.none,
+      focusedBorder: hasBorder
+          ? UnderlineInputBorder(
+              borderSide: BorderSide(
+              color: editViewForeground(context),
+            ))
+          : InputBorder.none,
+      focusedErrorBorder: hasBorder
+          ? UnderlineInputBorder(
+              borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.onError,
+            ))
+          : InputBorder.none,
       contentPadding: hasPadding ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
     );
   }
+
+  /// Size modifier for icons that should be bigger than usual
+  static const double largeIconSizeModifier = 1.4;
+
+  /// Font size for subtitle text
+  static const double subtitleFontSize = 18;
 
   /// Spacing between chips in forms across the application
   static const double dialogChipSpacing = 10;
@@ -247,11 +328,6 @@ class ThemeHelper {
 
   /// Border radius to use across the application.
   static double borderRadius() {
-    return 8.0;
-  }
-
-  /// Spacing between items in selection dialogs.
-  static double selectDialogItemSpacing() {
     return 8.0;
   }
 

@@ -39,7 +39,8 @@ class PresetCard extends StatelessWidget {
                   child: iconFromCode(
                     iconCode: preset.iconCode,
                     color: ThemeHelper.cardForegroundColor(context),
-                    size: 30,
+                    size: (Theme.of(context).iconTheme.size ?? 24) *
+                        ThemeHelper.largeIconSizeModifier,
                   ),
                 ),
                 Expanded(
@@ -50,8 +51,8 @@ class PresetCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: ThemeHelper.cardForegroundColor(context),
-                      ),
+                            color: ThemeHelper.cardForegroundColor(context),
+                          ),
                     ),
                   ),
                 ),
@@ -62,8 +63,8 @@ class PresetCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: ThemeHelper.cardForegroundColor(context),
-                    ),
+                          color: ThemeHelper.cardForegroundColor(context),
+                        ),
                   ),
                 ),
               ],
@@ -74,16 +75,16 @@ class PresetCard extends StatelessWidget {
               child: Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 12),
+                    padding: ThemeHelper.cardIconPadding(),
                     child: enabled
                         ? InkResponse(
-                            radius: 20,
+                            radius: Theme.of(context).iconTheme.size,
                             onTap: onFavouritePressed ?? () {},
                             child: Icon(
                               preset.isFavourite
                                   ? Icons.favorite
                                   : Icons.favorite_border,
-                              size: 20,
+                              size: Theme.of(context).iconTheme.size,
                               color: ThemeHelper.cardForegroundColor(context),
                             ),
                           )
@@ -91,14 +92,14 @@ class PresetCard extends StatelessWidget {
                             preset.isFavourite
                                 ? Icons.favorite
                                 : Icons.favorite_border,
-                            size: 20,
+                            size: Theme.of(context).iconTheme.size,
                             color: ThemeHelper.cardForegroundColor(context),
                           ),
                   ),
                   PresetCardMoreButton(
                     onSelected: onMoreSelected ?? (_) {},
                     enabled: enabled,
-                    size: 20,
+                    size: Theme.of(context).iconTheme.size,
                   ),
                 ],
               ),

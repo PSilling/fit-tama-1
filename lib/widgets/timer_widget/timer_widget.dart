@@ -12,8 +12,8 @@ class TimerWidget extends StatefulWidget {
   final TimerWidgetData initData;
   final bool startEditing;
 
-  const TimerWidget({super.key,
-    required this.initData, required this.startEditing});
+  const TimerWidget(
+      {super.key, required this.initData, required this.startEditing});
 
   @override
   State<StatefulWidget> createState() => TimerWidgetState();
@@ -21,7 +21,8 @@ class TimerWidget extends StatefulWidget {
 
 enum TimerWidgetTimerState { init, running, paused }
 
-class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidget> {
+class TimerWidgetState extends State<TimerWidget>
+    implements Editable<TimerWidget> {
   late int _currentTime = _data.initialTime;
   TimerWidgetTimerState _currentState = TimerWidgetTimerState.init;
   bool _isEditing = false;
@@ -45,6 +46,14 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
     super.initState();
   }
 
+  @override
+  void dispose() {
+    if (_currentState != TimerWidgetTimerState.init) {
+      _countdownTimer.cancel();
+    }
+    super.dispose();
+  }
+
   TimerWidgetData get data => _data;
 
   void run() {
@@ -56,7 +65,7 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
 
   void pause() {
     setState(() {
-      if(_currentState != TimerWidgetTimerState.init){
+      if (_currentState != TimerWidgetTimerState.init) {
         _currentState = TimerWidgetTimerState.paused;
         _countdownTimer.cancel();
       }
@@ -129,15 +138,15 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
   }
 
   Widget _titleWidget(BuildContext context) => FittedBox(
-      fit: BoxFit.contain,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
-        child: Text(
-          _data.name,
-          style: ThemeHelper.widgetTitle(context),
+        fit: BoxFit.contain,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
+          child: Text(
+            _data.name,
+            style: ThemeHelper.widgetTitle(context),
+          ),
         ),
-      ),
-    );
+      );
 
   Widget _timeWidget(BuildContext context) {
     return Padding(
@@ -151,10 +160,13 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
               Text(
                 formatTime(_currentTime),
                 style: _currentTime <= 0
-                    ? ThemeHelper.widgetContentMain(context).copyWith(color: Theme.of(context).colorScheme.error)
+                    ? ThemeHelper.widgetContentMain(context)
+                        .copyWith(color: Theme.of(context).colorScheme.error)
                     : ThemeHelper.widgetContentMain(context),
               ),
-              FontSpacer(text: formatTime(-data.initialTime.abs()), style: ThemeHelper.widgetContentMain(context)),
+              FontSpacer(
+                  text: formatTime(-data.initialTime.abs()),
+                  style: ThemeHelper.widgetContentMain(context)),
             ],
           ),
         ),
@@ -208,12 +220,10 @@ class TimerWidgetState extends State<TimerWidget> implements Editable<TimerWidge
                 context: context,
                 semanticLabel: "Resume the timer",
               ),
-              _themedIconButton(
-                Icons.replay,
-                onPressed: reset,
-                context: context,
-                semanticLabel: "Reset the timer"
-              ),
+              _themedIconButton(Icons.replay,
+                  onPressed: reset,
+                  context: context,
+                  semanticLabel: "Reset the timer"),
             ],
           ],
         ),
