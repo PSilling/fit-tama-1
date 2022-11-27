@@ -22,13 +22,19 @@ class ChessTimerEditDialogState extends State<ChessTimerEditDialog> {
   final List<int> _numTimersPossible = [2, 3];
   late _SeparateTimesSet _separateTimeSet;
   late List<int> _outputs;
+  late int _outputLength;
 
   late List<FormBuilderTextField> timeInputFields;
 
   @override
   void initState(){
     _separateTimeSet = _SeparateTimesSet.fromData(isSeparate: widget.data.isSeparate);
-    _outputs = List<int>.generate(_numTimersPossible.reduce(max), (index) => 0);
+    _outputs = List.from(widget.data.initialTimes);
+    for(int i = 0; i <= _numTimersPossible.reduce(max) - _outputs.length; i++){
+      _outputs.add(_outputs[0]);
+    }
+    print(_outputs);
+    _outputLength = widget.data.initialTimes.length;
     super.initState();
   }
 
@@ -53,9 +59,10 @@ class ChessTimerEditDialogState extends State<ChessTimerEditDialog> {
 
       if (_separateTimeSet == _SeparateTimesSet.together){
         widget.data.initialTimes = List
-            .generate(widget.data.initialTimes.length, (index) => _outputs[0]);
+            .generate(_outputLength, (index) => _outputs[0]);
       } else {
-        for(var i = 0; i < widget.data.initialTimes.length; i++){
+        widget.data.initialTimes = List.generate(_outputLength, (index) => 0);
+        for(var i = 0; i < _outputLength; i++){
           widget.data.initialTimes[i] = _outputs[i];
         }
       }
@@ -90,17 +97,10 @@ class ChessTimerEditDialogState extends State<ChessTimerEditDialog> {
                   activeColor: ThemeHelper.dialogForeground(context),
                   decoration: ThemeHelper.dialogInputDecoration(context, label: "Number of timers"),
                   name: "num_timers",
-                  initialValue: widget.data.initialTimes.length.toString(),
+                  initialValue: _outputLength.toString(),
                   onChanged: (val) {
-                    if (val != null){
-                      while(int.parse(val) > widget.data.initialTimes.length){
-                        widget.data.initialTimes.add(widget.data.initialTimes[0]);
-                      }
-                      while(int.parse(val) < widget.data.initialTimes.length){
-                        widget.data.initialTimes.removeAt(widget.data.initialTimes.length - 1);
-                      }
-                      setState(() {});
-                    }
+                    _outputLength = int.parse(val!);
+                    setState(() {});
                   },
                   options: List<FormBuilderFieldOption<String>>.generate(_numTimersPossible.length,
                     (i) {
@@ -134,7 +134,7 @@ class ChessTimerEditDialogState extends State<ChessTimerEditDialog> {
               ),
               for(var i = 0; i < _numTimersPossible.reduce(max); i++)
                 Visibility(
-                  visible: i < 1 || (_separateTimeSet == _SeparateTimesSet.separate && i < widget.data.initialTimes.length),
+                  visible: i < 1 || (_separateTimeSet == _SeparateTimesSet.separate && i < _outputLength),
                   child:
                   FormBuilderTextField(
                     style: TextStyle(
@@ -142,10 +142,13 @@ class ChessTimerEditDialogState extends State<ChessTimerEditDialog> {
                     ),
                     cursorColor: ThemeHelper.dialogForeground(context),
                     name: "initial_time_$i",
-                    decoration: ThemeHelper.dialogInputDecoration(context, label: "Initial time of player ${i+1}"),
+                    decoration: ThemeHelper.dialogInputDecoration(context,
+                      label: _separateTimeSet == _SeparateTimesSet.separate
+                        ? 'Initial time of player ${i+1}'
+                        : 'Initial time of all timers'),
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.done,
-                    initialValue: i < widget.data.initialTimes.length ? "${widget.data.initialTimes[i]}" : "",
+                    initialValue: '${_outputs[i]}',
                     validator: _numberValidator,
                     onSaved: (value) {_outputs[i] = int.parse(value!);}
                   )
@@ -188,10 +191,6 @@ enum _SeparateTimesSet {
       case _SeparateTimesSet.separate:
         return "Separate";
     }
-  }
-
-  static bool isSeparate({required String? value}) {
-    return value == _SeparateTimesSet.separate.label;
   }
 
   FormBuilderFieldOption<String> getOption(BuildContext context) {
