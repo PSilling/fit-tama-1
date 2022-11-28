@@ -5,16 +5,16 @@ import 'package:board_aid/util/themes.dart';
 import 'package:board_aid/widgets/font_spacer.dart';
 import 'package:flutter/material.dart';
 
+import '../../views/edit_views/edit_chess_timer_widget_view.dart';
 import '../editable.dart';
 import 'chess_timer_widget_data.dart';
-import 'chess_timer_edit_dialog.dart';
 
 class ChessTimerWidget extends StatefulWidget {
   final ChessTimerWidgetData initData;
   final bool startEditing;
 
-  const ChessTimerWidget({super.key,
-    required this.initData, required this.startEditing});
+  const ChessTimerWidget(
+      {super.key, required this.initData, required this.startEditing});
 
   @override
   State<StatefulWidget> createState() => ChessTimerWidgetState();
@@ -22,8 +22,8 @@ class ChessTimerWidget extends StatefulWidget {
 
 enum TimerWidgetTimerState { init, running, paused }
 
-class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<ChessTimerWidget> {
-
+class ChessTimerWidgetState extends State<ChessTimerWidget>
+    implements Editable<ChessTimerWidget> {
   late int _numTimers;
   int _activeTimer = 0;
 
@@ -45,35 +45,41 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
       _isEditing = editing;
     });
   }
-  
-  bool get allInit => _currentStates
-      .fold(true, (prev, elem) => prev && elem == TimerWidgetTimerState.init);
-  bool get anyRunning => _currentStates
-      .fold(false, (prev, elem) => prev || elem == TimerWidgetTimerState.running);
-  bool get allPausedOrInit => _currentStates
-      .fold(true, (prev, elem) => prev &&
-        [TimerWidgetTimerState.paused, TimerWidgetTimerState.init].contains(elem))
-      && ! allInit;
+
+  bool get allInit => _currentStates.fold(
+      true, (prev, elem) => prev && elem == TimerWidgetTimerState.init);
+  bool get anyRunning => _currentStates.fold(
+      false, (prev, elem) => prev || elem == TimerWidgetTimerState.running);
+  bool get allPausedOrInit =>
+      _currentStates.fold(
+          true,
+          (prev, elem) =>
+              prev &&
+              [TimerWidgetTimerState.paused, TimerWidgetTimerState.init]
+                  .contains(elem)) &&
+      !allInit;
 
   @override
   void initState() {
     _numTimers = widget.initData.initialTimes.length;
     _isEditing = widget.startEditing;
     _data = widget.initData;
-    _currentStates = List<TimerWidgetTimerState>
-        .generate(_numTimers, (index) => TimerWidgetTimerState.init);
+    _currentStates = List<TimerWidgetTimerState>.generate(
+        _numTimers, (index) => TimerWidgetTimerState.init);
     _countdownTimers = List<Timer?>.generate(_numTimers, (index) => null);
     super.initState();
   }
 
   void runTimer(int t) {
     setState(() {
-      _countdownTimers[t] = Timer(const Duration(seconds: 1), () {updateTimer(t);});
+      _countdownTimers[t] = Timer(const Duration(seconds: 1), () {
+        updateTimer(t);
+      });
       _currentStates[t] = TimerWidgetTimerState.running;
     });
   }
 
-  void run(){
+  void run() {
     runTimer(_activeTimer);
   }
 
@@ -84,14 +90,14 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
     });
   }
 
-  void pause(){
+  void pause() {
     pauseTimer(_activeTimer);
   }
 
   void reset() {
     setState(() {
-      _currentStates = List<TimerWidgetTimerState>
-          .generate(_currentStates.length, (index) => TimerWidgetTimerState.init);
+      _currentStates = List<TimerWidgetTimerState>.generate(
+          _currentStates.length, (index) => TimerWidgetTimerState.init);
       _currentTimes = List.from(_data.initialTimes);
     });
   }
@@ -99,7 +105,9 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
   void updateTimer(int t) {
     setState(() {
       if (_currentStates[t] == TimerWidgetTimerState.running) {
-        _countdownTimers[t] = Timer(const Duration(seconds: 1), () {updateTimer(t);});
+        _countdownTimers[t] = Timer(const Duration(seconds: 1), () {
+          updateTimer(t);
+        });
         _currentTimes[t]--;
       }
     });
@@ -120,22 +128,22 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
     }
   }
 
-  String getPartString(String inp) => inp.substring((inp.length/1.25).round());
+  String getPartString(String inp) =>
+      inp.substring((inp.length / 1.25).round());
 
-  TextStyle getStyle(int i){
-
+  TextStyle getStyle(int i) {
     var contentType = i == _activeTimer
-      ? ThemeHelper.widgetContentMain(context)
-      : ThemeHelper.widgetContentSecondary(context);
+        ? ThemeHelper.widgetContentMain(context)
+        : ThemeHelper.widgetContentSecondary(context);
 
     return _currentTimes[i] <= 0
         ? contentType.copyWith(color: Theme.of(context).colorScheme.error)
         : contentType;
   }
 
-  void _onTap(){
+  void _onTap() {
     if (_isEditing) {
-      _showEditingDialog();
+      _openEditView();
       return;
     }
     switch (_currentStates[_activeTimer]) {
@@ -153,35 +161,38 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
     }
   }
 
-  void _showEditingDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => ChessTimerEditDialog(
-        data: _data,
-        setData: (data) {
-          setState(() {
-            _data = data;
-            _currentTimes = List.from(data.initialTimes);
-            _numTimers = data.initialTimes.length;
-            _currentStates = List<TimerWidgetTimerState>
-                .generate(_numTimers, (index) => TimerWidgetTimerState.init);
-            _countdownTimers = List<Timer?>.generate(_numTimers, (index) => null);
-          });
-        },
+  void _openEditView() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditChessTimerWidgetView(
+          data: _data,
+          setData: (data) {
+            setState(() {
+              _data = data;
+              _currentTimes = List.from(data.initialTimes);
+              _numTimers = data.initialTimes.length;
+              _currentStates = List<TimerWidgetTimerState>.generate(
+                  _numTimers, (index) => TimerWidgetTimerState.init);
+              _countdownTimers =
+                  List<Timer?>.generate(_numTimers, (index) => null);
+            });
+          },
+        ),
       ),
     );
   }
 
   Widget _titleWidget(BuildContext context) => FittedBox(
-    fit: BoxFit.contain,
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
-      child: Text(
-        _data.name,
-        style: ThemeHelper.widgetTitle(context),
-      ),
-    ),
-  );
+        fit: BoxFit.contain,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
+          child: Text(
+            _data.name,
+            style: ThemeHelper.widgetTitle(context),
+          ),
+        ),
+      );
 
   Widget _timeWidget(BuildContext context) {
     return Padding(
@@ -195,8 +206,9 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
               Row(
                 children: [
                   FontSpacer(
-                      text: getPartString(formatTime(-data.initialTimes.reduce(max).abs())),
-                      style: ThemeHelper.widgetContentMain(context),
+                    text: getPartString(
+                        formatTime(-data.initialTimes.reduce(max).abs())),
+                    style: ThemeHelper.widgetContentMain(context),
                   ),
                   for (int i = 0; i < _numTimers; i++) ...[
                     Transform.scale(
@@ -206,18 +218,18 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
                         style: getStyle(i),
                       ),
                     ),
-                    if (i+1 < _numTimers)
+                    if (i + 1 < _numTimers)
                       FontSpacer(
-                        text: getPartString(formatTime(-data.initialTimes.reduce(max).abs())),
-                        style: ThemeHelper.widgetContentMain(context)
-                      ),
+                          text: getPartString(
+                              formatTime(-data.initialTimes.reduce(max).abs())),
+                          style: ThemeHelper.widgetContentMain(context)),
                   ],
                   FontSpacer(
-                      text: getPartString(formatTime(-data.initialTimes.reduce(max).abs())),
-                      style: ThemeHelper.widgetContentMain(context)
-                  ),
-                ]
-              )
+                      text: getPartString(
+                          formatTime(-data.initialTimes.reduce(max).abs())),
+                      style: ThemeHelper.widgetContentMain(context)),
+                ],
+              ),
             ],
           ),
         ),
@@ -226,19 +238,19 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
   }
 
   Widget _themedIconButton(IconData? icon,
-    {required BuildContext context,
-      void Function()? onPressed,
-      required String semanticLabel}) =>
-    FittedBox(
-      fit: BoxFit.contain,
-      child: IconButton(
-        onPressed: onPressed,
-        iconSize: 1000,
-        icon: Icon(icon,
-            semanticLabel: semanticLabel,
-            color: ThemeHelper.widgetTitleBottom(context).color),
-      ),
-    );
+          {required BuildContext context,
+          void Function()? onPressed,
+          required String semanticLabel}) =>
+      FittedBox(
+        fit: BoxFit.contain,
+        child: IconButton(
+          onPressed: onPressed,
+          iconSize: 1000,
+          icon: Icon(icon,
+              semanticLabel: semanticLabel,
+              color: ThemeHelper.widgetTitleBottom(context).color),
+        ),
+      );
 
   Widget _buttonWidget(BuildContext context) {
     return FractionallySizedBox(
@@ -271,14 +283,12 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
                 context: context,
                 semanticLabel: "Resume the timer",
               ),
-              _themedIconButton(
-                Icons.replay,
-                onPressed: reset,
-                context: context,
-                semanticLabel: "Reset the timer"
-               ),
+              _themedIconButton(Icons.replay,
+                  onPressed: reset,
+                  context: context,
+                  semanticLabel: "Reset the timer"),
             ],
-          ]
+          ],
         ),
       ),
     );
@@ -288,16 +298,17 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: ThemeHelper.cardBackgroundColor(context),
+        color:
+            _data.backgroundColor ?? ThemeHelper.cardBackgroundColor(context),
         borderRadius:
-        BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
+            BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
         boxShadow: const [BoxShadow()],
       ),
       padding: ThemeHelper.cardPadding(),
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: _onTap,
-        child:  Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -318,7 +329,7 @@ class ChessTimerWidgetState extends State<ChessTimerWidget> implements Editable<
             ),
           ],
         ),
-      )
+      ),
     );
   }
 }

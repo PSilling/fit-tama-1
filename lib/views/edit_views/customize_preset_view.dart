@@ -43,22 +43,24 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
   }
 
   /// Validates form inputs and saves if possible.
-  bool _validateAndSave() {
+  void _validateAndSave() {
     final formState = _formKey.currentState;
     if (formState != null && formState.validate()) {
       formState.save();
       widget.onSave(widget.preset);
-      return true;
     }
-    return false;
   }
 
   @override
   void initState() {
     super.initState();
     _updateTimer = Timer.periodic(
-      const Duration(seconds: 2),
-      (timer) => _validateAndSave(),
+      const Duration(seconds: 3),
+      (timer) {
+        setState(() {
+          _validateAndSave();
+        });
+      },
     );
   }
 
@@ -86,7 +88,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: ThemeHelper.editViewPadding(),
             child: FormBuilder(
               key: _formKey,
               child: Column(
@@ -128,7 +130,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: ThemeHelper.formPadding(),
                     child: FormBuilderTextField(
                       name: 'name',
                       style: TextStyle(
@@ -145,7 +147,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: ThemeHelper.formPadding(),
                     child: FormBuilderTextField(
                       name: 'game',
                       style: TextStyle(
@@ -161,7 +163,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: ThemeHelper.formPadding(),
                     child: DialogSelectInput(
                       value: widget.preset.iconCode,
                       onSelected: (iconCode) => setState(() {
@@ -183,7 +185,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 8),
+                    padding: ThemeHelper.formPadding(),
                     child: DialogSelectInput(
                       value: widget.preset.backgroundColor,
                       onSelected: (color) => setState(() {

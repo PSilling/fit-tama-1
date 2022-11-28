@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:board_aid/util/themes.dart';
-import 'package:board_aid/views/customize_preset_view/customize_preset_view.dart';
+import 'package:board_aid/views/edit_views/customize_preset_view.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_appbar_about_dialog.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_appbar_more_button.dart';
 import 'package:board_aid/views/presets_view/appbar/presets_appbar_sort_button.dart';

@@ -5,11 +5,11 @@ import 'package:board_aid/widgets/font_spacer.dart';
 import 'package:flutter/material.dart';
 
 import './counter_widget_data.dart';
-import './dialogs/counter_edit_dialog.dart';
 import './dialogs/counter_reset_dialog.dart';
 import './dialogs/counter_scale_dialog.dart';
 import '../../util/extensions.dart';
 import '../../util/measure_size.dart';
+import '../../views/edit_views/edit_counter_widget_view.dart';
 import '../editable.dart';
 
 class CounterWidget extends StatefulWidget {
@@ -22,17 +22,19 @@ class CounterWidget extends StatefulWidget {
     super.key,
     required this.initData,
     required this.startEditing,
-    required this.width});
+    required this.width,
+  });
 
   @override
   State<CounterWidget> createState() => CounterWidgetState();
 }
 
-class CounterWidgetState extends State<CounterWidget> implements Editable<CounterWidget> {
+class CounterWidgetState extends State<CounterWidget>
+    implements Editable<CounterWidget> {
   late CounterWidgetData _data;
   late int _currentIndex;
   var _isEditing = false;
-  final Map<int, List<int>>_widthSettings = {
+  final Map<int, List<int>> _widthSettings = {
     1: [1],
     2: [1, 2, 3],
   };
@@ -84,18 +86,20 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     setState(() {
       final deathModifier = _data.isRightDeath ? 1 : 0;
       final newIndex = _currentIndex + num < _data.scale.length + deathModifier
-          ? _currentIndex + num : _data.scale.length - 1;
+          ? _currentIndex + num
+          : _data.scale.length - 1;
       if (newIndex < _data.scale.length + deathModifier) {
         _currentIndex = newIndex;
       }
     });
   }
 
-  void decreaseIndexBy(int num){
+  void decreaseIndexBy(int num) {
     setState(() {
       final deathModifier = _data.isLeftDeath ? 1 : 0;
       final newIndex = _currentIndex - num >= 0 - deathModifier
-          ? _currentIndex - num : 0 - deathModifier;
+          ? _currentIndex - num
+          : 0 - deathModifier;
       if (newIndex >= 0 - deathModifier) {
         _currentIndex = newIndex;
       }
@@ -116,7 +120,7 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
 
   void _onLeftTapped(int num) {
     if (_isEditing) {
-      _showEditingDialog();
+      _openEditView();
     } else {
       decreaseIndexBy(num);
     }
@@ -124,7 +128,7 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
 
   void _onRightTapped(int num) {
     if (_isEditing) {
-      _showEditingDialog();
+      _openEditView();
     } else {
       increaseIndexBy(num);
     }
@@ -132,7 +136,7 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
 
   void _onMiddleTapped() {
     if (_isEditing) {
-      _showEditingDialog();
+      _openEditView();
     }
   }
 
@@ -198,17 +202,20 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     );
   }
 
-  void _showEditingDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => CounterEditDialog(
-        data: _data,
-        setData: (data) {
-          setState(() {
-            _data = data;
-            _currentIndex = data.defaultIndex;
-          });
-        },
+  void _openEditView() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCounterWidgetView(
+          data: _data,
+          setData: (data) {
+            setState(() {
+              _data = data;
+              _currentIndex = data.defaultIndex;
+            });
+          },
+          width: widget.width,
+        ),
       ),
     );
   }
@@ -220,7 +227,8 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     } else {
       final leftDeath = _data.isLeftDeath;
       final rightDeath = _data.isRightDeath;
-      final deathIcon = _themedIcon(CounterWidget._death, context: context, semanticLabel: "Death", style: style);
+      final deathIcon = _themedIcon(CounterWidget._death,
+          context: context, semanticLabel: "Death", style: style);
       if (leftDeath && index == -1) {
         return deathIcon;
       } else if (rightDeath && index == _data.scale.length) {
@@ -231,12 +239,12 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     }
   }
 
-
   int _getSpacerWidth(int index) {
     final center = _data.scale.elementAtOrNull(_currentIndex);
     final numberOfDigits = center?.toString().length ??
         [-1, 1]
-            .compactMap((element) => _data.scale.elementAtOrNull(_currentIndex + element))
+            .compactMap((element) =>
+                _data.scale.elementAtOrNull(_currentIndex + element))
             .map((element) => element.toString().length)
             .reduce(max);
     final minimum = index == _currentIndex ? 1 : 2;
@@ -259,21 +267,30 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
     );
   }
 
-  Widget _fittingNumber({required int index, required TextStyle? textStyle, required AlignmentGeometry alignment}) {
+  Widget _fittingNumber(
+      {required int index,
+      required TextStyle? textStyle,
+      required AlignmentGeometry alignment}) {
     return FittedBox(
       fit: BoxFit.contain,
       child: Stack(
         alignment: alignment,
         children: [
           _getNumberWidgetAt(index, style: textStyle),
-          FontSpacer.widest(characterWidth: _getSpacerWidth(index), purpose: FontSpacerPurpose.number, style: textStyle),
+          FontSpacer.widest(
+              characterWidth: _getSpacerWidth(index),
+              purpose: FontSpacerPurpose.number,
+              style: textStyle),
         ],
       ),
     );
   }
 
   Widget _numberButton(
-      {required int index, required TextStyle? textStyle, required int flex, required AlignmentGeometry alignment}) {
+      {required int index,
+      required TextStyle? textStyle,
+      required int flex,
+      required AlignmentGeometry alignment}) {
     return Expanded(
       flex: flex,
       child: ValueListenableBuilder<double?>(
@@ -287,7 +304,8 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
             child: IgnorePointer(
               child: Opacity(
                 opacity: 0.4,
-                child: _fittingNumber(index: index, textStyle: textStyle, alignment: alignment),
+                child: _fittingNumber(
+                    index: index, textStyle: textStyle, alignment: alignment),
               ),
             ),
           );
@@ -302,12 +320,12 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
       child: Row(
         children: [
           for (var i in sideNumbers.reversed.toList())
-          _numberButton(
-            index: _currentIndex - i,
-            flex: 4,
-            alignment: Alignment.centerRight,
-            textStyle: ThemeHelper.widgetContentSecondary(context),
-          ),
+            _numberButton(
+              index: _currentIndex - i,
+              flex: 4,
+              alignment: Alignment.centerRight,
+              textStyle: ThemeHelper.widgetContentSecondary(context),
+            ),
           Expanded(
             flex: 5,
             child: MeasureSize(
@@ -329,18 +347,21 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
             ),
           ),
           for (var i in sideNumbers)
-          _numberButton(
-            index: _currentIndex + i,
-            flex: 4,
-            alignment: Alignment.centerLeft,
-            textStyle: ThemeHelper.widgetContentSecondary(context),
-          ),
+            _numberButton(
+              index: _currentIndex + i,
+              flex: 4,
+              alignment: Alignment.centerLeft,
+              textStyle: ThemeHelper.widgetContentSecondary(context),
+            ),
         ],
       ),
     );
   }
 
-  Widget _themedIcon(IconData? icon, {required BuildContext context, required String semanticLabel, TextStyle? style}) =>
+  Widget _themedIcon(IconData? icon,
+          {required BuildContext context,
+          required String semanticLabel,
+          TextStyle? style}) =>
       Icon(icon, semanticLabel: semanticLabel, color: style?.color);
 
   Widget _buttonsSection(BuildContext context) {
@@ -369,8 +390,10 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: ThemeHelper.cardBackgroundColor(context),
-        borderRadius: BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
+        color:
+            _data.backgroundColor ?? ThemeHelper.cardBackgroundColor(context),
+        borderRadius:
+            BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
         boxShadow: const [BoxShadow()],
       ),
       padding: ThemeHelper.cardPadding(),
@@ -379,15 +402,17 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
           Row(
             children: [
               for (var i in _widthSettings[widget.width]!.reversed.toList())
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {_onLeftTapped(i);},
-                  onPanEnd: _isEditing ? null : _onPanEnd,
-                  onPanUpdate: _isEditing ? null :  _onPanUpdate,
-                  onPanCancel: _isEditing ? null :  _onPanCancel,
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () {
+                      _onLeftTapped(i);
+                    },
+                    onPanEnd: _isEditing ? null : _onPanEnd,
+                    onPanUpdate: _isEditing ? null : _onPanUpdate,
+                    onPanCancel: _isEditing ? null : _onPanCancel,
+                  ),
                 ),
-              ),
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
@@ -395,15 +420,17 @@ class CounterWidgetState extends State<CounterWidget> implements Editable<Counte
                 ),
               ),
               for (var i in _widthSettings[widget.width]!)
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {_onRightTapped(i);},
-                  onPanEnd: _isEditing ? null : _onPanEnd,
-                  onPanUpdate: _isEditing ? null :  _onPanUpdate,
-                  onPanCancel: _isEditing ? null :  _onPanCancel,
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () {
+                      _onRightTapped(i);
+                    },
+                    onPanEnd: _isEditing ? null : _onPanEnd,
+                    onPanUpdate: _isEditing ? null : _onPanUpdate,
+                    onPanCancel: _isEditing ? null : _onPanCancel,
+                  ),
                 ),
-              ),
             ],
           ),
           Column(

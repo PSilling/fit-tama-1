@@ -4,8 +4,8 @@ import 'package:board_aid/util/themes.dart';
 import 'package:board_aid/widgets/font_spacer.dart';
 import 'package:flutter/material.dart';
 
+import '../../views/edit_views/edit_timer_widget_view.dart';
 import '../editable.dart';
-import 'timer_edit_dialog.dart';
 import 'timer_widget_data.dart';
 
 class TimerWidget extends StatefulWidget {
@@ -105,7 +105,7 @@ class TimerWidgetState extends State<TimerWidget>
 
   void _onTap() {
     if (_isEditing) {
-      _showEditingDialog();
+      _openEditView();
       return;
     }
 
@@ -122,17 +122,19 @@ class TimerWidgetState extends State<TimerWidget>
     }
   }
 
-  void _showEditingDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => TimerEditDialog(
-        data: _data,
-        setData: (data) {
-          setState(() {
-            _data = data;
-            _currentTime = data.initialTime;
-          });
-        },
+  void _openEditView() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditTimerWidgetView(
+          data: _data,
+          setData: (data) {
+            setState(() {
+              _data = data;
+              _currentTime = data.initialTime;
+            });
+          },
+        ),
       ),
     );
   }
@@ -234,37 +236,39 @@ class TimerWidgetState extends State<TimerWidget>
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-          color: ThemeHelper.cardBackgroundColor(context),
-          borderRadius:
-              BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
-          boxShadow: const [BoxShadow()],
+      decoration: BoxDecoration(
+        color:
+            _data.backgroundColor ?? ThemeHelper.cardBackgroundColor(context),
+        borderRadius:
+            BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
+        boxShadow: const [BoxShadow()],
+      ),
+      padding: ThemeHelper.cardPadding(),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: _titleWidget(context),
+            ),
+            Expanded(
+              flex: 3,
+              child: _timeWidget(context),
+            ),
+            Flexible(
+              flex: 1,
+              fit: FlexFit.tight,
+              child: _buttonWidget(context),
+            ),
+          ],
         ),
-        padding: ThemeHelper.cardPadding(),
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: _onTap,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: _titleWidget(context),
-              ),
-              Expanded(
-                flex: 3,
-                child: _timeWidget(context),
-              ),
-              Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: _buttonWidget(context),
-              ),
-            ],
-          ),
-        ));
+      ),
+    );
   }
 }

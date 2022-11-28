@@ -5,16 +5,19 @@ import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
 
 import '../../util/extensions.dart';
+import '../../views/edit_views/edit_dice_widget_view.dart';
 import '../editable.dart';
-import 'dice_edit_dialog.dart';
 import 'dice_widget_data.dart';
 
 class DiceWidget extends StatefulWidget {
   final DiceWidgetData initData;
   final bool startEditing;
 
-  const DiceWidget({super.key,
-    required this.initData, required this.startEditing});
+  const DiceWidget({
+    super.key,
+    required this.initData,
+    required this.startEditing,
+  });
 
   @override
   State<StatefulWidget> createState() => DiceWidgetState();
@@ -63,22 +66,26 @@ class DiceWidgetState extends State<DiceWidget>
     });
   }
 
-  void _showEditingDialog() {
-    showDialog(
-        context: context,
-        builder: (context) => DiceEditDialog(
-            data: _data,
-            setData: (data) {
-              setState(() {
-                _data = data;
-                rollDice();
-              });
-            }));
+  void _openEditView() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditDiceWidgetView(
+          data: _data,
+          setData: (data) {
+            setState(() {
+              _data = data;
+              rollDice();
+            });
+          },
+        ),
+      ),
+    );
   }
 
   void _onTap() {
     if (_isEditing) {
-      _showEditingDialog();
+      _openEditView();
     } else if (!_data.longPressToReroll) {
       rollDice();
     }
@@ -91,7 +98,8 @@ class DiceWidgetState extends State<DiceWidget>
   }
 
   bool _showDiceTextCondition() {
-    return _data.numberOfDice > 1 && _data.numberOfSides.toString().length * _data.numberOfDice <= 3;
+    return _data.numberOfDice > 1 &&
+        _data.numberOfSides.toString().length * _data.numberOfDice <= 3;
   }
 
   Widget _diceText(BuildContext context) {
@@ -134,7 +142,8 @@ class DiceWidgetState extends State<DiceWidget>
           constraints: const BoxConstraints(minWidth: 1, minHeight: 1),
           child: Text(
             "${result ?? ""}",
-            textAlign: _showDiceTextCondition() ? TextAlign.left : TextAlign.center,
+            textAlign:
+                _showDiceTextCondition() ? TextAlign.left : TextAlign.center,
             style: ThemeHelper.widgetContentMain(context),
           ),
         ),
@@ -143,20 +152,22 @@ class DiceWidgetState extends State<DiceWidget>
   }
 
   Widget _titleWidget(BuildContext context) => FittedBox(
-      fit: BoxFit.contain,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
-        child: Text(
-          _data.name,
-          style: ThemeHelper.widgetTitle(context),
+        fit: BoxFit.contain,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 1, minWidth: 1),
+          child: Text(
+            _data.name,
+            style: ThemeHelper.widgetTitle(context),
+          ),
         ),
-      ),
-    );
+      );
 
   Widget _rollWidget(BuildContext context) => FractionallySizedBox(
         heightFactor: 0.7,
         child: Padding(
-          padding: _showDiceTextCondition() ? const EdgeInsets.only(right: 10) : EdgeInsets.zero,
+          padding: _showDiceTextCondition()
+              ? const EdgeInsets.only(right: 10)
+              : EdgeInsets.zero,
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -193,7 +204,8 @@ class DiceWidgetState extends State<DiceWidget>
   @override
   Widget build(BuildContext context) => Container(
         decoration: BoxDecoration(
-          color: ThemeHelper.cardBackgroundColor(context),
+          color:
+              _data.backgroundColor ?? ThemeHelper.cardBackgroundColor(context),
           borderRadius:
               BorderRadius.all(Radius.circular(ThemeHelper.borderRadius())),
           boxShadow: const [BoxShadow()],

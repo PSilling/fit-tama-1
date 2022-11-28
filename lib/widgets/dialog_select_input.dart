@@ -11,6 +11,7 @@ class DialogSelectInput extends StatelessWidget {
     required this.onSelected,
     required this.itemLabelMap,
     required this.itemBuilder,
+    this.defaultValue,
     this.label,
     this.dialogTitle,
     this.iconCode,
@@ -24,6 +25,7 @@ class DialogSelectInput extends StatelessWidget {
   final Function(dynamic item) onSelected;
   final Map<dynamic, String> itemLabelMap;
   final Widget Function(dynamic element) itemBuilder;
+  final dynamic defaultValue;
   final String? label;
   final String? dialogTitle;
   final int? iconCode;
@@ -36,6 +38,53 @@ class DialogSelectInput extends StatelessWidget {
   void _openSelectDialog(BuildContext context) {
     var sortedItems = itemLabelMap.entries.toList()
       ..sort((a, b) => a.value.compareTo(b.value));
+
+    var dialogChildren = <Widget>[
+      Expanded(
+        child: GridView.builder(
+          padding: EdgeInsets.all(ThemeHelper.selectDialogItemSpacing()),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: itemsPerRow,
+            childAspectRatio: 1,
+            crossAxisSpacing: ThemeHelper.selectDialogItemSpacing() / 2,
+            mainAxisSpacing: ThemeHelper.selectDialogItemSpacing() / 2,
+          ),
+          itemCount: sortedItems.length,
+          itemBuilder: (BuildContext context, index) {
+            var item = sortedItems[index].key;
+            return InkResponse(
+              onTap: () {
+                onSelected(item);
+                Navigator.pop(context);
+              },
+              child: itemBuilder(item),
+            );
+          },
+        ),
+      ),
+    ];
+
+    if (defaultValue != null) {
+      dialogChildren.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Default:"),
+            Padding(
+              padding: const EdgeInsets.only(left: 4, top: 8),
+              child: InkResponse(
+                onTap: () {
+                  onSelected(null);
+                  Navigator.pop(context);
+                },
+                child: itemBuilder(defaultValue),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -49,25 +98,9 @@ class DialogSelectInput extends StatelessWidget {
         content: SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height / heightDivisor,
-          child: GridView.builder(
-            padding: EdgeInsets.all(ThemeHelper.selectDialogItemSpacing()),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: itemsPerRow,
-              childAspectRatio: 1,
-              crossAxisSpacing: ThemeHelper.selectDialogItemSpacing() / 2,
-              mainAxisSpacing: ThemeHelper.selectDialogItemSpacing() / 2,
-            ),
-            itemCount: sortedItems.length,
-            itemBuilder: (BuildContext context, index) {
-              var item = sortedItems[index].key;
-              return InkResponse(
-                onTap: () {
-                  onSelected(item);
-                  Navigator.pop(context);
-                },
-                child: itemBuilder(item),
-              );
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: dialogChildren,
           ),
         ),
       ),
@@ -86,7 +119,7 @@ class DialogSelectInput extends StatelessWidget {
             size: iconSize,
           ),
           suffixIcon: const Icon(Icons.arrow_drop_down),
-          prefixText: itemLabelMap[value],
+          prefixText: value == null ? "Default" : itemLabelMap[value],
         ),
       ),
       onTap: () => _openSelectDialog(context),

@@ -80,7 +80,7 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
   Widget build(BuildContext context) {
     slot = 2;
     return WillPopScope(
-      onWillPop: () => _onWillPop(),
+      onWillPop: _onWillPop,
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(

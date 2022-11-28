@@ -44,6 +44,16 @@ class ThemeHelper {
     return const EdgeInsets.only(left: 14.0);
   }
 
+  /// Padding for customize views.
+  static EdgeInsets editViewPadding() {
+    return const EdgeInsets.all(16.0);
+  }
+
+  /// Padding for form inputs.
+  static EdgeInsets formPadding() {
+    return const EdgeInsets.only(top: 8);
+  }
+
   /// Padding for icons in select dialogs.
   static EdgeInsets selectDialogIconPadding() {
     return const EdgeInsets.all(8.0);
