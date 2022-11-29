@@ -26,7 +26,7 @@ class EditDiceWidgetView extends StatefulWidget {
 
 class _EditDiceWidgetViewState extends State<EditDiceWidgetView> {
   final _formKey = GlobalKey<FormBuilderState>();
-  late Timer _updateTimer;
+  final GlobalKey<DiceWidgetState> _previewKey = GlobalKey<DiceWidgetState>();
 
   /// Handles navigator pop and dice widget data saving on back button press.
   Future<bool> _onWillPop() {
@@ -51,26 +51,14 @@ class _EditDiceWidgetViewState extends State<EditDiceWidgetView> {
     if (formState != null && formState.validate()) {
       formState.save();
       widget.setData(widget.data);
+      _previewKey.currentState!.rollDice();
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _updateTimer = Timer.periodic(
-      const Duration(seconds: 3),
-      (timer) {
-        setState(() {
-          _validateAndSave();
-        });
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _updateTimer.cancel();
-    super.dispose();
+  void _onEditComplete(){
+    _validateAndSave();
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {});
   }
 
   @override
@@ -111,6 +99,7 @@ class _EditDiceWidgetViewState extends State<EditDiceWidgetView> {
                       width: previewWidth,
                       height: previewHeight,
                       child: DiceWidget(
+                        key: _previewKey,
                         initData: widget.data,
                         startEditing: false,
                       ),
@@ -142,9 +131,10 @@ class _EditDiceWidgetViewState extends State<EditDiceWidgetView> {
                       name: "name",
                       decoration: ThemeHelper.dialogInputDecoration(context,
                           label: "Title"),
-                      textInputAction: TextInputAction.next,
+                      textInputAction: TextInputAction.done,
                       initialValue: widget.data.name,
                       onSaved: (value) => widget.data.name = value ?? "",
+                      onEditingComplete: _onEditComplete,
                     ),
                   ),
                   Padding(
@@ -183,12 +173,13 @@ class _EditDiceWidgetViewState extends State<EditDiceWidgetView> {
                           label: "Dice count"),
                       keyboardType:
                           const TextInputType.numberWithOptions(signed: true),
-                      textInputAction: TextInputAction.next,
+                      textInputAction: TextInputAction.done,
                       initialValue: "${widget.data.numberOfDice}",
                       validator: (value) =>
                           _numberValidator(value, minimalValue: 1),
                       onSaved: (value) =>
                           widget.data.numberOfDice = int.parse(value!),
+                      onEditingComplete: _onEditComplete,
                     ),
                   ),
                   Padding(
@@ -209,6 +200,7 @@ class _EditDiceWidgetViewState extends State<EditDiceWidgetView> {
                           _numberValidator(value, minimalValue: 2),
                       onSaved: (value) =>
                           widget.data.numberOfSides = int.parse(value!),
+                      onEditingComplete: _onEditComplete,
                     ),
                   ),
                   Padding(
@@ -230,6 +222,10 @@ class _EditDiceWidgetViewState extends State<EditDiceWidgetView> {
                         _RerollOptions.tap.getOption(context),
                         _RerollOptions.longpress.getOption(context),
                       ],
+                      onChanged: (value) {
+                        _validateAndSave();
+                        setState(() {});
+                      },
                     ),
                   ),
                 ],

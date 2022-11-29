@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:board_aid/widgets/timer_widget/timer_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../../util/extensions.dart';
 import '../../util/themes.dart';
 import '../../widgets/dialog_select_input.dart';
 import '../../widgets/timer_widget/timer_widget_data.dart';
@@ -25,23 +25,12 @@ class EditTimerWidgetView extends StatefulWidget {
 
 class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
   final _formKey = GlobalKey<FormBuilderState>();
-  late Timer _updateTimer;
+  final GlobalKey<TimerWidgetState> _previewKey = GlobalKey<TimerWidgetState>();
 
   /// Handles navigator pop and dice widget data saving on back button press.
   Future<bool> _onWillPop() {
     _validateAndSave();
     return Future.value(true);
-  }
-
-  String? _numberValidator(String? value) {
-    final number = value.flatMap((value) => int.tryParse(value));
-    if (number == null) {
-      return "This field has to contain numbers only";
-    }
-    if (number <= 0) {
-      return "It has to be a positive number";
-    }
-    return null;
   }
 
   /// Validates form inputs and saves if possible.
@@ -50,26 +39,50 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
     if (formState != null && formState.validate()) {
       formState.save();
       widget.setData(widget.data);
+      _previewKey.currentState!.reset();
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _updateTimer = Timer.periodic(
-      const Duration(seconds: 3),
-      (timer) {
-        setState(() {
-          _validateAndSave();
-        });
-      },
-    );
+  void _onEditComplete(){
+    _validateAndSave();
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {});
   }
 
-  @override
-  void dispose() {
-    _updateTimer.cancel();
-    super.dispose();
+  String formatTime(int time) {
+    var sign = time < 0 ? "-" : "";
+    var seconds = time.abs() % 60;
+    var minutes = time.abs() % 3600 ~/ 60;
+    var hours = time.abs() ~/ 3600;
+
+    if (hours == 0 && minutes == 0) {
+      return "$sign${seconds}s";
+    } else if (hours == 0) {
+      return "$sign${minutes}m ${seconds}s";
+    } else {
+      return "$sign${hours}h ${minutes}m ${seconds}s";
+    }
+  }
+  
+  void _showDialog(Widget child) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => WillPopScope(
+        onWillPop: _onWillPop,
+        child: Container(
+          height: 216,
+          padding: const EdgeInsets.only(top: 6.0),
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          color: ThemeHelper.dialogBackground(context),
+          child: SafeArea(
+            top: false,
+            child: child,
+          ),
+        )
+      )
+    );
   }
 
   @override
@@ -110,6 +123,7 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
                       width: previewWidth,
                       height: previewHeight,
                       child: TimerWidget(
+                        key: _previewKey,
                         initData: widget.data,
                         startEditing: false,
                       ),
@@ -141,9 +155,10 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
                       name: "name",
                       decoration: ThemeHelper.dialogInputDecoration(context,
                           label: "Title"),
-                      textInputAction: TextInputAction.next,
+                      textInputAction: TextInputAction.done,
                       initialValue: widget.data.name,
                       onSaved: (value) => widget.data.name = value ?? "",
+                      onEditingComplete: _onEditComplete,
                     ),
                   ),
                   Padding(
@@ -172,24 +187,34 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
                   ),
                   Padding(
                     padding: ThemeHelper.formPadding(),
-                    child: FormBuilderTextField(
-                      style: TextStyle(
-                        color: ThemeHelper.dialogForeground(context),
+                    child: GestureDetector(
+                      onTap: () => _showDialog(
+                        CupertinoTimerPicker(
+                          initialTimerDuration: Duration(seconds: widget.data.initialTime),
+                          onTimerDurationChanged: (value) {
+                            widget.data.initialTime = value.inSeconds;
+                          },
+                        ),
                       ),
-                      cursorColor: ThemeHelper.dialogForeground(context),
-                      name: "initial_time",
-                      decoration: ThemeHelper.dialogInputDecoration(
-                        context,
-                        label: "Initial time",
-                      ),
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.done,
-                      initialValue: "${widget.data.initialTime}",
-                      validator: _numberValidator,
-                      onSaved: (value) =>
-                          widget.data.initialTime = int.parse(value!),
-                    ),
-                  ),
+                      child: FormBuilderField(
+                        name: 'init_time',
+                        builder: (FormFieldState field) => InputDecorator(
+                          decoration: ThemeHelper.dialogInputDecoration(context,
+                            errorText: field.errorText,
+                            hasBorder: true,
+                            isDense: false,
+                            hasPadding: true),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('Initial time:'),
+                              Text(formatTime(widget.data.initialTime))
+                            ]
+                          )
+                        )
+                      )
+                    )
+                  )
                 ],
               ),
             ),

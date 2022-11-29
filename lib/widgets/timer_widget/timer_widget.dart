@@ -27,7 +27,7 @@ class TimerWidgetState extends State<TimerWidget>
   TimerWidgetTimerState _currentState = TimerWidgetTimerState.init;
   bool _isEditing = false;
   late TimerWidgetData _data;
-  late Timer _countdownTimer;
+  late Timer? _countdownTimer;
 
   @override
   bool get isEditing => _isEditing;
@@ -49,7 +49,7 @@ class TimerWidgetState extends State<TimerWidget>
   @override
   void dispose() {
     if (_currentState != TimerWidgetTimerState.init) {
-      _countdownTimer.cancel();
+      _countdownTimer?.cancel();
     }
     super.dispose();
   }
@@ -67,13 +67,16 @@ class TimerWidgetState extends State<TimerWidget>
     setState(() {
       if (_currentState != TimerWidgetTimerState.init) {
         _currentState = TimerWidgetTimerState.paused;
-        _countdownTimer.cancel();
+        _countdownTimer!.cancel();
       }
     });
   }
 
   void reset() {
     setState(() {
+      if(_currentState != TimerWidgetTimerState.init){
+        _countdownTimer!.cancel();
+      }
       _currentState = TimerWidgetTimerState.init;
       _currentTime = _data.initialTime;
     });
@@ -123,6 +126,9 @@ class TimerWidgetState extends State<TimerWidget>
   }
 
   void _openEditView() {
+    if(_currentState == TimerWidgetTimerState.running){
+      _countdownTimer!.cancel();
+    }
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -132,6 +138,8 @@ class TimerWidgetState extends State<TimerWidget>
             setState(() {
               _data = data;
               _currentTime = data.initialTime;
+              _countdownTimer = null;
+              _currentState = TimerWidgetTimerState.init;
             });
           },
         ),

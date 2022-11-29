@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-import '../../util/extensions.dart';
 import '../../util/themes.dart';
 import '../../widgets/chess_timer_widget/chess_timer_widget.dart';
 import '../../widgets/chess_timer_widget/chess_timer_widget_data.dart';
@@ -26,7 +26,7 @@ class EditChessTimerWidgetView extends StatefulWidget {
 
 class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
   final _formKey = GlobalKey<FormBuilderState>();
-  late Timer _updateTimer;
+  final GlobalKey<ChessTimerWidgetState> _previewKey = GlobalKey<ChessTimerWidgetState>();
 
   final List<int> _numTimersPossible = [2, 3];
   late _SeparateTimesSet _separateTimeSet;
@@ -46,38 +46,14 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
       _outputs.add(_outputs[0]);
     }
     _outputLength = widget.data.initialTimes.length;
-    _updateTimer = Timer.periodic(
-      const Duration(seconds: 3),
-      (timer) {
-        setState(() {
-          _validateAndSave();
-        });
-      },
-    );
-    super.initState();
-  }
 
-  @override
-  void dispose() {
-    _updateTimer.cancel();
-    super.dispose();
+    super.initState();
   }
 
   /// Handles navigator pop and dice widget data saving on back button press.
   Future<bool> _onWillPop() {
     _validateAndSave();
     return Future.value(true);
-  }
-
-  String? _numberValidator(String? value) {
-    final number = value.flatMap((value) => int.tryParse(value));
-    if (number == null) {
-      return "This field has to contain numbers only";
-    }
-    if (number <= 0) {
-      return "It has to be a positive number";
-    }
-    return null;
   }
 
   /// Validates form inputs and saves if possible.
@@ -88,7 +64,6 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
     }
     if (formState.validate()) {
       formState.save();
-
       if (_separateTimeSet == _SeparateTimesSet.together) {
         widget.data.initialTimes =
             List.generate(_outputLength, (index) => _outputs[0]);
@@ -98,9 +73,51 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
           widget.data.initialTimes[i] = _outputs[i];
         }
       }
-
       widget.setData(widget.data);
+      _previewKey.currentState?.reset();
     }
+  }
+
+  void _onEditComplete(){
+    _validateAndSave();
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {});
+  }
+
+  String formatTime(int time) {
+    var sign = time < 0 ? "-" : "";
+    var seconds = time.abs() % 60;
+    var minutes = time.abs() % 3600 ~/ 60;
+    var hours = time.abs() ~/ 3600;
+
+    if (hours == 0 && minutes == 0) {
+      return "$sign${seconds}s";
+    } else if (hours == 0) {
+      return "$sign${minutes}m ${seconds}s";
+    } else {
+      return "$sign${hours}h ${minutes}m ${seconds}s";
+    }
+  }
+
+  void _showDialog(Widget child) {
+    showCupertinoModalPopup<void>(
+        context: context,
+        builder: (BuildContext context) => WillPopScope(
+            onWillPop: _onWillPop,
+            child: Container(
+              height: 216,
+              padding: const EdgeInsets.only(top: 6.0),
+              margin: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              color: ThemeHelper.dialogBackground(context),
+              child: SafeArea(
+                top: false,
+                child: child,
+              ),
+            )
+        )
+    );
   }
 
   @override
@@ -141,8 +158,9 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                       width: previewWidth,
                       height: previewHeight,
                       child: ChessTimerWidget(
-                        initData: widget.data,
-                        startEditing: false,
+                          key: _previewKey,
+                          initData: widget.data,
+                          startEditing: false
                       ),
                     ),
                   ),
@@ -172,9 +190,10 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                       name: "name",
                       decoration: ThemeHelper.dialogInputDecoration(context,
                           label: "Title"),
-                      textInputAction: TextInputAction.next,
+                      textInputAction: TextInputAction.done,
                       initialValue: widget.data.name,
                       onSaved: (value) => widget.data.name = value ?? "",
+                      onEditingComplete: _onEditComplete,
                     ),
                   ),
                   Padding(
@@ -211,6 +230,7 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                       initialValue: _outputLength.toString(),
                       onChanged: (val) {
                         _outputLength = int.parse(val!);
+                        _validateAndSave();
                         setState(() {});
                       },
                       options: List<FormBuilderFieldOption<String>>.generate(
@@ -235,7 +255,7 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                       activeColor: ThemeHelper.dialogForeground(context),
                       decoration: ThemeHelper.dialogInputDecoration(
                         context,
-                        label: "Scale",
+                        label: "Timer ranges:",
                       ),
                       name: "timer_ranges",
                       initialValue: _separateTimeSet.label,
@@ -243,6 +263,7 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                         if (value != null) {
                           _separateTimeSet =
                               _SeparateTimesSet.fromStr(inputStr: value);
+                          _validateAndSave();
                           setState(() {});
                         }
                       },
@@ -260,26 +281,34 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                               i < _outputLength),
                       child: Padding(
                         padding: ThemeHelper.formPadding(),
-                        child: FormBuilderTextField(
-                          style: TextStyle(
-                            color: ThemeHelper.dialogForeground(context),
+                        child: GestureDetector(
+                          onTap: () => _showDialog(
+                            CupertinoTimerPicker(
+                              initialTimerDuration: Duration(seconds: widget.data.initialTimes[i]),
+                              onTimerDurationChanged: (value) {
+                                _outputs[i] = value.inSeconds;
+                              },
+                            ),
                           ),
-                          cursorColor: ThemeHelper.dialogForeground(context),
-                          name: "initial_time_$i",
-                          decoration: ThemeHelper.dialogInputDecoration(context,
-                              label:
-                                  _separateTimeSet == _SeparateTimesSet.separate
-                                      ? 'Initial time of player ${i + 1}'
-                                      : 'Initial time of all timers'),
-                          keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.done,
-                          initialValue: '${_outputs[i]}',
-                          validator: _numberValidator,
-                          onSaved: (value) {
-                            _outputs[i] = int.parse(value!);
-                          },
-                        ),
-                      ),
+                          child: FormBuilderField(
+                            name: 'init_time',
+                            builder: (FormFieldState field) => InputDecorator(
+                              decoration: ThemeHelper.dialogInputDecoration(context,
+                                errorText: field.errorText,
+                                hasBorder: true,
+                                isDense: false,
+                                hasPadding: true),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Initial time of player ${i+1}:'),
+                                  Text(formatTime(widget.data.initialTimes[i]))
+                                ]
+                              )
+                            )
+                          )
+                        )
+                      )
                     ),
                 ],
               ),

@@ -30,7 +30,7 @@ class EditCounterWidgetView extends StatefulWidget {
 
 class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
   final _formKey = GlobalKey<FormBuilderState>();
-  late Timer _updateTimer;
+  final GlobalKey<CounterWidgetState> _previewKey = GlobalKey<CounterWidgetState>();
 
   late bool _isUneven;
   late List<KeyedEntry> _keyedScale;
@@ -56,21 +56,12 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
       _keyedScale = [KeyedEntry(value: null)];
       _defaultIndexKey = null;
     }
-    _updateTimer = Timer.periodic(
-      const Duration(seconds: 3),
-      (timer) {
-        setState(() {
-          _validateAndSave();
-        });
-      },
-    );
-    super.initState();
   }
 
-  @override
-  void dispose() {
-    _updateTimer.cancel();
-    super.dispose();
+  void _onEditComplete(){
+    _validateAndSave();
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {});
   }
 
   /// Handles navigator pop and dice widget data saving on back button press.
@@ -134,6 +125,7 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
     if (formState != null && formState.validate()) {
       formState.save();
       widget.setData(widget.data);
+      _previewKey.currentState!.resetIndex();
     }
   }
 
@@ -259,9 +251,10 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                       : "${_rangeInitialValue.start}",
                   keyboardType:
                       const TextInputType.numberWithOptions(signed: true),
-                  textInputAction: TextInputAction.next,
+                  textInputAction: TextInputAction.done,
                   onChanged: (value) => _rangeStartChanged(value, field),
                   validator: _numberValidator,
+                  onEditingComplete: _onEditComplete,
                 ),
               ),
               Padding(
@@ -283,6 +276,7 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                   textInputAction: TextInputAction.done,
                   onChanged: (value) => _rangeEndChanged(value, field),
                   validator: _numberValidator,
+                  onEditingComplete: _onEditComplete,
                 ),
               ),
               if (field.value.flatMap((value) => value.validate()) ?? false)
@@ -309,6 +303,10 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                       final scale = field.value!.toScale();
                       widget.data.defaultIndex =
                           scale.indexWhere((element) => element == value);
+                    },
+                    onChanged: (value) {
+                      _validateAndSave();
+                      setState(() {});
                     },
                   ),
                 ),
@@ -371,6 +369,10 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                               setState(() {
                                 _keyedScale.removeAt(index);
                               });
+                            },
+                            onUpdate: (details) {
+                              _validateAndSave();
+                              setState(() {});
                             },
                             child: Row(
                               children: [
@@ -456,6 +458,8 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                       } else {
                         superField.didChange(null);
                       }
+                      _validateAndSave();
+                      setState(() {});
                     },
                   ),
                 ),
@@ -497,6 +501,8 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                           }
                           FocusScope.of(context)
                               .requestFocus(nextEntry.focusNode);
+                          _validateAndSave();
+                          setState(() {});
                         },
                       ),
                     ),
@@ -549,6 +555,7 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                       width: previewWidth,
                       height: previewHeight,
                       child: CounterWidget(
+                        key: _previewKey,
                         initData: widget.data,
                         startEditing: false,
                         width: widget.width,
@@ -581,9 +588,10 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                       name: "title",
                       decoration: ThemeHelper.dialogInputDecoration(context,
                           label: "Title"),
-                      textInputAction: TextInputAction.next,
+                      textInputAction: TextInputAction.done,
                       initialValue: widget.data.name,
                       onSaved: (value) => widget.data.name = value ?? "",
+                      onEditingComplete: _onEditComplete,
                     ),
                   ),
                   Padding(
@@ -634,6 +642,10 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                         widget.data.isRightDeath =
                             value.contains(_DeathOptions.right.label);
                       },
+                      onChanged: (value) {
+                        _validateAndSave();
+                        setState(() {});
+                      },
                     ),
                   ),
                   Padding(
@@ -646,9 +658,9 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
                       initialValue:
                           _EvennessOptions.fromData(isUneven: _isUneven).label,
                       onChanged: (value) {
-                        setState(() {
-                          _isUneven = _EvennessOptions.isUneven(value: value);
-                        });
+                        _isUneven = _EvennessOptions.isUneven(value: value);
+                        _validateAndSave();
+                        setState(() {});
                       },
                       onSaved: (value) => widget.data.isUneven =
                           _EvennessOptions.isUneven(value: value),
