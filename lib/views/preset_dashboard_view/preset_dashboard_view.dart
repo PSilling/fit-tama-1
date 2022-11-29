@@ -131,16 +131,19 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
                 ),
             ),
             IconButton(
-                onPressed: () {
-                  editVisible = !editVisible;
-                  itemController.isEditing = !itemController.isEditing;
-                  storage.setWidgetsEditing(itemController.isEditing);
-                  if (itemController.isEditing == false) {
-                    storage.onItemsUpdated([], slot!);
-                  }
-                  setState(() {});
-                },
-                icon: const Icon(Icons.edit)),
+              onPressed: () {
+                editVisible = !editVisible;
+                itemController.isEditing = !itemController.isEditing;
+                storage.setWidgetsEditing(itemController.isEditing);
+                if (itemController.isEditing == false) {
+                  storage.onItemsUpdated([], slot!);
+                }
+                setState(() {});
+              },
+              icon: editVisible
+                ? const Icon(Icons.edit_off)
+                : const Icon(Icons.edit),
+            ),
           ],
         ),
         body: SafeArea(
