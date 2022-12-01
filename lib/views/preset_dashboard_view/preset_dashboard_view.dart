@@ -41,6 +41,7 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
   bool editVisible = false;
   late FocusNode textFocusNode;
   late String nameEdit;
+  bool titleEdit = false;
 
   @override
   void initState() {
@@ -80,24 +81,44 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
         appBar: AppBar(
           title: Stack(
             children: [
-              TextFormField(
-                focusNode: textFocusNode,
-                style: Theme.of(context).textTheme.titleLarge,
-                cursorColor: ThemeHelper.dialogForeground(context),
-                decoration: ThemeHelper.dialogInputDecoration(
-                  context,
-                  hasBorder: false,
-                  hasPadding: false
+              Visibility(
+                visible: !titleEdit,
+                child: GestureDetector(
+                  child: Text(
+                    widget.preset.name,
+                    style: const TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  onTap: (){
+                    titleEdit = true;
+                    setState(() {});
+                    textFocusNode.requestFocus();
+                  },
                 ),
-                initialValue: widget.preset.name,
-                textInputAction: TextInputAction.done,
-                onTap: () => textFocusNode.requestFocus(),
-                onChanged: (value) {nameEdit = value;},
-                onEditingComplete: () {
-                  widget.preset.name = nameEdit;
-                  textFocusNode.unfocus();
-                  setState(() {});
-                },
+              ),
+              Visibility(
+                visible: titleEdit,
+                child: TextFormField(
+                  focusNode: textFocusNode,
+                  style: Theme.of(context).textTheme.titleLarge,
+                  cursorColor: ThemeHelper.dialogForeground(context),
+                  decoration: ThemeHelper.dialogInputDecoration(
+                    context,
+                    hasBorder: false,
+                    hasPadding: false
+                  ),
+                  initialValue: widget.preset.name,
+                  textInputAction: TextInputAction.done,
+                  onTap: () => textFocusNode.requestFocus(),
+                  onChanged: (value) {nameEdit = value;},
+                  onEditingComplete: () {
+                    widget.preset.name = nameEdit;
+                    textFocusNode.unfocus();
+                    titleEdit = false;
+                    setState(() {});
+                  },
+                ),
               ),
             ]
           ),
