@@ -1,11 +1,14 @@
 import 'package:board_aid/util/themes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'views/presets_view/presets_view.dart';
 
 /// Application entrypoint.
 void main() {
-  runApp(const BoardAidApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((value) => runApp(const BoardAidApp()));
 }
 
 /// Root application widget of Board Aid.
