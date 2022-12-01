@@ -301,8 +301,18 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Initial time of player ${i+1}:'),
-                                  Text(formatTime(widget.data.initialTimes[i]))
+                                  Text(
+                                    'Initial time of player ${i+1}:',
+                                    style: TextStyle(
+                                        color: ThemeHelper.editViewForeground(context)
+                                    ),
+                                  ),
+                                  Text(
+                                    formatTime(widget.data.initialTimes[i]),
+                                    style: TextStyle(
+                                        color: ThemeHelper.editViewForeground(context)
+                                    ),
+                                  )
                                 ]
                               )
                             )

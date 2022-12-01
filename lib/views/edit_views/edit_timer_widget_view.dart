@@ -207,8 +207,18 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Initial time:'),
-                              Text(formatTime(widget.data.initialTime))
+                              Text(
+                                'Initial time:',
+                                style: TextStyle(
+                                  color: ThemeHelper.editViewForeground(context)
+                                ),
+                              ),
+                              Text(
+                                formatTime(widget.data.initialTime),
+                                style: TextStyle(
+                                    color: ThemeHelper.editViewForeground(context)
+                                ),
+                              )
                             ]
                           )
                         )

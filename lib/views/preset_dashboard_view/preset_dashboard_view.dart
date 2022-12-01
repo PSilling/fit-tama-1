@@ -6,6 +6,7 @@ import 'package:dashboard/dashboard.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../../widgets/confirmation_dialog.dart';
 import './add_widget_dialog.dart';
 import './remove_widget_dialog.dart';
 import '../../models/preset_model.dart';
@@ -225,14 +226,13 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
   }
 
   Future<void> clear(BuildContext context) async {
-    var res = await showDialog(
-        context: context,
-        builder: (c) {
-          return const RemoveWidgetDialog();
-        });
-
-    if (res != null && res) {
-      itemController.clear();
-    }
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => ConfirmationDialog(
+        title: 'Remove All Widgets',
+        message: 'Are you sure you want to remove all widgets?',
+        onConfirm: () => itemController.clear(),
+      ),
+    );
   }
 }
