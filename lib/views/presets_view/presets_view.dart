@@ -44,7 +44,8 @@ class _PresetsViewState extends State<PresetsView> {
     var randomColor =
         ThemeHelper.cardBackgroundColors.keys.elementAt(colorIndex);
     var newPreset = PresetModel(
-      name: 'Title (Tap to Edit)',
+      name: 'Title',
+      defaultTitle: true,
       iconCode: randomIconCode,
       backgroundColor: randomColor,
     );
@@ -54,6 +55,7 @@ class _PresetsViewState extends State<PresetsView> {
       context,
       MaterialPageRoute(
         builder: (context) => PresetDashboardView(
+          startOnEdit: true,
           preset: newPreset,
           onClose: (updatedPreset, widgets) {
             // Save the new Preset (if not empty).
@@ -278,6 +280,7 @@ class _PresetsViewState extends State<PresetsView> {
                 MaterialPageRoute(
                   builder: (context) => PresetDashboardView(
                     preset: preset,
+                    startOnEdit: false,
                     onClose: _handleExistingPresetClose,
                   ),
                 ),

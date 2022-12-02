@@ -48,7 +48,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "52a9d27c606c9e69aaf301c293abcf717a7a4d9a"
+      resolved-ref: d3d19ac4556396605e8323ee740996e6eb7323ec
       url: "https://github.com/xcoupe01/dashboard"
     source: git
     version: "0.0.2+4"

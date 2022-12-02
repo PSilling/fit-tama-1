@@ -11,6 +11,7 @@ class PresetModel {
   bool isFavourite;
   int openedCount;
   Color backgroundColor;
+  bool defaultTitle;
 
   PresetModel({
     String? id,
@@ -20,6 +21,7 @@ class PresetModel {
     this.isFavourite = false,
     this.openedCount = 0,
     this.backgroundColor = Colors.blue,
+    this.defaultTitle = true,
   }) {
     if (id != null) {
       this.id = id;
@@ -37,7 +39,8 @@ class PresetModel {
         iconCode = json['iconCode'],
         isFavourite = json['isFavourite'],
         openedCount = json['openedCount'],
-        backgroundColor = Color(json['backgroundColor']);
+        backgroundColor = Color(json['backgroundColor']),
+        defaultTitle = json['defaultTitle'];
 
   /// Generates a JSON representation of the preset.
   Map<String, dynamic> toJson() => {
@@ -48,5 +51,6 @@ class PresetModel {
         'isFavourite': isFavourite,
         'openedCount': openedCount,
         'backgroundColor': backgroundColor.value,
+        'defaultTitle': defaultTitle,
       };
 }

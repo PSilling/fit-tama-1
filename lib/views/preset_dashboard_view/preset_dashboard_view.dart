@@ -8,13 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import '../../widgets/confirmation_dialog.dart';
-import './add_widget_dialog.dart';
 import '../../models/preset_model.dart';
 import 'colored_dashboard_item.dart';
 import 'preset_widgets_storage.dart';
 
 class PresetDashboardView extends StatefulWidget {
   final PresetModel preset;
+  final bool startOnEdit;
   final Function(
     PresetModel updatedPreset,
     Map<String, dynamic> widgets,
@@ -23,6 +23,7 @@ class PresetDashboardView extends StatefulWidget {
   const PresetDashboardView({
     super.key,
     required this.preset,
+    required this.startOnEdit,
     this.onClose,
   });
   @override
@@ -39,7 +40,7 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
   late DashboardItemController<ColoredDashboardItem> itemController;
 
   int? slot;
-  bool editVisible = false;
+  late bool editVisible;
   late FocusNode textFocusNode;
   late String nameEdit;
   bool titleEdit = false;
@@ -47,11 +48,12 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
   @override
   void initState() {
     super.initState();
-    storage = PresetWidgetsStorage(widget.preset.id);
+    storage = PresetWidgetsStorage(widget.preset.id, widget.startOnEdit);
     itemController = DashboardItemController<ColoredDashboardItem>.withDelegate(
         itemStorageDelegate: storage);
     textFocusNode = FocusNode();
     nameEdit = widget.preset.name;
+    editVisible = widget.startOnEdit;
   }
 
   void setSlot() {
@@ -82,24 +84,47 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
         appBar: AppBar(
           title: Stack(
             children: [
-              TextFormField(
-                focusNode: textFocusNode,
-                style: Theme.of(context).textTheme.titleLarge,
-                cursorColor: ThemeHelper.dialogForeground(context),
-                decoration: ThemeHelper.dialogInputDecoration(
-                    context,
-                    hasBorder: false,
-                    hasPadding: false
+              Visibility(
+                visible: !titleEdit,
+                child: GestureDetector(
+                  child: Text(
+                    widget.preset.name + (
+                    widget.preset.defaultTitle ? ' (Tap to Edit)' : ''
+                    ),
+                    style: const TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  onTap: (){
+                    titleEdit = true;
+                    setState(() {});
+                    textFocusNode.requestFocus();
+                  },
                 ),
-                initialValue: widget.preset.name,
-                textInputAction: TextInputAction.done,
-                onTap: () => textFocusNode.requestFocus(),
-                onChanged: (value) {nameEdit = value;},
-                onEditingComplete: () {
-                  widget.preset.name = nameEdit;
-                  textFocusNode.unfocus();
-                  setState(() {});
-                },
+              ),
+              Visibility(
+                visible: titleEdit,
+                child: TextFormField(
+                  focusNode: textFocusNode,
+                  style: Theme.of(context).textTheme.titleLarge,
+                  cursorColor: ThemeHelper.dialogForeground(context),
+                  decoration: ThemeHelper.dialogInputDecoration(
+                      context,
+                      hasBorder: false,
+                      hasPadding: false
+                  ),
+                  initialValue: widget.preset.name,
+                  textInputAction: TextInputAction.done,
+                  onTap: () => textFocusNode.requestFocus(),
+                  onChanged: (value) {nameEdit = value;},
+                  onEditingComplete: () {
+                    widget.preset.name = nameEdit;
+                    widget.preset.defaultTitle = false;
+                    textFocusNode.unfocus();
+                    titleEdit = false;
+                    setState(() {});
+                  },
+                ),
               ),
             ]
           ),
@@ -141,6 +166,7 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
             scrollController: scrollController,
             dashboardItemController: itemController,
             slotCount: slot!,
+            startInEdit: editVisible,
             physics: const RangeMaintainingScrollPhysics(),
             dragStartBehavior: DragStartBehavior.down,
             errorPlaceholder: (e, s) {
@@ -197,6 +223,7 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
             activeBackgroundColor: ThemeHelper.dialogBackground(context),
             activeForegroundColor: ThemeHelper.dialogForeground(context),
             tooltip: 'Add a widget',
+            isOpenOnStart: widget.startOnEdit,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             spacing: 12,
             children: [

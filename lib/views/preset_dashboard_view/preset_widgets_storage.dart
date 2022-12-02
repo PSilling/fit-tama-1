@@ -17,14 +17,15 @@ import 'colored_dashboard_item.dart';
 
 class PresetWidgetsStorage
     extends DashboardItemStorageDelegate<ColoredDashboardItem> {
-  PresetWidgetsStorage(this.presetLink);
+  PresetWidgetsStorage(this.presetLink, this.startEdit);
 
   String presetLink;
+  bool startEdit;
   late SharedPreferences _preferences;
   final List<int> _slotCounts = [2];
   Map<int, Map<String, ColoredDashboardItem>>? _localItems;
   Map<String, dynamic>? widgets;
-  bool _editing = false;
+  bool? _editing;
 
   final Map<String, Widget Function(String i, bool e, int w)> _widgetMap = {
     'counter': (l, e, w) => CounterWidget(
@@ -59,55 +60,19 @@ class PresetWidgetsStorage
         isLeftDeath: false,
         isRightDeath: false)),
     'dice': jsonEncode(
-        DiceWidgetData(name: 'Dice', numberOfDice: 2, numberOfSides: 2)),
+        DiceWidgetData(name: 'Dice', numberOfDice: 2, numberOfSides: 6)),
     'timer': jsonEncode(TimerWidgetData(name: 'Timer', initialTime: 30)),
     'chess_timer': jsonEncode(
         ChessTimerWidgetData(name: 'Chess timer', initialTimes: [90, 90])),
   };
 
   late final Map<int, List<ColoredDashboardItem>> _default = {
-    2: <ColoredDashboardItem>[
-      ColoredDashboardItem(
-        width: 2,
-        minWidth: 2,
-        height: 1,
-        identifier: 'counter',
-        startX: 0,
-        startY: 0,
-        type: 'counter',
-        data: defaultData['counter']!,
-      ),
-      ColoredDashboardItem(
-        width: 1,
-        height: 1,
-        identifier: 'dice',
-        startX: 1,
-        startY: 1,
-        type: 'dice',
-        data: defaultData['dice']!,
-      ),
-      ColoredDashboardItem(
-          width: 1,
-          height: 1,
-          identifier: 'timer',
-          startX: 0,
-          startY: 1,
-          type: 'timer',
-          data: defaultData['timer']!),
-      ColoredDashboardItem(
-          width: 2,
-          minWidth: 2,
-          height: 1,
-          identifier: 'chess_timer',
-          startX: 0,
-          startY: 1,
-          type: 'chess_timer',
-          data: defaultData['chess_timer']!),
-    ],
+    2: <ColoredDashboardItem>[],
   };
 
   dynamic buildWidget(ColoredDashboardItem item) {
-    return _widgetMap[item.type]!(item.data, _editing, item.getWidth());
+    _editing ??= startEdit;
+    return _widgetMap[item.type]!(item.data, _editing!, item.getWidth());
   }
 
   @override

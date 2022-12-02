@@ -47,6 +47,7 @@ class _CustomizePresetViewState extends State<CustomizePresetView> {
     final formState = _formKey.currentState;
     if (formState != null && formState.validate()) {
       formState.save();
+      widget.preset.defaultTitle = false;
       widget.onSave(widget.preset);
     }
   }
