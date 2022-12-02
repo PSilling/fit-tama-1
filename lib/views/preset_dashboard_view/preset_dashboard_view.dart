@@ -5,10 +5,10 @@ import 'package:board_aid/util/themes.dart';
 import 'package:dashboard/dashboard.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import '../../widgets/confirmation_dialog.dart';
 import './add_widget_dialog.dart';
-import './remove_widget_dialog.dart';
 import '../../models/preset_model.dart';
 import 'colored_dashboard_item.dart';
 import 'preset_widgets_storage.dart';
@@ -190,12 +190,62 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
           curve: editVisible ? Curves.ease : Curves.easeInExpo,
           duration: const Duration(milliseconds: 300),
           offset: editVisible ? Offset.zero : const Offset(0, 2),
-          child: FloatingActionButton(
+          child: SpeedDial(
             backgroundColor: ThemeHelper.floaterBackgroundColor(context),
             foregroundColor: ThemeHelper.floaterForegroundColor(context),
-            onPressed: () {add(context);},
-            tooltip: 'Add new widget',
+            activeBackgroundColor: ThemeHelper.dialogBackground(context),
+            activeForegroundColor: ThemeHelper.dialogForeground(context),
+            tooltip: 'Add a widget',
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            spacing: 12,
+            children: [
+              SpeedDialChild(
+                onTap: () => addWidget('dice', 1),
+                child: const Icon(Icons.casino_outlined),
+                label: 'Dice',
+                backgroundColor: ThemeHelper.floaterBackgroundColor(context),
+                foregroundColor: ThemeHelper.floaterForegroundColor(context),
+                labelBackgroundColor: ThemeHelper.dialogBackground(context),
+                labelStyle: TextStyle(color: ThemeHelper.dialogForeground(context)),
+              ),
+              SpeedDialChild(
+                onTap: () => addWidget('counter', 1),
+                child: const Icon(Icons.control_point),
+                label: 'Counter',
+                backgroundColor: ThemeHelper.floaterBackgroundColor(context),
+                foregroundColor: ThemeHelper.floaterForegroundColor(context),
+                labelBackgroundColor: ThemeHelper.dialogBackground(context),
+                labelStyle: TextStyle(color: ThemeHelper.dialogForeground(context)),
+              ),
+              SpeedDialChild(
+                onTap: () => addWidget('counter', 2),
+                child: const Icon(Icons.control_point_duplicate),
+                label: 'Wide Counter',
+                backgroundColor: ThemeHelper.floaterBackgroundColor(context),
+                foregroundColor: ThemeHelper.floaterForegroundColor(context),
+                labelBackgroundColor: ThemeHelper.dialogBackground(context),
+                labelStyle: TextStyle(color: ThemeHelper.dialogForeground(context)),
+              ),
+              SpeedDialChild(
+                onTap: () => addWidget('timer', 1),
+                child: const Icon(Icons.timer_outlined),
+                label: 'Timer',
+                backgroundColor: ThemeHelper.floaterBackgroundColor(context),
+                foregroundColor: ThemeHelper.floaterForegroundColor(context),
+                labelBackgroundColor: ThemeHelper.dialogBackground(context),
+                labelStyle: TextStyle(color: ThemeHelper.dialogForeground(context)),
+              ),
+              SpeedDialChild(
+                onTap: () => addWidget('chess_timer', 2),
+                child: const Icon(Icons.alarm),
+                label: 'Chess Timer',
+                backgroundColor: ThemeHelper.floaterBackgroundColor(context),
+                foregroundColor: ThemeHelper.floaterForegroundColor(context),
+                labelBackgroundColor: ThemeHelper.dialogBackground(context),
+                labelStyle: TextStyle(color: ThemeHelper.dialogForeground(context)),
+              ),
+            ],
+            activeChild: const Icon(Icons.close),
             child: const Icon(Icons.add),
           ),
         ),
@@ -223,6 +273,20 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
           type: res[0],
           data: storage.defaultData[res[0]]!));
     }
+  }
+
+  void addWidget(String id, int width) {
+    itemController.add(ColoredDashboardItem(
+        width: width,
+        height: 1,
+        identifier: Random().nextInt(1000).toString() +
+            DateTime.now().microsecondsSinceEpoch.toString(),
+        minWidth: width,
+        minHeight: 1,
+        maxWidth: 2,
+        maxHeight: 1,
+        type: id,
+        data: storage.defaultData[id]!));
   }
 
   Future<void> clear(BuildContext context) async {

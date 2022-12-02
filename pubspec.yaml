@@ -17,6 +17,7 @@ dependencies:
     git:
       url: https://github.com/xcoupe01/dashboard
   cupertino_icons: ^1.0.4
+  flutter_speed_dial: ^6.2.0
 
 dev_dependencies:
   flutter_test:
