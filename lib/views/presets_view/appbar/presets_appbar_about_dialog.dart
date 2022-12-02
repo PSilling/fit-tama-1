@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Dialog with basic information about the application and its developers.
 class PresetsAppbarAboutDialog extends StatelessWidget {
@@ -8,7 +9,7 @@ class PresetsAppbarAboutDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return const AboutDialog(
       applicationName: 'Board Aid',
-      applicationIcon: Icon(Icons.people), // TODO: Real icon?
+      applicationIcon: Image(image: AssetImage('assets/icon.png')),
       applicationVersion: 'Version 1.0.0+1',
       applicationLegalese: '© The Board Aid Team',
       children: [
