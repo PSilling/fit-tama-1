@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:board_aid/util/extensions.dart';
 import 'package:board_aid/widgets/timer_widget/timer_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -187,6 +188,31 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
                   ),
                   Padding(
                     padding: ThemeHelper.formPadding(),
+                    child: FormBuilderChoiceChip<String>(
+                      backgroundColor: ThemeHelper.dialogForeground(context)
+                          .withOpacity(0.5),
+                      selectedColor: ThemeHelper.dialogForeground(context),
+                      decoration: ThemeHelper.dialogInputDecoration(context,
+                          label: "Behavior when the timer is up"),
+                      spacing: ThemeHelper.dialogChipSpacing,
+                      name: "count_negative",
+                      initialValue: _NegativeTimeOptions.fromData(
+                        cont: widget.data.countNegative,
+                      ).label,
+                      onSaved: (value) => widget.data.countNegative =
+                          _NegativeTimeOptions.countNegative(value: value),
+                      options: [
+                        _NegativeTimeOptions.cont.getOption(context),
+                        _NegativeTimeOptions.stop.getOption(context),
+                      ],
+                      onChanged: (value) {
+                        _validateAndSave();
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: ThemeHelper.formPadding(),
                     child: GestureDetector(
                       onTap: () => _showDialog(
                         CupertinoTimerPicker(
@@ -207,18 +233,62 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Initial time:'),
-                              Text(formatTime(widget.data.initialTime))
+                              Text(
+                                'Initial time:',
+                                style: TextStyle(
+                                  color: ThemeHelper.editViewForeground(context)
+                                ),
+                              ),
+                              Text(
+                                formatTime(widget.data.initialTime),
+                                style: TextStyle(
+                                    color: ThemeHelper.editViewForeground(context)
+                                ),
+                              )
                             ]
                           )
                         )
                       )
                     )
-                  )
+                  ),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+enum _NegativeTimeOptions {
+  cont,
+  stop;
+
+  factory _NegativeTimeOptions.fromData({required bool cont}) {
+    return cont ? _NegativeTimeOptions.cont : _NegativeTimeOptions.stop;
+  }
+
+  String get label {
+    switch (this) {
+      case _NegativeTimeOptions.stop:
+        return "Stop the timer";
+      case _NegativeTimeOptions.cont:
+        return "Continue";
+    }
+  }
+
+  static bool countNegative({required String? value}) {
+    return value == _NegativeTimeOptions.cont.label;
+  }
+
+  FormBuilderChipOption<String> getOption(BuildContext context) {
+    return FormBuilderChipOption<String>(
+      value: label,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: ThemeHelper.dialogBackground(context),
         ),
       ),
     );

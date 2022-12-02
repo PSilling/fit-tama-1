@@ -222,6 +222,31 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                   ),
                   Padding(
                     padding: ThemeHelper.formPadding(),
+                    child: FormBuilderChoiceChip<String>(
+                      backgroundColor: ThemeHelper.dialogForeground(context)
+                          .withOpacity(0.5),
+                      selectedColor: ThemeHelper.dialogForeground(context),
+                      decoration: ThemeHelper.dialogInputDecoration(context,
+                          label: "Behavior when the timer is up"),
+                      spacing: ThemeHelper.dialogChipSpacing,
+                      name: "count_negative",
+                      initialValue: _NegativeTimeOptions.fromData(
+                        cont: widget.data.countNegative,
+                      ).label,
+                      onSaved: (value) => widget.data.countNegative =
+                          _NegativeTimeOptions.countNegative(value: value),
+                      options: [
+                        _NegativeTimeOptions.cont.getOption(context),
+                        _NegativeTimeOptions.stop.getOption(context),
+                      ],
+                      onChanged: (value) {
+                        _validateAndSave();
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: ThemeHelper.formPadding(),
                     child: FormBuilderRadioGroup<String>(
                       activeColor: ThemeHelper.dialogForeground(context),
                       decoration: ThemeHelper.dialogInputDecoration(context,
@@ -255,7 +280,7 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                       activeColor: ThemeHelper.dialogForeground(context),
                       decoration: ThemeHelper.dialogInputDecoration(
                         context,
-                        label: "Timer ranges:",
+                        label: "Timer ranges",
                       ),
                       name: "timer_ranges",
                       initialValue: _separateTimeSet.label,
@@ -301,8 +326,18 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Initial time of player ${i+1}:'),
-                                  Text(formatTime(widget.data.initialTimes[i]))
+                                  Text(
+                                    'Initial time of player ${i+1}:',
+                                    style: TextStyle(
+                                        color: ThemeHelper.editViewForeground(context)
+                                    ),
+                                  ),
+                                  Text(
+                                    formatTime(widget.data.initialTimes[i]),
+                                    style: TextStyle(
+                                        color: ThemeHelper.editViewForeground(context)
+                                    ),
+                                  )
                                 ]
                               )
                             )
@@ -350,6 +385,40 @@ enum _SeparateTimesSet {
         label,
         style: TextStyle(
           color: ThemeHelper.dialogForeground(context),
+        ),
+      ),
+    );
+  }
+}
+
+enum _NegativeTimeOptions {
+  cont,
+  stop;
+
+  factory _NegativeTimeOptions.fromData({required bool cont}) {
+    return cont ? _NegativeTimeOptions.cont : _NegativeTimeOptions.stop;
+  }
+
+  String get label {
+    switch (this) {
+      case _NegativeTimeOptions.stop:
+        return "Stop the timer";
+      case _NegativeTimeOptions.cont:
+        return "Continue";
+    }
+  }
+
+  static bool countNegative({required String? value}) {
+    return value == _NegativeTimeOptions.cont.label;
+  }
+
+  FormBuilderChipOption<String> getOption(BuildContext context) {
+    return FormBuilderChipOption<String>(
+      value: label,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: ThemeHelper.dialogBackground(context),
         ),
       ),
     );

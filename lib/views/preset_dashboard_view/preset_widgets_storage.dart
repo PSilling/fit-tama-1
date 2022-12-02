@@ -60,7 +60,7 @@ class PresetWidgetsStorage
         isRightDeath: false)),
     'dice': jsonEncode(
         DiceWidgetData(name: 'Dice', numberOfDice: 2, numberOfSides: 2)),
-    'timer': jsonEncode(TimerWidgetData(name: 'Timer', initialTime: 90)),
+    'timer': jsonEncode(TimerWidgetData(name: 'Timer', initialTime: 30)),
     'chess_timer': jsonEncode(
         ChessTimerWidgetData(name: 'Chess timer', initialTimes: [90, 90])),
   };

@@ -69,7 +69,12 @@ class DialogSelectInput extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Default:"),
+            Text(
+              "Default:",
+              style: TextStyle(
+                color: ThemeHelper.dialogForeground(context),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 4, top: 8),
               child: InkResponse(

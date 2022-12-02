@@ -21,6 +21,8 @@ class ConfirmationDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: ThemeHelper.dialogBackground(context),
+      contentTextStyle: Theme.of(context).textTheme.subtitle1!.copyWith(color: ThemeHelper.dialogForeground(context)),
+      titleTextStyle: Theme.of(context).textTheme.headline6!.copyWith(color: ThemeHelper.dialogForeground(context)),
       title: Text(title),
       content: Text(message),
       actions: [
