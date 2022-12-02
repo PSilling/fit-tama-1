@@ -12,7 +12,7 @@ class DiceWidgetData {
     this.backgroundColor,
     required this.numberOfDice,
     required this.numberOfSides,
-    this.longPressToReroll = true,
+    this.longPressToReroll = false,
   });
 
   DiceWidgetData.fromJson(Map<String, dynamic> json)
