@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:board_aid/util/themes.dart';
 import 'package:board_aid/widgets/font_spacer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../views/edit_views/edit_timer_widget_view.dart';
 import '../editable.dart';
@@ -87,11 +88,31 @@ class TimerWidgetState extends State<TimerWidget>
       if (_currentState == TimerWidgetTimerState.running) {
         _countdownTimer = Timer(const Duration(seconds: 1), update);
         _currentTime--;
+        if (_currentTime == 0) { // notification (once)
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "'${_data.name}' timer is up!",
+                style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+            ),
+          );
+        }
+        if (_currentTime <= 0) {
+          if (_data.countNegative) {  // vibrate (ongoing)
+            HapticFeedback.mediumImpact();
+          } else { // vibrate more and stop
+            HapticFeedback.vibrate();
+            _currentState = TimerWidgetTimerState.paused;
+          }
+        }
       }
     });
   }
 
   String formatTime(int time) {
+    if (!_data.countNegative && time < 0) return "0s";
     var sign = time < 0 ? "-" : "";
     var seconds = time.abs() % 60;
     var minutes = time.abs() % 3600 ~/ 60;
@@ -120,7 +141,11 @@ class TimerWidgetState extends State<TimerWidget>
         pause();
         break;
       case TimerWidgetTimerState.paused:
-        run();
+        if (_currentTime <= 0 && !_data.countNegative) {
+          reset();
+        } else {
+          run();
+        }
         break;
     }
   }
@@ -223,7 +248,14 @@ class TimerWidgetState extends State<TimerWidget>
                 context: context,
                 semanticLabel: "Pause the timer",
               ),
-            if (_currentState == TimerWidgetTimerState.paused) ...[
+            if (_currentState == TimerWidgetTimerState.paused
+                && _currentTime <= 0 && !_data.countNegative)
+              _themedIconButton(Icons.replay,
+                  onPressed: reset,
+                  context: context,
+                  semanticLabel: "Reset the timer"),
+            if (_currentState == TimerWidgetTimerState.paused
+                && !(_currentTime <= 0 && !_data.countNegative)) ...[
               _themedIconButton(
                 Icons.play_arrow,
                 onPressed: run,

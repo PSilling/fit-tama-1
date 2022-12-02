@@ -189,7 +189,7 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
         floatingActionButton: AnimatedSlide(
           curve: editVisible ? Curves.ease : Curves.easeInExpo,
           duration: const Duration(milliseconds: 300),
-          offset: editVisible ? Offset.zero : const Offset(0, 2),
+          offset: editVisible ? Offset.zero : const Offset(0, 20),
           child: SpeedDial(
             backgroundColor: ThemeHelper.floaterBackgroundColor(context),
             foregroundColor: ThemeHelper.floaterForegroundColor(context),
@@ -251,28 +251,6 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
         ),
       ),
     );
-  }
-
-  Future<void> add(BuildContext context) async {
-    var res = await showDialog(
-        context: context,
-        builder: (c) {
-          return const AddWidgetDialog();
-        });
-
-    if (res != null) {
-      itemController.add(ColoredDashboardItem(
-          width: res[1],
-          height: 1,
-          identifier: Random().nextInt(1000).toString() +
-              DateTime.now().microsecondsSinceEpoch.toString(),
-          minWidth: res[1],
-          minHeight: 1,
-          maxWidth: 2,
-          maxHeight: 1,
-          type: res[0],
-          data: storage.defaultData[res[0]]!));
-    }
   }
 
   void addWidget(String id, int width) {

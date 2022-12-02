@@ -70,6 +70,7 @@ class ThemeHelper {
     const Color(0xFFb35900): 'Orange',
     Colors.brown.shade500: 'Brown',
     Colors.lime.shade900: 'Lime',
+    const Color(0xff486a56): 'Moss Green',
     Colors.green.shade700: 'Green',
     Colors.teal.shade600: 'Teal',
     Colors.blueGrey.shade600: 'Blue Grey',
@@ -77,8 +78,7 @@ class ThemeHelper {
     Colors.indigo.shade500: 'Indigo',
     Colors.deepPurple.shade500: 'Deep Purple',
     Colors.purple.shade500: 'Purple',
-    const Color(0xFFcc33a6): 'Pink',
-    const Color(0xffc42e23): 'Red',
+    const Color(0xFFb34d99): 'Pink',
   };
 
   /// Codes of available preset card icons.
