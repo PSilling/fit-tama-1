@@ -247,43 +247,53 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                   ),
                   Padding(
                     padding: ThemeHelper.formPadding(),
-                    child: FormBuilderRadioGroup<String>(
-                      activeColor: ThemeHelper.dialogForeground(context),
+                    child: FormBuilderChoiceChip<String>(
+                      backgroundColor: ThemeHelper.dialogForeground(context)
+                          .withOpacity(0.5),
+                      selectedColor: ThemeHelper.dialogForeground(context),
                       decoration: ThemeHelper.dialogInputDecoration(context,
                           label: "Number of timers"),
+                      spacing: ThemeHelper.dialogChipSpacing,
                       name: "num_timers",
                       initialValue: _outputLength.toString(),
-                      onChanged: (val) {
-                        _outputLength = int.parse(val!);
-                        _validateAndSave();
-                        setState(() {});
-                      },
-                      options: List<FormBuilderFieldOption<String>>.generate(
+                      onSaved: (value) => widget.data.countNegative =
+                          _NegativeTimeOptions.countNegative(value: value),
+                      options: List<FormBuilderChipOption<String>>.generate(
                         _numTimersPossible.length,
-                        (i) {
-                          return FormBuilderFieldOption<String>(
+                            (i) {
+                          return FormBuilderChipOption<String>(
                             value: _numTimersPossible[i].toString(),
                             child: Text(
-                              _numTimersPossible[i].toString(),
+                              '${_numTimersPossible[i]} timers',
                               style: TextStyle(
-                                color: ThemeHelper.dialogForeground(context),
+                                color: ThemeHelper.dialogBackground(context),
                               ),
                             ),
                           );
                         },
                       ),
+                      onChanged: (value) {
+                        _outputLength = int.parse(value!);
+                        _validateAndSave();
+                        setState(() {});
+                      },
                     ),
                   ),
                   Padding(
                     padding: ThemeHelper.formPadding(),
-                    child: FormBuilderRadioGroup<String>(
-                      activeColor: ThemeHelper.dialogForeground(context),
-                      decoration: ThemeHelper.dialogInputDecoration(
-                        context,
-                        label: "Timer ranges",
-                      ),
+                    child: FormBuilderChoiceChip<String>(
+                      backgroundColor: ThemeHelper.dialogForeground(context)
+                          .withOpacity(0.5),
+                      selectedColor: ThemeHelper.dialogForeground(context),
+                      decoration: ThemeHelper.dialogInputDecoration(context,
+                          label: "Timer ranges"),
+                      spacing: ThemeHelper.dialogChipSpacing,
                       name: "timer_ranges",
                       initialValue: _separateTimeSet.label,
+                      options: [
+                        _SeparateTimesSet.together.getOption(context),
+                        _SeparateTimesSet.separate.getOption(context),
+                      ],
                       onChanged: (value) {
                         if (value != null) {
                           _separateTimeSet =
@@ -292,11 +302,6 @@ class EditChessTimerWidgetViewState extends State<EditChessTimerWidgetView> {
                           setState(() {});
                         }
                       },
-                      // onSaved: (value) => widget.data.isUneven = _EvennessOptions.isUneven(value: value),
-                      options: [
-                        _SeparateTimesSet.together.getOption(context),
-                        _SeparateTimesSet.separate.getOption(context),
-                      ],
                     ),
                   ),
                   for (var i = 0; i < _numTimersPossible.reduce(max); i++)
@@ -378,13 +383,13 @@ enum _SeparateTimesSet {
     }
   }
 
-  FormBuilderFieldOption<String> getOption(BuildContext context) {
-    return FormBuilderFieldOption<String>(
+  FormBuilderChipOption<String> getOption(BuildContext context) {
+    return FormBuilderChipOption<String>(
       value: label,
       child: Text(
         label,
         style: TextStyle(
-          color: ThemeHelper.dialogForeground(context),
+          color: ThemeHelper.dialogBackground(context),
         ),
       ),
     );
