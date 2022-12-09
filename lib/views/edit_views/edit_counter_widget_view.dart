@@ -30,7 +30,8 @@ class EditCounterWidgetView extends StatefulWidget {
 
 class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final GlobalKey<CounterWidgetState> _previewKey = GlobalKey<CounterWidgetState>();
+  final GlobalKey<CounterWidgetState> _previewKey =
+      GlobalKey<CounterWidgetState>();
 
   late bool _isUneven;
   late List<KeyedEntry> _keyedScale;
@@ -45,6 +46,7 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
 
   @override
   void initState() {
+    super.initState();
     _isUneven = widget.data.isUneven;
     if (widget.data.isUneven) {
       final defaultScale = widget.data.scale
@@ -58,7 +60,7 @@ class _EditCounterWidgetViewState extends State<EditCounterWidgetView> {
     }
   }
 
-  void _onEditComplete(){
+  void _onEditComplete() {
     _validateAndSave();
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {});

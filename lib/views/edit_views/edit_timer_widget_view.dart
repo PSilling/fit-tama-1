@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:board_aid/util/extensions.dart';
 import 'package:board_aid/widgets/timer_widget/timer_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +43,7 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
     }
   }
 
-  void _onEditComplete(){
+  void _onEditComplete() {
     _validateAndSave();
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {});
@@ -64,26 +63,24 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
       return "$sign${hours}h ${minutes}m ${seconds}s";
     }
   }
-  
+
   void _showDialog(Widget child) {
     showCupertinoModalPopup<void>(
-      context: context,
-      builder: (BuildContext context) => WillPopScope(
-        onWillPop: _onWillPop,
-        child: Container(
-          height: 216,
-          padding: const EdgeInsets.only(top: 6.0),
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          color: ThemeHelper.dialogBackground(context),
-          child: SafeArea(
-            top: false,
-            child: child,
-          ),
-        )
-      )
-    );
+        context: context,
+        builder: (BuildContext context) => WillPopScope(
+            onWillPop: _onWillPop,
+            child: Container(
+              height: 216,
+              padding: const EdgeInsets.only(top: 6.0),
+              margin: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              color: ThemeHelper.dialogBackground(context),
+              child: SafeArea(
+                top: false,
+                child: child,
+              ),
+            )));
   }
 
   @override
@@ -212,45 +209,43 @@ class _EditTimerWidgetViewState extends State<EditTimerWidgetView> {
                     ),
                   ),
                   Padding(
-                    padding: ThemeHelper.formPadding(),
-                    child: GestureDetector(
-                      onTap: () => _showDialog(
-                        CupertinoTimerPicker(
-                          initialTimerDuration: Duration(seconds: widget.data.initialTime),
-                          onTimerDurationChanged: (value) {
-                            widget.data.initialTime = value.inSeconds;
-                          },
-                        ),
-                      ),
-                      child: FormBuilderField(
-                        name: 'init_time',
-                        builder: (FormFieldState field) => InputDecorator(
-                          decoration: ThemeHelper.dialogInputDecoration(context,
-                            errorText: field.errorText,
-                            hasBorder: true,
-                            isDense: false,
-                            hasPadding: true),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Initial time:',
-                                style: TextStyle(
-                                  color: ThemeHelper.editViewForeground(context)
+                      padding: ThemeHelper.formPadding(),
+                      child: GestureDetector(
+                          onTap: () => _showDialog(
+                                CupertinoTimerPicker(
+                                  initialTimerDuration: Duration(
+                                      seconds: widget.data.initialTime),
+                                  onTimerDurationChanged: (value) {
+                                    widget.data.initialTime = value.inSeconds;
+                                  },
                                 ),
                               ),
-                              Text(
-                                formatTime(widget.data.initialTime),
-                                style: TextStyle(
-                                    color: ThemeHelper.editViewForeground(context)
-                                ),
-                              )
-                            ]
-                          )
-                        )
-                      )
-                    )
-                  ),
+                          child: FormBuilderField(
+                              name: 'init_time',
+                              builder: (FormFieldState field) => InputDecorator(
+                                  decoration: ThemeHelper.dialogInputDecoration(
+                                      context,
+                                      errorText: field.errorText,
+                                      hasBorder: true,
+                                      isDense: false,
+                                      hasPadding: true),
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Initial time:',
+                                          style: TextStyle(
+                                              color: ThemeHelper
+                                                  .editViewForeground(context)),
+                                        ),
+                                        Text(
+                                          formatTime(widget.data.initialTime),
+                                          style: TextStyle(
+                                              color: ThemeHelper
+                                                  .editViewForeground(context)),
+                                        )
+                                      ]))))),
                 ],
               ),
             ),

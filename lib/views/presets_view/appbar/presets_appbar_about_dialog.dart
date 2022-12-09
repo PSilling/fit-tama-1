@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// Dialog with basic information about the application and its developers.
 class PresetsAppbarAboutDialog extends StatelessWidget {
