@@ -13,7 +13,6 @@ dependencies:
     sdk: flutter
   flutter_form_builder: ^7.7.0
   dashboard:
-    #path: '../dashboard' #leaved for debugging purposes
     git:
       url: https://github.com/xcoupe01/dashboard
   flutter_speed_dial: ^6.2.0
