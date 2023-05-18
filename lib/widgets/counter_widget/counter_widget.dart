@@ -32,7 +32,6 @@ class CounterWidget extends StatefulWidget {
 class CounterWidgetState extends State<CounterWidget>
     implements Editable<CounterWidget> {
   late CounterWidgetData _data;
-  late int _currentIndex;
   var _isEditing = false;
   final Map<int, List<int>> _widthSettings = {
     1: [1],
@@ -57,27 +56,26 @@ class CounterWidgetState extends State<CounterWidget>
     super.initState();
     _isEditing = widget.startEditing;
     _data = widget.initData;
-    _currentIndex = _data.defaultIndex;
   }
 
   CounterWidgetData get data => _data;
 
   void increaseIndex() {
     setState(() {
-      final newIndex = _currentIndex + 1;
+      final newIndex = data.currentIndex.value + 1;
       final deathModifier = _data.isRightDeath ? 1 : 0;
       if (newIndex < _data.scale.length + deathModifier) {
-        _currentIndex = newIndex;
+        data.currentIndex.value = newIndex;
       }
     });
   }
 
   void decreaseIndex() {
     setState(() {
-      final newIndex = _currentIndex - 1;
+      final newIndex = data.currentIndex.value - 1;
       final deathModifier = _data.isLeftDeath ? 1 : 0;
       if (newIndex >= 0 - deathModifier) {
-        _currentIndex = newIndex;
+        data.currentIndex.value = newIndex;
       }
     });
   }
@@ -85,11 +83,11 @@ class CounterWidgetState extends State<CounterWidget>
   void increaseIndexBy(int num) {
     setState(() {
       final deathModifier = _data.isRightDeath ? 1 : 0;
-      final newIndex = _currentIndex + num < _data.scale.length + deathModifier
-          ? _currentIndex + num
+      final newIndex = data.currentIndex.value + num < _data.scale.length + deathModifier
+          ? data.currentIndex.value + num
           : _data.scale.length - 1;
       if (newIndex < _data.scale.length + deathModifier) {
-        _currentIndex = newIndex;
+        data.currentIndex.value = newIndex;
       }
     });
   }
@@ -97,24 +95,24 @@ class CounterWidgetState extends State<CounterWidget>
   void decreaseIndexBy(int num) {
     setState(() {
       final deathModifier = _data.isLeftDeath ? 1 : 0;
-      final newIndex = _currentIndex - num >= 0 - deathModifier
-          ? _currentIndex - num
+      final newIndex = data.currentIndex.value - num >= 0 - deathModifier
+          ? data.currentIndex.value - num
           : 0 - deathModifier;
       if (newIndex >= 0 - deathModifier) {
-        _currentIndex = newIndex;
+        data.currentIndex.value = newIndex;
       }
     });
   }
 
   void setIndex(int index) {
     setState(() {
-      _currentIndex = index;
+      data.currentIndex.value = index;
     });
   }
 
   void resetIndex() {
     setState(() {
-      _currentIndex = _data.defaultIndex;
+      data.currentIndex.value = _data.defaultIndex;
     });
   }
 
@@ -192,7 +190,7 @@ class CounterWidgetState extends State<CounterWidget>
       context: context,
       builder: (context) => CounterScaleDialog(
         scaleLength: _data.scale.length,
-        currentIndex: _currentIndex,
+        currentIndex: data.currentIndex.value,
         defaultIndex: _data.defaultIndex,
         isLeftDeath: _data.isLeftDeath,
         isRightDeath: _data.isRightDeath,
@@ -211,7 +209,7 @@ class CounterWidgetState extends State<CounterWidget>
           setData: (data) {
             setState(() {
               _data = data;
-              _currentIndex = data.defaultIndex;
+              data.currentIndex.value = data.defaultIndex;
             });
           },
           width: widget.width,
@@ -240,14 +238,14 @@ class CounterWidgetState extends State<CounterWidget>
   }
 
   int _getSpacerWidth(int index) {
-    final center = _data.scale.elementAtOrNull(_currentIndex);
+    final center = _data.scale.elementAtOrNull(data.currentIndex.value);
     final numberOfDigits = center?.toString().length ??
         [-1, 1]
             .compactMap((element) =>
-                _data.scale.elementAtOrNull(_currentIndex + element))
+                _data.scale.elementAtOrNull(data.currentIndex.value + element))
             .map((element) => element.toString().length)
             .reduce(max);
-    final minimum = index == _currentIndex ? 1 : 2;
+    final minimum = index == data.currentIndex.value ? 1 : 2;
     return max(numberOfDigits, minimum);
   }
 
@@ -321,7 +319,7 @@ class CounterWidgetState extends State<CounterWidget>
         children: [
           for (var i in sideNumbers.reversed.toList())
             _numberButton(
-              index: _currentIndex - i,
+              index: data.currentIndex.value - i,
               flex: 4,
               alignment: Alignment.centerRight,
               textStyle: ThemeHelper.widgetContentSecondary(context),
@@ -338,7 +336,7 @@ class CounterWidgetState extends State<CounterWidget>
                   onPanUpdate: _onPanUpdate,
                   onPanCancel: _onPanCancel,
                   child: _fittingNumber(
-                    index: _currentIndex,
+                    index: data.currentIndex.value,
                     textStyle: ThemeHelper.widgetContentMain(context),
                     alignment: Alignment.center,
                   ),
@@ -348,7 +346,7 @@ class CounterWidgetState extends State<CounterWidget>
           ),
           for (var i in sideNumbers)
             _numberButton(
-              index: _currentIndex + i,
+              index: data.currentIndex.value + i,
               flex: 4,
               alignment: Alignment.centerLeft,
               textStyle: ThemeHelper.widgetContentSecondary(context),

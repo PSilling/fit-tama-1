@@ -136,6 +136,16 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
                   icon: const Icon(Icons.delete)
                 ),
             ),
+            Visibility(
+              visible: !editVisible,
+              child: IconButton(
+                onPressed: () {
+                  reset(context);
+                  setState(() {});
+                },
+                icon: const Icon(Icons.replay),
+              ),
+            ),
             IconButton(
               onPressed: () {
                 editVisible = !editVisible;
@@ -302,6 +312,17 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
         title: 'Remove All Widgets',
         message: 'Are you sure you want to remove all widgets?',
         onConfirm: () => itemController.clear(),
+      ),
+    );
+  }
+
+  Future<void> reset(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => ConfirmationDialog(
+        title: 'Reset All Widgets',
+        message: 'Are you sure you want to reset all widgets?',
+        onConfirm: () => storage.resetAll(),
       ),
     );
   }

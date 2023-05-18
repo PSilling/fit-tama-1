@@ -24,7 +24,6 @@ enum TimerWidgetTimerState { init, running, paused }
 
 class TimerWidgetState extends State<TimerWidget>
     implements Editable<TimerWidget> {
-  late int _currentTime = _data.initialTime;
   TimerWidgetTimerState _currentState = TimerWidgetTimerState.init;
   bool _isEditing = false;
   late TimerWidgetData _data;
@@ -79,7 +78,7 @@ class TimerWidgetState extends State<TimerWidget>
         _countdownTimer!.cancel();
       }
       _currentState = TimerWidgetTimerState.init;
-      _currentTime = _data.initialTime;
+      data.currentTime = _data.initialTime;
     });
   }
 
@@ -87,8 +86,8 @@ class TimerWidgetState extends State<TimerWidget>
     setState(() {
       if (_currentState == TimerWidgetTimerState.running) {
         _countdownTimer = Timer(const Duration(seconds: 1), update);
-        _currentTime--;
-        if (_currentTime == 0) { // notification (once)
+        data.currentTime--;
+        if (data.currentTime == 0) { // notification (once)
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -99,7 +98,7 @@ class TimerWidgetState extends State<TimerWidget>
             ),
           );
         }
-        if (_currentTime <= 0) {
+        if (data.currentTime <= 0) {
           if (_data.countNegative) {  // vibrate (ongoing)
             HapticFeedback.mediumImpact();
           } else { // vibrate more and stop
@@ -141,7 +140,7 @@ class TimerWidgetState extends State<TimerWidget>
         pause();
         break;
       case TimerWidgetTimerState.paused:
-        if (_currentTime <= 0 && !_data.countNegative) {
+        if (data.currentTime <= 0 && !_data.countNegative) {
           reset();
         } else {
           run();
@@ -162,7 +161,7 @@ class TimerWidgetState extends State<TimerWidget>
           setData: (data) {
             setState(() {
               _data = data;
-              _currentTime = data.initialTime;
+              data.currentTime = data.initialTime;
               _countdownTimer = null;
               _currentState = TimerWidgetTimerState.init;
             });
@@ -193,8 +192,8 @@ class TimerWidgetState extends State<TimerWidget>
             alignment: Alignment.center,
             children: [
               Text(
-                formatTime(_currentTime),
-                style: _currentTime <= 0
+                formatTime(data.currentTime),
+                style: data.currentTime <= 0
                     ? ThemeHelper.widgetContentMain(context)
                         .copyWith(color: Theme.of(context).colorScheme.error)
                     : ThemeHelper.widgetContentMain(context),
@@ -241,6 +240,12 @@ class TimerWidgetState extends State<TimerWidget>
                 context: context,
                 semanticLabel: "Start the timer",
               ),
+            if (_currentState == TimerWidgetTimerState.init &&
+              _data.currentTime != _data.initialTime)
+              _themedIconButton(Icons.replay,
+                  onPressed: reset,
+                  context: context,
+                  semanticLabel: "Reset the timer"),
             if (_currentState == TimerWidgetTimerState.running)
               _themedIconButton(
                 Icons.pause,
@@ -249,13 +254,13 @@ class TimerWidgetState extends State<TimerWidget>
                 semanticLabel: "Pause the timer",
               ),
             if (_currentState == TimerWidgetTimerState.paused
-                && _currentTime <= 0 && !_data.countNegative)
+                && data.currentTime <= 0 && !_data.countNegative)
               _themedIconButton(Icons.replay,
                   onPressed: reset,
                   context: context,
                   semanticLabel: "Reset the timer"),
             if (_currentState == TimerWidgetTimerState.paused
-                && !(_currentTime <= 0 && !_data.countNegative)) ...[
+                && !(data.currentTime <= 0 && !_data.countNegative)) ...[
               _themedIconButton(
                 Icons.play_arrow,
                 onPressed: run,

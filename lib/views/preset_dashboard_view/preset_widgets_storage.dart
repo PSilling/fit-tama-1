@@ -57,13 +57,14 @@ class PresetWidgetsStorage
         isUneven: false,
         scale: List<int>.generate(10, (i) => i + 1),
         defaultIndex: 4,
+        currentIndex: ValueNotifier<int>(4),
         isLeftDeath: false,
         isRightDeath: false)),
     'dice': jsonEncode(
         DiceWidgetData(name: 'Dice', numberOfDice: 2, numberOfSides: 6)),
-    'timer': jsonEncode(TimerWidgetData(name: 'Timer', initialTime: 30)),
+    'timer': jsonEncode(TimerWidgetData(name: 'Timer', initialTime: 30, currentTime: 30)),
     'chess_timer': jsonEncode(
-        ChessTimerWidgetData(name: 'Chess timer', initialTimes: [90, 90])),
+        ChessTimerWidgetData(name: 'Chess timer', initialTimes: [90, 90], currentTimes: [90, 90])),
   };
 
   late final Map<int, List<ColoredDashboardItem>> _default = {
@@ -201,6 +202,19 @@ class PresetWidgetsStorage
     for (var item in widgets!.values) {
       if (item != null) {
         item.key.currentState.isEditing = _editing;
+      }
+    }
+  }
+
+  void resetAll(){
+    for (var item in widgets!.values){
+      if(item != null){
+        if (item! is CounterWidget){
+          item.key.currentState.resetIndex();
+        }
+        if (item! is TimerWidget || item! is ChessTimerWidget){
+          item.key.currentState.reset();
+        }
       }
     }
   }

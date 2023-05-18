@@ -7,6 +7,7 @@ class ChessTimerWidgetData {
   Color? backgroundColor;
   List<int> initialTimes;
   bool countNegative;
+  List<int> currentTimes;
 
   bool get isTogether =>
       initialTimes.fold(true, (prev, elem) => prev && elem == initialTimes[0]);
@@ -17,6 +18,7 @@ class ChessTimerWidgetData {
     required this.name,
     this.backgroundColor,
     required this.initialTimes,
+    required this.currentTimes,
     this.countNegative = true,
   });
 
@@ -26,12 +28,16 @@ class ChessTimerWidgetData {
             ? null
             : Color(json['backgroundColor']),
         initialTimes = List<int>.from(jsonDecode(json['initialTime'])),
-        countNegative = json['countNegative'] == 1;
+        countNegative = json['countNegative'] == 1,
+        currentTimes = json['currentTimes'] == null
+          ? List<int>.from(jsonDecode(json['initialTimes']))
+          : List<int>.from(jsonDecode(json['currentTimes']));
 
   Map<String, dynamic> toJson() => {
         'name': name,
         'backgroundColor': backgroundColor?.value,
         'initialTime': jsonEncode(initialTimes),
         'countNegative': countNegative ? 1 : 0,
+        'currentTimes': jsonEncode(currentTimes),
       };
 }
