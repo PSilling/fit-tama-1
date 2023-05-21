@@ -26,7 +26,6 @@ enum TimerWidgetTimerState { init, running, paused }
 
 class ChessTimerWidgetState extends State<ChessTimerWidget>
     implements Editable<ChessTimerWidget> {
-  int _activeTimer = 0;
 
   late TimerWidgetTimerState _currentState;
 
@@ -65,7 +64,7 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
   }
 
   void run() {
-    runTimer(_activeTimer);
+    runTimer(_data.activeTimer);
   }
 
   void pause() {
@@ -83,7 +82,8 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
         _countdownTimer!.cancel();
       }
       _currentState = TimerWidgetTimerState.init;
-      data.currentTimes = List.from(_data.initialTimes);
+      _data.currentTimes = List.from(_data.initialTimes);
+      _data.activeTimer = 0;
     });
   }
 
@@ -93,19 +93,19 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
         _countdownTimer = Timer(const Duration(seconds: 1), () {
           updateTimer(t);
         });
-        data.currentTimes[t]--;
-        if (data.currentTimes[t] == 0) { // notification (once)
+        _data.currentTimes[t]--;
+        if (_data.currentTimes[t] == 0) { // notification (once)
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                "'${_data.name}' timer is up!",
+                "player's ${_data.activeTimer + 1} '${_data.name}' timer is up!",
                 style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
               ),
               backgroundColor: Theme.of(context).colorScheme.secondary,
             ),
           );
         }
-        if (data.currentTimes[t] <= 0) {
+        if (_data.currentTimes[t] <= 0) {
           if (_data.countNegative) {  // vibrate (ongoing)
             HapticFeedback.mediumImpact();
           } else { // vibrate more and stop
@@ -137,11 +137,11 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
       inp.substring((inp.length / 1.25).round());
 
   TextStyle getStyle(int i) {
-    var contentType = i == _activeTimer
+    var contentType = i == _data.activeTimer
         ? ThemeHelper.widgetContentMain(context)
         : ThemeHelper.widgetContentSecondary(context);
 
-    return data.currentTimes[i] <= 0
+    return _data.currentTimes[i] <= 0
         ? contentType.copyWith(color: Theme.of(context).colorScheme.error)
         : contentType;
   }
@@ -153,18 +153,18 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
     }
     switch (_currentState) {
       case TimerWidgetTimerState.init:
-        runTimer(_activeTimer);
+        runTimer(_data.activeTimer);
         break;
       case TimerWidgetTimerState.running:
         pause();
-        _activeTimer = (_activeTimer + 1) % data.currentTimes.length;
-        runTimer(_activeTimer);
+        _data.activeTimer = (_data.activeTimer + 1) % _data.currentTimes.length;
+        runTimer(_data.activeTimer);
         break;
       case TimerWidgetTimerState.paused:
-        if (data.currentTimes.reduce(min) <= 0 && !_data.countNegative) {
+        if (_data.currentTimes.reduce(min) <= 0 && !_data.countNegative) {
           reset();
         } else {
-          runTimer(_activeTimer);
+          runTimer(_data.activeTimer);
         }
         break;
     }
@@ -182,7 +182,7 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
           setData: (data) {
             setState(() {
               _data = data;
-              data.currentTimes = List.from(_data.initialTimes);
+              _data.currentTimes = List.from(_data.initialTimes);
               _currentState = TimerWidgetTimerState.init;
               _countdownTimer = null;
             });
@@ -221,13 +221,13 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
                   ),
                   for (int i = 0; i < data.currentTimes.length; i++) ...[
                     Transform.scale(
-                      scale: i == _activeTimer ? 1.1 : 0.8,
+                      scale: i == _data.activeTimer ? 1.1 : 0.8,
                       child: Text(
-                        formatTime(data.currentTimes[i]),
+                        formatTime(_data.currentTimes[i]),
                         style: getStyle(i),
                       ),
                     ),
-                    if (i + 1 < data.currentTimes.length)
+                    if (i + 1 < _data.currentTimes.length)
                       FontSpacer(
                           text: getPartString(
                               formatTime(_data.initialTimes.reduce(max).abs())),
@@ -279,7 +279,7 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
                 semanticLabel: "Start the timer",
               ),
             if (_currentState == TimerWidgetTimerState.init &&
-                !const ListEquality().equals(data.currentTimes, data.initialTimes))
+                !const ListEquality().equals(_data.currentTimes, _data.initialTimes))
               _themedIconButton(Icons.replay,
                   onPressed: reset,
                   context: context,
@@ -292,13 +292,13 @@ class ChessTimerWidgetState extends State<ChessTimerWidget>
                 semanticLabel: "Pause the timer",
               ),
             if (_currentState == TimerWidgetTimerState.paused
-                && data.currentTimes.reduce(min) <= 0 && !_data.countNegative)
+                && _data.currentTimes.reduce(min) <= 0 && !_data.countNegative)
               _themedIconButton(Icons.replay,
                   onPressed: reset,
                   context: context,
                   semanticLabel: "Reset the timer"),
             if (_currentState == TimerWidgetTimerState.paused
-                && !(data.currentTimes.reduce(min) <= 0 && !_data.countNegative)) ...[
+                && !(_data.currentTimes.reduce(min) <= 0 && !_data.countNegative)) ...[
               _themedIconButton(
                 Icons.play_arrow,
                 onPressed: run,

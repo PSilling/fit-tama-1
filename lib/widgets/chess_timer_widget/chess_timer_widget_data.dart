@@ -8,6 +8,7 @@ class ChessTimerWidgetData {
   List<int> initialTimes;
   bool countNegative;
   List<int> currentTimes;
+  int activeTimer;
 
   bool get isTogether =>
       initialTimes.fold(true, (prev, elem) => prev && elem == initialTimes[0]);
@@ -20,6 +21,7 @@ class ChessTimerWidgetData {
     required this.initialTimes,
     required this.currentTimes,
     this.countNegative = true,
+    this.activeTimer = 0,
   });
 
   ChessTimerWidgetData.fromJson(Map<String, dynamic> json)
@@ -31,7 +33,8 @@ class ChessTimerWidgetData {
         countNegative = json['countNegative'] == 1,
         currentTimes = json['currentTimes'] == null
           ? List<int>.from(jsonDecode(json['initialTimes']))
-          : List<int>.from(jsonDecode(json['currentTimes']));
+          : List<int>.from(jsonDecode(json['currentTimes'])),
+        activeTimer = json['activeTimer'] ?? 0;
 
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -39,5 +42,6 @@ class ChessTimerWidgetData {
         'initialTime': jsonEncode(initialTimes),
         'countNegative': countNegative ? 1 : 0,
         'currentTimes': jsonEncode(currentTimes),
+        'activeTimer': activeTimer,
       };
 }

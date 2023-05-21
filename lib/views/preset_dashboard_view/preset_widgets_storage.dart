@@ -57,7 +57,7 @@ class PresetWidgetsStorage
         isUneven: false,
         scale: List<int>.generate(10, (i) => i + 1),
         defaultIndex: 4,
-        currentIndex: ValueNotifier<int>(4),
+        currentIndex: 4,
         isLeftDeath: false,
         isRightDeath: false)),
     'dice': jsonEncode(

@@ -10,7 +10,7 @@ class CounterWidgetData {
   int defaultIndex;
   bool isLeftDeath;
   bool isRightDeath;
-  ValueNotifier<int> currentIndex;
+  int currentIndex;
 
   CounterWidgetData(
       {required this.name,
@@ -32,7 +32,7 @@ class CounterWidgetData {
         defaultIndex = json['defaultIndex'],
         isLeftDeath = json['isLeftDeath'] == 1,
         isRightDeath = json['isRightDeath'] == 1,
-        currentIndex = ValueNotifier<int>( json['currentIndex'] ?? json['defaultIndex']);
+        currentIndex = json['currentIndex'] ?? json['defaultIndex'];
 
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -42,6 +42,6 @@ class CounterWidgetData {
         'defaultIndex': defaultIndex,
         'isLeftDeath': isLeftDeath ? 1 : 0,
         'isRightDeath': isRightDeath ? 1 : 0,
-        'currentIndex': currentIndex.value
+        'currentIndex': currentIndex
       };
 }

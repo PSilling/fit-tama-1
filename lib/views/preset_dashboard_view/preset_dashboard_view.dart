@@ -30,7 +30,7 @@ class PresetDashboardView extends StatefulWidget {
   State<PresetDashboardView> createState() => _PresetDashboardViewState();
 }
 
-class _PresetDashboardViewState extends State<PresetDashboardView> {
+class _PresetDashboardViewState extends State<PresetDashboardView> with WidgetsBindingObserver {
   ///
   final ScrollController scrollController = ScrollController();
 
@@ -54,6 +54,28 @@ class _PresetDashboardViewState extends State<PresetDashboardView> {
     textFocusNode = FocusNode();
     nameEdit = widget.preset.name;
     editVisible = widget.startOnEdit;
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state){
+      case AppLifecycleState.paused:
+        storage.onItemsUpdated([], slot!);
+        break;
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.detached:
+        break;
+      case AppLifecycleState.resumed:
+        break;
+    }
+  }
+
+  @override
+  void dispose(){
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void setSlot() {

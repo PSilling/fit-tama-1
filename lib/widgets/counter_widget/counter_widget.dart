@@ -62,20 +62,20 @@ class CounterWidgetState extends State<CounterWidget>
 
   void increaseIndex() {
     setState(() {
-      final newIndex = data.currentIndex.value + 1;
+      final newIndex = _data.currentIndex + 1;
       final deathModifier = _data.isRightDeath ? 1 : 0;
       if (newIndex < _data.scale.length + deathModifier) {
-        data.currentIndex.value = newIndex;
+        _data.currentIndex = newIndex;
       }
     });
   }
 
   void decreaseIndex() {
     setState(() {
-      final newIndex = data.currentIndex.value - 1;
+      final newIndex = _data.currentIndex - 1;
       final deathModifier = _data.isLeftDeath ? 1 : 0;
       if (newIndex >= 0 - deathModifier) {
-        data.currentIndex.value = newIndex;
+        _data.currentIndex = newIndex;
       }
     });
   }
@@ -83,11 +83,11 @@ class CounterWidgetState extends State<CounterWidget>
   void increaseIndexBy(int num) {
     setState(() {
       final deathModifier = _data.isRightDeath ? 1 : 0;
-      final newIndex = data.currentIndex.value + num < _data.scale.length + deathModifier
-          ? data.currentIndex.value + num
+      final newIndex = _data.currentIndex + num < _data.scale.length + deathModifier
+          ? _data.currentIndex + num
           : _data.scale.length - 1;
       if (newIndex < _data.scale.length + deathModifier) {
-        data.currentIndex.value = newIndex;
+        _data.currentIndex = newIndex;
       }
     });
   }
@@ -95,24 +95,24 @@ class CounterWidgetState extends State<CounterWidget>
   void decreaseIndexBy(int num) {
     setState(() {
       final deathModifier = _data.isLeftDeath ? 1 : 0;
-      final newIndex = data.currentIndex.value - num >= 0 - deathModifier
-          ? data.currentIndex.value - num
+      final newIndex = _data.currentIndex - num >= 0 - deathModifier
+          ? _data.currentIndex - num
           : 0 - deathModifier;
       if (newIndex >= 0 - deathModifier) {
-        data.currentIndex.value = newIndex;
+        _data.currentIndex = newIndex;
       }
     });
   }
 
   void setIndex(int index) {
     setState(() {
-      data.currentIndex.value = index;
+      data.currentIndex = index;
     });
   }
 
   void resetIndex() {
     setState(() {
-      data.currentIndex.value = _data.defaultIndex;
+      data.currentIndex = _data.defaultIndex;
     });
   }
 
@@ -190,7 +190,7 @@ class CounterWidgetState extends State<CounterWidget>
       context: context,
       builder: (context) => CounterScaleDialog(
         scaleLength: _data.scale.length,
-        currentIndex: data.currentIndex.value,
+        currentIndex: _data.currentIndex,
         defaultIndex: _data.defaultIndex,
         isLeftDeath: _data.isLeftDeath,
         isRightDeath: _data.isRightDeath,
@@ -209,7 +209,7 @@ class CounterWidgetState extends State<CounterWidget>
           setData: (data) {
             setState(() {
               _data = data;
-              data.currentIndex.value = data.defaultIndex;
+              data.currentIndex = data.defaultIndex;
             });
           },
           width: widget.width,
@@ -238,14 +238,14 @@ class CounterWidgetState extends State<CounterWidget>
   }
 
   int _getSpacerWidth(int index) {
-    final center = _data.scale.elementAtOrNull(data.currentIndex.value);
+    final center = _data.scale.elementAtOrNull(data.currentIndex);
     final numberOfDigits = center?.toString().length ??
         [-1, 1]
             .compactMap((element) =>
-                _data.scale.elementAtOrNull(data.currentIndex.value + element))
+                _data.scale.elementAtOrNull(_data.currentIndex + element))
             .map((element) => element.toString().length)
             .reduce(max);
-    final minimum = index == data.currentIndex.value ? 1 : 2;
+    final minimum = index == _data.currentIndex ? 1 : 2;
     return max(numberOfDigits, minimum);
   }
 
@@ -319,7 +319,7 @@ class CounterWidgetState extends State<CounterWidget>
         children: [
           for (var i in sideNumbers.reversed.toList())
             _numberButton(
-              index: data.currentIndex.value - i,
+              index: data.currentIndex - i,
               flex: 4,
               alignment: Alignment.centerRight,
               textStyle: ThemeHelper.widgetContentSecondary(context),
@@ -336,7 +336,7 @@ class CounterWidgetState extends State<CounterWidget>
                   onPanUpdate: _onPanUpdate,
                   onPanCancel: _onPanCancel,
                   child: _fittingNumber(
-                    index: data.currentIndex.value,
+                    index: data.currentIndex,
                     textStyle: ThemeHelper.widgetContentMain(context),
                     alignment: Alignment.center,
                   ),
@@ -346,7 +346,7 @@ class CounterWidgetState extends State<CounterWidget>
           ),
           for (var i in sideNumbers)
             _numberButton(
-              index: data.currentIndex.value + i,
+              index: data.currentIndex + i,
               flex: 4,
               alignment: Alignment.centerLeft,
               textStyle: ThemeHelper.widgetContentSecondary(context),
@@ -369,16 +369,18 @@ class CounterWidgetState extends State<CounterWidget>
         fit: BoxFit.contain,
         child: IgnorePointer(
           ignoring: _isEditing,
-          child: IconButton(
-            iconSize: 1000,
-            onPressed: _showResetIndexConfirmation,
-            icon: _themedIcon(
-              Icons.replay,
-              context: context,
-              semanticLabel: "Reset the counter",
-              style: ThemeHelper.widgetTitleBottom(context),
-            ),
-          ),
+          child: data.currentIndex != data.defaultIndex
+            ? IconButton(
+              iconSize: 1000,
+              onPressed: _showResetIndexConfirmation,
+              icon: _themedIcon(
+                Icons.replay,
+                context: context,
+                semanticLabel: "Reset the counter",
+                style: ThemeHelper.widgetTitleBottom(context),
+              ),
+            )
+            : const Icon(null, size:1000),
         ),
       ),
     );

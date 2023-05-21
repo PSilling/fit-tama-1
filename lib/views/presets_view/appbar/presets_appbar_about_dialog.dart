@@ -17,7 +17,7 @@ class PresetsAppbarAboutDialog extends StatelessWidget {
       child: AboutDialog(
         applicationName: 'Board Aid',
         applicationIcon: const Image(image: AssetImage('assets/icon.png')),
-        applicationVersion: 'Version 1.0.0+1',
+        applicationVersion: 'Version 1.1.0+1',
         applicationLegalese: '© The Board Aid Team',
         children: [
           Padding(
