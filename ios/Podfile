@@ -1,6 +1,9 @@
 # Uncomment this line to define a global platform for your project
 # platform :ios, '11.0'
 
+# fixes issue with pod install (https://stackoverflow.com/a/73278622)
+source 'https://github.com/CocoaPods/Specs.git'
+
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
