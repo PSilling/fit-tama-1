@@ -17,7 +17,9 @@ class PresetsAppbarMoreButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<PresetsAppbarMoreOption>(
       color: ThemeHelper.popUpBackgroundColor(context),
-      icon: const Icon(Icons.more_vert),
+      icon: const Icon(
+          Icons.more_vert,
+          color: Colors.white,),
       tooltip: 'Show menu',
       onSelected: onSelected,
       itemBuilder: (BuildContext context) => [

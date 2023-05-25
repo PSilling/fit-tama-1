@@ -51,7 +51,9 @@ class PresetsAppbarSortButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<PresetsAppbarSortOption>(
       color: ThemeHelper.popUpBackgroundColor(context),
-      icon: const Icon(Icons.sort),
+      icon: const Icon(
+        Icons.sort,
+        color: Colors.white,),
       tooltip: 'Show sort options',
       onSelected: onSelected,
       itemBuilder: (BuildContext context) => [

@@ -17,7 +17,9 @@ class PresetsAppbarSearchInput extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Icon(Icons.search),
+          child: Icon(
+            Icons.search,
+            color: Colors.white,),
         ),
         Expanded(
           child: Padding(

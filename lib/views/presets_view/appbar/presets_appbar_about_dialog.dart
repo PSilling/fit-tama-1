@@ -10,22 +10,22 @@ class PresetsAppbarAboutDialog extends StatelessWidget {
     return Theme(
       data: ThemeData(
         textTheme: Typography.whiteCupertino.apply(
-          bodyColor: Theme.of(context).colorScheme.onSecondary,
-          displayColor: Theme.of(context).colorScheme.onSecondary,
+          bodyColor: Colors.black,
+          displayColor: Theme.of(context).colorScheme.secondary,
         ),
       ),
-      child: AboutDialog(
+      child: const AboutDialog(
         applicationName: 'Board Aid',
-        applicationIcon: const Image(image: AssetImage('assets/icon.png')),
+        applicationIcon: Image(image: AssetImage('assets/icon.png')),
         applicationVersion: 'Version 1.1.0+1',
         applicationLegalese: '© The Board Aid Team',
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 20),
+            padding: EdgeInsets.only(top: 20),
             child: Text(
               'Board Aid provides customisable presets of widgets that can be '
                   'modified to satisfy all of you board game needs!',
-              style: ThemeHelper.popUpTextStyle(context),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ],
