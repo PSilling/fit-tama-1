@@ -27,3 +27,7 @@ inside `pubspec.yaml` are necessary to compile the application.
 ## Usage
 
 For more details about Board Aid and its usage, see the documentation in `doc/`.
+
+## Support
+
+To report any potential issues please navigate to the `Issues` tab and submit them there.
