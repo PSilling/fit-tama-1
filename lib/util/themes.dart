@@ -376,10 +376,6 @@ class ThemeHelper {
       child: Text(label),
     );
   }
-
-  static getTheme(context){
-    return Theme.of(context);
-  }
 }
 
 const ColorScheme darkColorScheme = ColorScheme(
@@ -426,8 +422,8 @@ const ColorScheme lightColorScheme = ColorScheme(
   brightness: Brightness.light,
   primary: Color(0xFF5865F2),
   onPrimary: Colors.white,
-  secondary: Colors.white, // Color(0xFF2F3136),
-  onSecondary: Colors.black, // Colors.white
+  secondary: Color(0xFF2F3136),
+  onSecondary: Colors.white,
   tertiary: Color(0xFF4F545C),
   onTertiary: Colors.white,
   error: Color(0xFFD83C3E),
